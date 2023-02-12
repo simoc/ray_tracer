@@ -67,6 +67,11 @@ pub fn normalize(v: Tuple) -> Tuple
     Tuple{x: v.x / m, y: v.y / m, z: v.z / m, w: v.w / m}
 }
 
+pub fn dot_product(a: Tuple, b: Tuple) -> f64
+{
+	a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
+}
+
 pub fn fuzzy_equal(a: f64, b: f64) -> bool
 {
 	let epsilon = 0.00001;
@@ -192,5 +197,10 @@ mod tests
         // p.10 Scenario: The magnitude of a normalized vector
 		let m6 = magnitude(no3);
         assert!(fuzzy_equal(m6, 1.0));
+
+        // p.10 Scenario: The dot product of two tuples
+		let dp1 = dot_product(create_vector(1.0, 2.0, 3.0),
+			create_vector(2.0, 3.0, 4.0));
+        assert!(fuzzy_equal(dp1, 20.0));
     }
 }
