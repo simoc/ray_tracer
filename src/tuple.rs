@@ -44,6 +44,16 @@ pub fn negate(a: Tuple) -> Tuple
     Tuple{x: -a.x, y: -a.y, z: -a.z, w: -a.w}
 }
 
+pub fn multiply(a: Tuple, scalar: f64) -> Tuple
+{
+    Tuple{x: a.x * scalar, y: a.y * scalar, z: a.z * scalar, w: a.w * scalar}
+}
+
+pub fn divide(a: Tuple, scalar: f64) -> Tuple
+{
+    Tuple{x: a.x / scalar, y: a.y / scalar, z: a.z / scalar, w: a.w / scalar}
+}
+
 pub fn fuzzy_equal(a: f64, b: f64) -> bool
 {
 	let epsilon = 0.00001;
@@ -120,5 +130,20 @@ mod tests
         let n1 = negate(create_tuple(1.0, -2.0, 3.0, -4.0));
 		let n2 = create_tuple(-1.0, 2.0, -3.0, 4.0);
         assert!(equal(n1, n2));
+
+        // p.8 Scenario: Multiplying a tuple by a scalar
+        let m1 = multiply(create_tuple(1.0, -2.0, 3.0, -4.0), 3.5);
+        let m2 = create_tuple(3.5, -7.0, 10.5, -14.0);
+        assert!(equal(m1, m2));
+
+        // p.8 Scenario: Multiplying a tuple by a fraction
+        let m3 = multiply(create_tuple(1.0, -2.0, 3.0, -4.0), 0.5);
+        let m4 = create_tuple(0.5, -1.0, 1.5, -2.0);
+        assert!(equal(m3, m4));
+
+        // p.8 Scenario: Dividing a tuple by a scalar
+        let d1 = divide(create_tuple(1.0, -2.0, 3.0, -4.0), 2.0);
+        let d2 = create_tuple(0.5, -1.0, 1.5, -2.0);
+        assert!(equal(d1, d2));
     }
 }
