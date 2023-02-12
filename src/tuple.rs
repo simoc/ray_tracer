@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Copy, Clone)]
 pub struct Tuple
 {
@@ -13,6 +15,14 @@ impl Tuple
     {
         vec![self.x, self.y, self.z, self.w]
     }
+}
+
+impl fmt::Display for Tuple
+{
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
+	{
+		write!(f, "({}, {}, {}, {})", self.x, self.y, self.z, self.w)
+	}
 }
 
 pub fn create_point(x: f64, y: f64, z: f64) -> Tuple
