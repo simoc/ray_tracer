@@ -19,10 +19,10 @@ impl Tuple
 
 impl fmt::Display for Tuple
 {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
-	{
-		write!(f, "({}, {}, {}, {})", self.x, self.y, self.z, self.w)
-	}
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
+    {
+        write!(f, "({}, {}, {}, {})", self.x, self.y, self.z, self.w)
+    }
 }
 
 pub fn create_point(x: f64, y: f64, z: f64) -> Tuple
@@ -78,40 +78,40 @@ pub fn magnitude(v: Tuple) -> f64
 
 pub fn normalize(v: Tuple) -> Tuple
 {
-	let m = magnitude(v);
+    let m = magnitude(v);
     Tuple{x: v.x / m, y: v.y / m, z: v.z / m, w: v.w / m}
 }
 
 pub fn dot_product(a: Tuple, b: Tuple) -> f64
 {
-	a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
+    a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
 }
 
 pub fn cross_product(a: Tuple, b: Tuple) -> Tuple
 {
-	create_vector(a.y * b.z - a.z * b.y,
-		a.z * b.x - a.x * b.z,
-		a.x * b.y - a.y * b.x)
+    create_vector(a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x)
 }
 
 pub fn hadamard_product(a: Tuple, b: Tuple) -> Tuple
 {
-	create_color(a.x * b.x, a.y * b.y, a.z * b.z)
+    create_color(a.x * b.x, a.y * b.y, a.z * b.z)
 }
 
 pub fn fuzzy_equal(a: f64, b: f64) -> bool
 {
-	let epsilon = 0.00001;
-	let diff = a - b;
-	diff.abs() < epsilon
+    let epsilon = 0.00001;
+    let diff = a - b;
+    diff.abs() < epsilon
 }
 
 pub fn equal(a: Tuple, b: Tuple) -> bool
 {
-	fuzzy_equal(a.x, b.x) &&
-		fuzzy_equal(a.y, b.y) &&
-		fuzzy_equal(a.z, b.z) &&
-		fuzzy_equal(a.w, b.w)
+    fuzzy_equal(a.x, b.x) &&
+        fuzzy_equal(a.y, b.y) &&
+        fuzzy_equal(a.z, b.z) &&
+        fuzzy_equal(a.w, b.w)
 }
 
 #[cfg(test)]
@@ -122,7 +122,7 @@ mod tests
     #[test]
     fn test_tuples_feature()
     {
-		// p.4 Scenario: A tuple with w=1 is a point
+        // p.4 Scenario: A tuple with w=1 is a point
         let p1 = create_point(4.3, -4.2, 3.1).get_vec();
         assert_eq!(p1.len(), 4);
         assert!(fuzzy_equal(p1[0], 4.3));
@@ -130,7 +130,7 @@ mod tests
         assert!(fuzzy_equal(p1[2], 3.1));
         assert!(fuzzy_equal(p1[3], 1.0));
 
-		// p.4 Scenario: A tuple with w=0 is a vector
+        // p.4 Scenario: A tuple with w=0 is a vector
         let v1 = create_vector(4.3, -4.2, 3.1).get_vec();
         assert_eq!(v1.len(), 4);
         assert!(fuzzy_equal(v1[0], 4.3));
@@ -138,42 +138,42 @@ mod tests
         assert!(fuzzy_equal(v1[2], 3.1));
         assert!(fuzzy_equal(v1[3], 0.0));
 
-		// p.5 Scenario: Adding two tuples
+        // p.5 Scenario: Adding two tuples
         let a1 = add(create_point(3.0, -2.0, 5.0),
-			create_vector(-2.0, 3.0, 1.0)).get_vec();
+            create_vector(-2.0, 3.0, 1.0)).get_vec();
         assert_eq!(a1.len(), 4);
         assert!(fuzzy_equal(a1[0], 1.0));
         assert!(fuzzy_equal(a1[1], 1.0));
         assert!(fuzzy_equal(a1[2], 6.0));
         assert!(fuzzy_equal(a1[3], 1.0));
 
-		// p.5 Scenario: Subtracting two points
+        // p.5 Scenario: Subtracting two points
         let s1 = sub(create_point(3.0, 2.0, 1.0),
-			create_point(5.0, 6.0, 7.0));
-		let s2 = create_vector(-2.0, -4.0, -6.0);
+            create_point(5.0, 6.0, 7.0));
+        let s2 = create_vector(-2.0, -4.0, -6.0);
         assert!(equal(s1, s2));
 
-		// p.5 Scenario: Subtracting a vector from a point
+        // p.5 Scenario: Subtracting a vector from a point
         let s3 = sub(create_point(3.0, 2.0, 1.0),
-			create_vector(5.0, 6.0, 7.0));
-		let s4 = create_point(-2.0, -4.0, -6.0);
+            create_vector(5.0, 6.0, 7.0));
+        let s4 = create_point(-2.0, -4.0, -6.0);
         assert!(equal(s3, s4));
 
-		// p.7 Scenario: Subtracting two vectors
+        // p.7 Scenario: Subtracting two vectors
         let s5 = sub(create_vector(3.0, 2.0, 1.0),
-			create_vector(5.0, 6.0, 7.0));
-		let s6 = create_vector(-2.0, -4.0, -6.0);
+            create_vector(5.0, 6.0, 7.0));
+        let s6 = create_vector(-2.0, -4.0, -6.0);
         assert!(equal(s5, s6));
 
-		// p.7 Scenario: Subtracting a vector from the zero vector
+        // p.7 Scenario: Subtracting a vector from the zero vector
         let s7 = sub(create_vector(0.0, 0.0, 0.0),
-			create_vector(1.0, -2.0, 3.0));
-		let s8 = create_vector(-1.0, 2.0, -3.0);
+            create_vector(1.0, -2.0, 3.0));
+        let s8 = create_vector(-1.0, 2.0, -3.0);
         assert!(equal(s7, s8));
 
-		// p.7 Scenario: Negating a tuple
+        // p.7 Scenario: Negating a tuple
         let n1 = negate(create_tuple(1.0, -2.0, 3.0, -4.0));
-		let n2 = create_tuple(-1.0, 2.0, -3.0, 4.0);
+        let n2 = create_tuple(-1.0, 2.0, -3.0, 4.0);
         assert!(equal(n1, n2));
 
         // p.8 Scenario: Multiplying a tuple by a scalar
@@ -213,29 +213,29 @@ mod tests
 
         // p.10 Scenario: Normalizing the vector (4, 0, 0) gives (1, 0, 0)
         let no1 = normalize(create_vector(4.0, 0.0, 0.0));
-		let no2 = create_vector(1.0, 0.0, 0.0);
+        let no2 = create_vector(1.0, 0.0, 0.0);
         assert!(equal(no1, no2));
 
         // p.10 Scenario: Normalizing the vector (1, 2, 3)
         let no3 = normalize(create_vector(1.0, 2.0, 3.0));
-		let no4 = create_vector(0.26726, 0.53452, 0.80178);
+        let no4 = create_vector(0.26726, 0.53452, 0.80178);
         assert!(equal(no3, no4));
 
         // p.10 Scenario: The magnitude of a normalized vector
-		let m6 = magnitude(no3);
+        let m6 = magnitude(no3);
         assert!(fuzzy_equal(m6, 1.0));
 
         // p.10 Scenario: The dot product of two tuples
-		let dp1 = dot_product(create_vector(1.0, 2.0, 3.0),
-			create_vector(2.0, 3.0, 4.0));
+        let dp1 = dot_product(create_vector(1.0, 2.0, 3.0),
+            create_vector(2.0, 3.0, 4.0));
         assert!(fuzzy_equal(dp1, 20.0));
 
         // p.11 Scenario: The cross product of two vectors
-		let cp1 = cross_product(create_vector(1.0, 2.0, 3.0),
-			create_vector(2.0, 3.0, 4.0));
+        let cp1 = cross_product(create_vector(1.0, 2.0, 3.0),
+            create_vector(2.0, 3.0, 4.0));
         assert!(equal(cp1, create_vector(-1.0, 2.0, -1.0)));
-		let cp2 = cross_product(create_vector(2.0, 3.0, 4.0),
-			create_vector(1.0, 2.0, 3.0));
+        let cp2 = cross_product(create_vector(2.0, 3.0, 4.0),
+            create_vector(1.0, 2.0, 3.0));
         assert!(equal(cp2, create_vector(1.0, -2.0, 1.0)));
 
         // p.16 Scenario: Colors are (red, green, böue) tuples
@@ -246,25 +246,25 @@ mod tests
 
         // p.17 Scenario: Adding colors
         let c2 = add(create_color(0.9, 0.6, 0.75),
-        	create_color(0.7, 0.1, 0.25));
-		let c3 = create_color(1.6, 0.7, 1.0);
+            create_color(0.7, 0.1, 0.25));
+        let c3 = create_color(1.6, 0.7, 1.0);
         assert!(equal(c2, c3));
 
         // p.17 Scenario: Subtracting colors
         let c4 = sub(create_color(0.9, 0.6, 0.75),
-        	create_color(0.7, 0.1, 0.25));
-		let c5 = create_color(0.2, 0.5, 0.5);
+            create_color(0.7, 0.1, 0.25));
+        let c5 = create_color(0.2, 0.5, 0.5);
         assert!(equal(c4, c5));
 
         // p.17 Scenario: Mutiplying a color by a scalar
-		let c6 = multiply(create_color(0.2, 0.3, 0.4), 2.0);
-		let c7 = create_color(0.4, 0.6, 0.8);
+        let c6 = multiply(create_color(0.2, 0.3, 0.4), 2.0);
+        let c7 = create_color(0.4, 0.6, 0.8);
         assert!(equal(c6, c7));
 
         // p.17 Scenario: Mutiplying colors
         let c8 = hadamard_product(create_color(1.0, 0.2, 0.4),
-			create_color(0.9, 1.0, 0.1));
-		let c9 = create_color(0.9, 0.2, 0.04);
+            create_color(0.9, 1.0, 0.1));
+        let c9 = create_color(0.9, 0.2, 0.04);
         assert!(equal(c8, c9));
     }
 }
