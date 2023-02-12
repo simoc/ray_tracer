@@ -72,6 +72,13 @@ pub fn dot_product(a: Tuple, b: Tuple) -> f64
 	a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
 }
 
+pub fn cross_product(a: Tuple, b: Tuple) -> Tuple
+{
+	create_vector(a.y * b.z - a.z * b.y,
+		a.z * b.x - a.x * b.z,
+		a.x * b.y - a.y * b.x)
+}
+
 pub fn fuzzy_equal(a: f64, b: f64) -> bool
 {
 	let epsilon = 0.00001;
@@ -202,5 +209,13 @@ mod tests
 		let dp1 = dot_product(create_vector(1.0, 2.0, 3.0),
 			create_vector(2.0, 3.0, 4.0));
         assert!(fuzzy_equal(dp1, 20.0));
+
+        // p.11 Scenario: The cross product of two vectors
+		let cp1 = cross_product(create_vector(1.0, 2.0, 3.0),
+			create_vector(2.0, 3.0, 4.0));
+        assert!(equal(cp1, create_vector(-1.0, 2.0, -1.0)));
+		let cp2 = cross_product(create_vector(2.0, 3.0, 4.0),
+			create_vector(1.0, 2.0, 3.0));
+        assert!(equal(cp2, create_vector(1.0, -2.0, 1.0)));
     }
 }
