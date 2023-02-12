@@ -54,6 +54,12 @@ pub fn divide(a: Tuple, scalar: f64) -> Tuple
     Tuple{x: a.x / scalar, y: a.y / scalar, z: a.z / scalar, w: a.w / scalar}
 }
 
+pub fn magnitude(v: Tuple) -> f64
+{
+    let n = (v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w);
+    n.sqrt()
+}
+
 pub fn fuzzy_equal(a: f64, b: f64) -> bool
 {
 	let epsilon = 0.00001;
@@ -145,5 +151,25 @@ mod tests
         let d1 = divide(create_tuple(1.0, -2.0, 3.0, -4.0), 2.0);
         let d2 = create_tuple(0.5, -1.0, 1.5, -2.0);
         assert!(equal(d1, d2));
+
+        // p.8 Scenario: Computing the magnitude of vector(1, 0, 0)
+        let m1 = magnitude(create_vector(1.0, 0.0, 0.0));
+        assert!(fuzzy_equal(m1, 1.0));
+
+        // p.9 Scenario: Computing the magnitude of vector(0, 1, 0)
+        let m2 = magnitude(create_vector(0.0, 1.0, 0.0));
+        assert!(fuzzy_equal(m2, 1.0));
+
+        // p.9 Scenario: Computing the magnitude of vector(0, 0, 1)
+        let m3 = magnitude(create_vector(0.0, 0.0, 1.0));
+        assert!(fuzzy_equal(m3, 1.0));
+
+        // p.9 Scenario: Computing the magnitude of vector(1, 2, 3)
+        let m4 = magnitude(create_vector(1.0, 2.0, 3.0));
+        assert!(fuzzy_equal(m4, 14.0_f64.sqrt()));
+
+        // p.9 Scenario: Computing the magnitude of vector(-1, -2, -3)
+        let m5 = magnitude(create_vector(-1.0, -2.0, -3.0));
+        assert!(fuzzy_equal(m5, 14.0_f64.sqrt()));
     }
 }
