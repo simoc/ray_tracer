@@ -35,6 +35,11 @@ pub fn create_vector(x: f64, y: f64, z: f64) -> Tuple
     Tuple{x: x, y: y, z: z, w: 0.0}
 }
 
+pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
+{
+    Tuple{x: r, y: g, z: b, w: 0.0}
+}
+
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
@@ -87,6 +92,11 @@ pub fn cross_product(a: Tuple, b: Tuple) -> Tuple
 	create_vector(a.y * b.z - a.z * b.y,
 		a.z * b.x - a.x * b.z,
 		a.x * b.y - a.y * b.x)
+}
+
+pub fn hadamard_product(a: Tuple, b: Tuple) -> Tuple
+{
+	create_color(a.x * b.x, a.y * b.y, a.z * b.z)
 }
 
 pub fn fuzzy_equal(a: f64, b: f64) -> bool
@@ -227,5 +237,34 @@ mod tests
 		let cp2 = cross_product(create_vector(2.0, 3.0, 4.0),
 			create_vector(1.0, 2.0, 3.0));
         assert!(equal(cp2, create_vector(1.0, -2.0, 1.0)));
+
+        // p.16 Scenario: Colors are (red, green, böue) tuples
+        let c1 = create_color(-0.5, 0.4, 1.7).get_vec();
+        assert!(fuzzy_equal(c1[0], -0.5));
+        assert!(fuzzy_equal(c1[1], 0.4));
+        assert!(fuzzy_equal(c1[2], 1.7));
+
+        // p.17 Scenario: Adding colors
+        let c2 = add(create_color(0.9, 0.6, 0.75),
+        	create_color(0.7, 0.1, 0.25));
+		let c3 = create_color(1.6, 0.7, 1.0);
+        assert!(equal(c2, c3));
+
+        // p.17 Scenario: Subtracting colors
+        let c4 = sub(create_color(0.9, 0.6, 0.75),
+        	create_color(0.7, 0.1, 0.25));
+		let c5 = create_color(0.2, 0.5, 0.5);
+        assert!(equal(c4, c5));
+
+        // p.17 Scenario: Mutiplying a color by a scalar
+		let c6 = multiply(create_color(0.2, 0.3, 0.4), 2.0);
+		let c7 = create_color(0.4, 0.6, 0.8);
+        assert!(equal(c6, c7));
+
+        // p.17 Scenario: Mutiplying colors
+        let c8 = hadamard_product(create_color(1.0, 0.2, 0.4),
+			create_color(0.9, 1.0, 0.1));
+		let c9 = create_color(0.9, 0.2, 0.04);
+        assert!(equal(c8, c9));
     }
 }
