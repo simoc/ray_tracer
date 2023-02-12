@@ -1,3 +1,4 @@
+#[derive(Copy, Clone)]
 pub struct Tuple
 {
     pub x: f64,
@@ -58,6 +59,12 @@ pub fn magnitude(v: Tuple) -> f64
 {
     let n = (v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w);
     n.sqrt()
+}
+
+pub fn normalize(v: Tuple) -> Tuple
+{
+	let m = magnitude(v);
+    Tuple{x: v.x / m, y: v.y / m, z: v.z / m, w: v.w / m}
 }
 
 pub fn fuzzy_equal(a: f64, b: f64) -> bool
@@ -171,5 +178,19 @@ mod tests
         // p.9 Scenario: Computing the magnitude of vector(-1, -2, -3)
         let m5 = magnitude(create_vector(-1.0, -2.0, -3.0));
         assert!(fuzzy_equal(m5, 14.0_f64.sqrt()));
+
+        // p.10 Scenario: Normalizing the vector (4, 0, 0) gives (1, 0, 0)
+        let no1 = normalize(create_vector(4.0, 0.0, 0.0));
+		let no2 = create_vector(1.0, 0.0, 0.0);
+        assert!(equal(no1, no2));
+
+        // p.10 Scenario: Normalizing the vector (1, 2, 3)
+        let no3 = normalize(create_vector(1.0, 2.0, 3.0));
+		let no4 = create_vector(0.26726, 0.53452, 0.80178);
+        assert!(equal(no3, no4));
+
+        // p.10 Scenario: The magnitude of a normalized vector
+		let m6 = magnitude(no3);
+        assert!(fuzzy_equal(m6, 1.0));
     }
 }
