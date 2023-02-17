@@ -238,7 +238,7 @@ mod tests
             create_vector(1.0, 2.0, 3.0));
         assert!(equal(cp2, create_vector(1.0, -2.0, 1.0)));
 
-        // p.16 Scenario: Colors are (red, green, böue) tuples
+        // p.16 Scenario: Colors are (red, green, blue) tuples
         let c1 = create_color(-0.5, 0.4, 1.7).get_vec();
         assert!(fuzzy_equal(c1[0], -0.5));
         assert!(fuzzy_equal(c1[1], 0.4));
