@@ -9,7 +9,7 @@ pub struct Canvas
 
 impl Canvas
 {
-    pub fn write_pixel(mut self, x : usize, y: usize, c: Tuple)
+    pub fn write_pixel(&mut self, x : usize, y: usize, c: Tuple)
     {
         if x >= self.width || y >= self.height
         {
@@ -18,9 +18,29 @@ impl Canvas
         self.pixels[y][x] = c;
     }
 
-    pub fn pixel_at(self, x : usize, y: usize) -> Tuple
+    pub fn pixel_at(&self, x : usize, y: usize) -> Tuple
     {
         return self.pixels[y][x];
+    }
+
+    pub fn canvas_to_ppm(&self) -> String
+    {
+        let max_value = 255;
+        let mut ppm = format!("P3\n{} {}\n{}\n", self.width, self.height, max_value);
+        for y in 0..self.height
+        {
+            for x in 0..self.width
+            {
+                let v = self.pixel_at(x, y).get_vec();
+                let pixel = format!(" {} {} {}",
+                    v[0] * f64::from(max_value),
+                    v[1] * f64::from(max_value),
+                    v[2] * f64::from(max_value));
+                ppm.push_str(&pixel);
+            }
+            ppm.push_str("\n");
+        }
+        ppm
     }
 }
 
@@ -61,9 +81,17 @@ mod tests
         }
 
         // p.19 Scenario: Writing pixels to a canvas
-        let c2 = create_canvas(10, 20);
+        let mut c2 = create_canvas(10, 20);
         let color_red = create_color(1.0, 0.0, 0.0);
         c2.write_pixel(2, 3, color_red);
         assert!(equal(c2.pixel_at(2, 3), color_red));
+
+        // p.20 Scenario: Constructing the PPM header
+        let c3 = create_canvas(5, 3);
+        let ppm = c3.canvas_to_ppm();
+        let mut lines = ppm.lines();
+        assert_eq!(lines.next(), Some("P3"));
+        assert_eq!(lines.next(), Some("5 3"));
+        assert_eq!(lines.next(), Some("255"));
     }
 }
