@@ -32,24 +32,26 @@ impl Canvas
             let mut line = String::new();
             for x in 0..self.width
             {
-                let v = self.pixel_at(x, y).get_vec();
-                let r = (v[0] * f64::from(max_value)).clamp(0.0, 255.0).round();
-                let g = (v[1] * f64::from(max_value)).clamp(0.0, 255.0).round();
-                let b = (v[2] * f64::from(max_value)).clamp(0.0, 255.0).round();
-                let pixel = format!("{} {} {}", r, g, b);
-                if line.len() + pixel.len() > 70
+                let mut rgb = self.pixel_at(x, y).get_vec();
+                rgb.resize(3, 0.0); // want only RGB components
+                for p1 in rgb
                 {
-                    // Split long lines.
-                    ppm.push_str(&line);
-                    ppm.push_str("\n");
-                    line = String::new();
+                    let p2 = (p1 * f64::from(max_value)).clamp(0.0, 255.0).round();
+                    let p3 = format!("{}", p2);
+                    if line.len() + 1 + p3.len() > 70
+                    {
+                        // Split long lines.
+                        ppm.push_str(&line);
+                        ppm.push_str("\n");
+                        line = String::new();
+                    }
+                    else if line.len() > 0
+                    {
+                        // Need a space between pixel values.
+                        line.push_str(" ");
+                    }
+                    line.push_str(&p3);
                 }
-                else if x > 0
-                {
-                    // Need a space between pixel values.
-                    line.push_str(" ");
-                }
-                line.push_str(&pixel);
             }
             if line.len() > 0
             {
@@ -124,5 +126,29 @@ mod tests
         assert_eq!(lines4.next(), Some("255 0 0 0 0 0 0 0 0 0 0 0 0 0 0"));
         assert_eq!(lines4.next(), Some("0 0 0 0 0 0 0 128 0 0 0 0 0 0 0"));
         assert_eq!(lines4.next(), Some("0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"));
+
+        // p.22 Scenario: Splitting long lines in PPM files
+        let mut c5 = create_canvas(10, 2);
+        for y in 0..c5.height
+        {
+            for x in 0..c5.width
+            {
+                c5.write_pixel(x, y, create_color(1.0, 0.8, 0.6));
+            }
+        }
+        let ppm5 = c5.canvas_to_ppm();
+        let mut lines5 = ppm5.lines();
+        lines5.next();
+        lines5.next();
+        lines5.next();
+        assert_eq!(lines5.next(), Some("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204"));
+        assert_eq!(lines5.next(), Some("153 255 204 153 255 204 153 255 204 153 255 204 153"));
+        assert_eq!(lines5.next(), Some("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204"));
+        assert_eq!(lines5.next(), Some("153 255 204 153 255 204 153 255 204 153 255 204 153"));
+
+        // p.22 Scenario: PPM files are terminated by a newline character
+        let c6 = create_canvas(5, 3);
+        let ppm6 = c6.canvas_to_ppm();
+        assert!(ppm6.ends_with("\n"));
     }
 }
