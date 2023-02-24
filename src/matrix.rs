@@ -59,7 +59,7 @@ pub fn create_matrix(rows: usize, columns: usize, cell_values: &Vec<f64>) -> Mat
     Matrix{rows: rows, columns: columns, cells: cells}
 }
 
-pub fn from(cell_values: &str) -> Matrix
+pub fn matrix_from(cell_values: &str) -> Matrix
 {
     let mut cells = Vec::new();
     let mut columns = 0;
@@ -94,6 +94,26 @@ pub fn equal(a: Matrix, b: Matrix) -> bool
         }
     }
     return true;
+}
+
+pub fn multiply(a: Matrix, b: Matrix) -> Matrix
+{
+    let mut cells = Vec::new();
+    for y in 0..a.rows
+    {
+        let mut row = Vec::new();
+        for x in 0..a.columns
+        {
+            let mut total = 0.0;
+            for i in 0..a.columns
+            {
+                total = total + (a.cells[y][i] * b.cells[i][x]);
+            }
+            row.push(total);
+        }
+        cells.push(row);
+    }
+    Matrix{rows: a.rows, columns: b.columns, cells: cells}
 }
 
 #[cfg(test)]
@@ -151,5 +171,19 @@ mod tests
             4.0, 3.0, 2.0, 1.0];
         let m7 = create_matrix(4, 4, &v7);
         assert!(!equal(m6, m7));
+
+        // p.28 Scenario: Multiplying two matrices
+        let m8 = create_matrix(4, 4, &v4);
+        let v9 = vec![-2.0, 1.0, 2.0, 3.0,
+            3.0, 2.0, 1.0, -1.0,
+            4.0, 3.0, 6.0, 5.0,
+            1.0, 2.0, 7.0, 8.0];
+        let m9 = create_matrix(4, 4, &v9);
+        let m10 = multiply(m8, m9);
+        let m11 = create_matrix(4, 4, &vec![20.0, 22.0, 50.0, 48.0,
+            44.0, 54.0, 114.0, 108.0,
+            40.0, 58.0, 110.0, 102.0,
+            16.0, 26.0, 46.0, 42.0]);
+        assert!(equal(m10, m11));
     }
 }
