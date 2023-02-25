@@ -61,7 +61,7 @@ pub fn create_matrix(rows: usize, columns: usize, cell_values: &Vec<f64>) -> Mat
 
 pub fn matrix_from(cell_values: &str) -> Matrix
 {
-    let mut cells = Vec::new();
+    let cells = Vec::new();
     let mut columns = 0;
     let without_separators = cell_values.replace("|", " ");
     let lines = without_separators.lines();
@@ -79,7 +79,7 @@ pub fn matrix_from(cell_values: &str) -> Matrix
 
 pub fn equal(a: Matrix, b: Matrix) -> bool
 {
-    if (a.rows != b.rows || a.columns != b.columns)
+    if a.rows != b.rows || a.columns != b.columns
     {
         return false;
     }
@@ -87,7 +87,7 @@ pub fn equal(a: Matrix, b: Matrix) -> bool
     {
         for x in 0..a.columns
         {
-            if (!fuzzy_equal(a.cells[y][x], b.cells[y][x]))
+            if !fuzzy_equal(a.cells[y][x], b.cells[y][x])
             {
                 return false;
             }
@@ -114,6 +114,22 @@ pub fn multiply(a: Matrix, b: Matrix) -> Matrix
         cells.push(row);
     }
     Matrix{rows: a.rows, columns: b.columns, cells: cells}
+}
+
+pub fn multiply_tuple(a: Matrix, b: Tuple) -> Tuple
+{
+	let bv = b.get_vec();
+    let mut mv = Vec::new();
+    for y in 0..a.rows
+    {
+        let mut total = 0.0;
+        for x in 0..a.columns
+        {
+            total = total + (a.cells[y][x] * bv[x]);
+        }
+        mv.push(total);
+	}
+	create_tuple(mv[0], mv[1], mv[2], mv[3])
 }
 
 #[cfg(test)]
@@ -185,5 +201,13 @@ mod tests
             40.0, 58.0, 110.0, 102.0,
             16.0, 26.0, 46.0, 42.0]);
         assert!(equal(m10, m11));
+
+        // p.28 Scenario: A matrix multiplied by a tuple
+        let m12 = create_matrix(4, 4, &vec![1.0, 2.0, 3.0, 4.0,
+            2.0, 4.0, 4.0, 2.0,
+			8.0, 6.0, 4.0, 1.0,
+			0.0, 0.0, 0.0, 1.0]);
+        let t13 = multiply_tuple(m12, create_tuple(1.0, 2.0, 3.0, 1.0));
+        assert!(crate::tuple::equal(t13, create_tuple(18.0, 24.0, 33.0, 1.0)));
     }
 }
