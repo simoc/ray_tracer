@@ -59,6 +59,28 @@ pub fn create_matrix(rows: usize, columns: usize, cell_values: &Vec<f64>) -> Mat
     Matrix{rows: rows, columns: columns, cells: cells}
 }
 
+pub fn create_identity_matrix(rows: usize, columns: usize) -> Matrix
+{
+    let mut cells = Vec::new();
+    for y in 0..rows
+    {
+        let mut row = Vec::new();
+        for x in 0..columns
+        {
+			if x == y
+			{
+				row.push(1.0);
+			}
+			else
+			{
+				row.push(0.0);
+			}
+        }
+        cells.push(row);
+    }
+    Matrix{rows: rows, columns: columns, cells: cells}
+}
+
 pub fn matrix_from(cell_values: &str) -> Matrix
 {
     let cells = Vec::new();
@@ -96,7 +118,7 @@ pub fn equal(a: Matrix, b: Matrix) -> bool
     return true;
 }
 
-pub fn multiply(a: Matrix, b: Matrix) -> Matrix
+pub fn multiply(a: &Matrix, b: &Matrix) -> Matrix
 {
     let mut cells = Vec::new();
     for y in 0..a.rows
@@ -195,7 +217,7 @@ mod tests
             4.0, 3.0, 6.0, 5.0,
             1.0, 2.0, 7.0, 8.0];
         let m9 = create_matrix(4, 4, &v9);
-        let m10 = multiply(m8, m9);
+        let m10 = multiply(&m8, &m9);
         let m11 = create_matrix(4, 4, &vec![20.0, 22.0, 50.0, 48.0,
             44.0, 54.0, 114.0, 108.0,
             40.0, 58.0, 110.0, 102.0,
@@ -209,5 +231,13 @@ mod tests
 			0.0, 0.0, 0.0, 1.0]);
         let t13 = multiply_tuple(m12, create_tuple(1.0, 2.0, 3.0, 1.0));
         assert!(crate::tuple::equal(t13, create_tuple(18.0, 24.0, 33.0, 1.0)));
+
+        // p.32 Scenario: Multiplying a matrix by the identity matrix
+        let m14 = create_matrix(4, 4, &vec![0.0, 1.0, 2.0, 4.0,
+            1.0, 2.0, 4.0, 8.0,
+			2.0, 4.0, 8.0, 16.0,
+			4.0, 8.0, 16.0, 32.0]);
+        let m15 = multiply(&m14, &create_identity_matrix(4, 4));
+        assert!(equal(m14, m15));
     }
 }
