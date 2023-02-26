@@ -100,13 +100,13 @@ impl Matrix
 
     pub fn transpose(&self) -> Matrix
     {
-        let mut cells = Vec::with_capacity(self.rows);
-        for y in 0..self.rows
+        let mut cells = Vec::with_capacity(self.columns);
+        for x in 0..self.columns
         {
-            let mut row = Vec::with_capacity(self.columns);
-            for x in 0..self.columns
+            let mut row = Vec::with_capacity(self.rows);
+            for y in 0..self.rows
             {
-                row.push(self.at(x, y));
+                row.push(self.at(y, x));
             }
             cells.push(row);
         }
