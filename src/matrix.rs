@@ -112,6 +112,32 @@ impl Matrix
         }
         Matrix{rows: self.columns, columns: self.rows, cells: cells}
     }
+
+    pub fn determinant(&self) -> f64
+    {
+        (self.at(0, 0) * self.at(1, 1)) - (self.at(0, 1) * self.at(1, 0))
+    }
+
+    pub fn submatrix(&self, omit_row: usize, omit_column: usize) -> Matrix
+    {
+        let mut cells = Vec::with_capacity(self.rows - 1);
+        for y in 0..self.rows
+        {
+            let mut row = Vec::with_capacity(self.columns - 1);
+            for x in 0..self.columns
+            {
+                if y != omit_row && x != omit_column
+                {
+                    row.push(self.at(y, x));
+                }
+            }
+            if row.len() > 0
+            {
+                cells.push(row);
+            }
+        }
+        Matrix{rows: self.rows - 1, columns: self.columns - 1, cells: cells}
+    }
 }
 
 impl fmt::Display for Matrix
@@ -273,5 +299,16 @@ mod tests
 
         // p.33 Scenario: Transposing the identity matrix
         assert_eq!(Matrix::identity(4), Matrix::identity(4).transpose());
+
+        // p.34 Scenario: Calculating the determinant of a 2x2 matrix
+        let d1 = Matrix::new(2, 2, &vec![1.0, 5.0, -3.0, 2.0]).determinant();
+        assert!(fuzzy_equal(d1, 17.0));
+
+        // p.35 Scenario: A submatrix of a 3x3 matrix is a 2x2 matrix
+        let m18 = Matrix::new(3, 3, &vec![1.0, 5.0, 0.0,
+            -3.0, 2.0, 7.0,
+            0.0, 6.0, -3.0]);
+        let m19 = Matrix::new(2, 2, &vec![-3.0, 2.0, 0.0, 6.0]);
+        assert_eq!(m18.submatrix(0, 2), m19);
     }
 }
