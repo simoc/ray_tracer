@@ -269,5 +269,8 @@ mod tests
             9.0, 8.0, 8.0, 0.0,
             3.0, 0.0, 5.0, 5.0,
             0.0, 8.0, 3.0, 8.0]));
+
+        // p.33 Scenario: Transposing the identity matrix
+        assert_eq!(Matrix::identity(4), Matrix::identity(4).transpose());
     }
 }
