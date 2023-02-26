@@ -50,6 +50,28 @@ impl Matrix
 		}
 		create_tuple(mv[0], mv[1], mv[2], mv[3])
 	}
+
+	pub fn identity(dimension: usize) -> Matrix
+	{
+		let mut cells = Vec::new();
+		for y in 0..dimension
+		{
+			let mut row = Vec::new();
+			for x in 0..dimension
+			{
+				if x == y
+				{
+					row.push(1.0);
+				}
+				else
+				{
+					row.push(0.0);
+				}
+			}
+			cells.push(row);
+		}
+		Matrix{rows: dimension, columns: dimension, cells: cells}
+	}
 }
 
 impl fmt::Display for Matrix
@@ -89,28 +111,6 @@ pub fn create_matrix(rows: usize, columns: usize, cell_values: &Vec<f64>) -> Mat
             {
                 row.push(0.0);
             }
-        }
-        cells.push(row);
-    }
-    Matrix{rows: rows, columns: columns, cells: cells}
-}
-
-pub fn create_identity_matrix(rows: usize, columns: usize) -> Matrix
-{
-    let mut cells = Vec::new();
-    for y in 0..rows
-    {
-        let mut row = Vec::new();
-        for x in 0..columns
-        {
-			if x == y
-			{
-				row.push(1.0);
-			}
-			else
-			{
-				row.push(0.0);
-			}
         }
         cells.push(row);
     }
@@ -237,7 +237,7 @@ mod tests
             1.0, 2.0, 4.0, 8.0,
 			2.0, 4.0, 8.0, 16.0,
 			4.0, 8.0, 16.0, 32.0]);
-        let m15 = m14.multiply(&create_identity_matrix(4, 4));
+        let m15 = m14.multiply(&Matrix::identity(4));
         assert!(equal(m14, m15));
     }
 }
