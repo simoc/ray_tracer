@@ -14,6 +14,26 @@ impl Matrix
     {
         self.cells[y][x]
     }
+
+	pub fn multiply(&self, b: &Matrix) -> Matrix
+	{
+		let mut cells = Vec::new();
+		for y in 0..self.rows
+		{
+			let mut row = Vec::new();
+			for x in 0..self.columns
+			{
+				let mut total = 0.0;
+				for i in 0..self.columns
+				{
+					total = total + (self.cells[y][i] * b.cells[i][x]);
+				}
+				row.push(total);
+			}
+			cells.push(row);
+		}
+		Matrix{rows: self.rows, columns: b.columns, cells: cells}
+	}
 }
 
 impl fmt::Display for Matrix
@@ -118,26 +138,6 @@ pub fn equal(a: Matrix, b: Matrix) -> bool
     return true;
 }
 
-pub fn multiply(a: &Matrix, b: &Matrix) -> Matrix
-{
-    let mut cells = Vec::new();
-    for y in 0..a.rows
-    {
-        let mut row = Vec::new();
-        for x in 0..a.columns
-        {
-            let mut total = 0.0;
-            for i in 0..a.columns
-            {
-                total = total + (a.cells[y][i] * b.cells[i][x]);
-            }
-            row.push(total);
-        }
-        cells.push(row);
-    }
-    Matrix{rows: a.rows, columns: b.columns, cells: cells}
-}
-
 pub fn multiply_tuple(a: Matrix, b: Tuple) -> Tuple
 {
 	let bv = b.get_vec();
@@ -217,7 +217,7 @@ mod tests
             4.0, 3.0, 6.0, 5.0,
             1.0, 2.0, 7.0, 8.0];
         let m9 = create_matrix(4, 4, &v9);
-        let m10 = multiply(&m8, &m9);
+        let m10 = m8.multiply(&m9);
         let m11 = create_matrix(4, 4, &vec![20.0, 22.0, 50.0, 48.0,
             44.0, 54.0, 114.0, 108.0,
             40.0, 58.0, 110.0, 102.0,
@@ -237,7 +237,7 @@ mod tests
             1.0, 2.0, 4.0, 8.0,
 			2.0, 4.0, 8.0, 16.0,
 			4.0, 8.0, 16.0, 32.0]);
-        let m15 = multiply(&m14, &create_identity_matrix(4, 4));
+        let m15 = m14.multiply(&create_identity_matrix(4, 4));
         assert!(equal(m14, m15));
     }
 }
