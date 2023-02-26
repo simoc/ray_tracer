@@ -73,6 +73,21 @@ impl Matrix
 		}
 		Matrix{rows: dimension, columns: dimension, cells: cells}
 	}
+
+	pub fn transpose(&self) -> Matrix
+	{
+		let mut cells = Vec::new();
+		for y in 0..self.rows
+		{
+			let mut row = Vec::new();
+			for x in 0..self.columns
+			{
+				row.push(self.at(x, y));
+			}
+			cells.push(row);
+		}
+		Matrix{rows: self.columns, columns: self.rows, cells: cells}
+	}
 }
 
 impl fmt::Display for Matrix
@@ -243,5 +258,16 @@ mod tests
 			4.0, 8.0, 16.0, 32.0]);
         let m15 = m14.multiply(&Matrix::identity(4));
         assert_eq!(m14, m15);
+
+        // p.33 Scenario: Transposing a matrix
+        let m16 = create_matrix(4, 4, &vec![0.0, 9.0, 3.0, 0.0,
+            9.0, 8.0, 0.0, 8.0,
+			1.0, 8.0, 5.0, 3.0,
+			0.0, 0.0, 5.0, 8.0]);
+        let m17 = m16.transpose();
+        assert_eq!(m17, create_matrix(4, 4, &vec![0.0, 9.0, 1.0, 0.0,
+			9.0, 8.0, 8.0, 0.0,
+			3.0, 0.0, 5.0, 5.0,
+			0.0, 8.0, 3.0, 8.0]));
     }
 }
