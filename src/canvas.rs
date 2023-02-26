@@ -9,6 +9,22 @@ pub struct Canvas
 
 impl Canvas
 {
+	pub fn new(width: usize, height: usize) -> Self
+	{
+		let color_black = create_color(0.0, 0.0, 0.0);
+		let mut pixels = Vec::with_capacity(height);
+		for _ in 0..height
+		{
+			let mut row = Vec::with_capacity(width);
+			for _ in 0..width
+			{
+				row.push(color_black);
+			}
+			pixels.push(row);
+		}
+		Canvas{width: width, height: height, pixels: pixels}
+	}
+
     pub fn write_pixel(&mut self, x : usize, y: usize, c: Tuple)
     {
         if x >= self.width || y >= self.height
@@ -63,22 +79,6 @@ impl Canvas
     }
 }
 
-pub fn create_canvas(width: usize, height: usize) -> Canvas
-{
-    let color_black = create_color(0.0, 0.0, 0.0);
-    let mut pixels = Vec::with_capacity(height);
-    for _ in 0..height
-    {
-        let mut row = Vec::with_capacity(width);
-        for _ in 0..width
-        {
-            row.push(color_black);
-        }
-        pixels.push(row);
-    }
-    Canvas{width: width, height: height, pixels: pixels}
-}
-
 #[cfg(test)]
 mod tests
 {
@@ -88,7 +88,7 @@ mod tests
     fn test_canvas_feature()
     {
         // p.19 Scenario: Creating a canvas
-        let c1 = create_canvas(10, 20);
+        let c1 = Canvas::new(10, 20);
         assert_eq!(c1.width, 10);
         assert_eq!(c1.height, 20);
         for y in 0..c1.height
@@ -100,13 +100,13 @@ mod tests
         }
 
         // p.19 Scenario: Writing pixels to a canvas
-        let mut c2 = create_canvas(10, 20);
+        let mut c2 = Canvas::new(10, 20);
         let color_red = create_color(1.0, 0.0, 0.0);
         c2.write_pixel(2, 3, color_red);
         assert!(equal(c2.pixel_at(2, 3), color_red));
 
         // p.20 Scenario: Constructing the PPM header
-        let c3 = create_canvas(5, 3);
+        let c3 = Canvas::new(5, 3);
         let ppm3 = c3.canvas_to_ppm();
         let mut lines3 = ppm3.lines();
         assert_eq!(lines3.next(), Some("P3"));
@@ -114,7 +114,7 @@ mod tests
         assert_eq!(lines3.next(), Some("255"));
 
         // p.21 Scenario: Constructing the pixel data
-        let mut c4 = create_canvas(5, 3);
+        let mut c4 = Canvas::new(5, 3);
         c4.write_pixel(0, 0, create_color(1.5, 0.0, 0.0));
         c4.write_pixel(2, 1, create_color(0.0, 0.5, 0.0));
         c4.write_pixel(4, 2, create_color(-0.5, 0.0, 1.0));
@@ -128,7 +128,7 @@ mod tests
         assert_eq!(lines4.next(), Some("0 0 0 0 0 0 0 0 0 0 0 0 0 0 255"));
 
         // p.22 Scenario: Splitting long lines in PPM files
-        let mut c5 = create_canvas(10, 2);
+        let mut c5 = Canvas::new(10, 2);
         for y in 0..c5.height
         {
             for x in 0..c5.width
@@ -147,7 +147,7 @@ mod tests
         assert_eq!(lines5.next(), Some("153 255 204 153 255 204 153 255 204 153 255 204 153"));
 
         // p.22 Scenario: PPM files are terminated by a newline character
-        let c6 = create_canvas(5, 3);
+        let c6 = Canvas::new(5, 3);
         let ppm6 = c6.canvas_to_ppm();
         assert!(ppm6.ends_with("\n"));
     }
