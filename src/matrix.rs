@@ -1,6 +1,7 @@
 use std::fmt;
 use crate::tuple::*;
 
+#[derive(Debug)]
 pub struct Matrix
 {
     pub rows: usize,
@@ -93,6 +94,28 @@ impl fmt::Display for Matrix
     }
 }
 
+impl PartialEq for Matrix
+{
+	fn eq(&self, other: &Self) -> bool
+	{
+		if self.rows != other.rows || self.columns != other.columns
+		{
+			return false;
+		}
+		for y in 0..self.rows
+		{
+			for x in 0..self.columns
+			{
+				if !fuzzy_equal(self.cells[y][x], other.cells[y][x])
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+}
+
 pub fn create_matrix(rows: usize, columns: usize, cell_values: &Vec<f64>) -> Matrix
 {
     let mut cell_index = 0;
@@ -133,25 +156,6 @@ pub fn matrix_from(cell_values: &str) -> Matrix
         columns = row.len();
     }
     Matrix{rows: cells.len(), columns: columns, cells: cells}
-}
-
-pub fn equal(a: Matrix, b: Matrix) -> bool
-{
-    if a.rows != b.rows || a.columns != b.columns
-    {
-        return false;
-    }
-    for y in 0..a.rows
-    {
-        for x in 0..a.columns
-        {
-            if !fuzzy_equal(a.cells[y][x], b.cells[y][x])
-            {
-                return false;
-            }
-        }
-    }
-    return true;
 }
 
 #[cfg(test)]
@@ -199,7 +203,7 @@ mod tests
             5.0, 4.0, 3.0, 2.0];
         let m4 = create_matrix(4, 4, &v4);
         let m5 = create_matrix(4, 4, &v4);
-        assert!(equal(m4, m5));
+        assert_eq!(m4, m5);
 
         // p.27 Scenario: Matrix equality with different matrices
         let m6 = create_matrix(4, 4, &v4);
@@ -208,7 +212,7 @@ mod tests
             8.0, 7.0, 6.0, 5.0,
             4.0, 3.0, 2.0, 1.0];
         let m7 = create_matrix(4, 4, &v7);
-        assert!(!equal(m6, m7));
+        assert_ne!(m6, m7);
 
         // p.28 Scenario: Multiplying two matrices
         let m8 = create_matrix(4, 4, &v4);
@@ -222,7 +226,7 @@ mod tests
             44.0, 54.0, 114.0, 108.0,
             40.0, 58.0, 110.0, 102.0,
             16.0, 26.0, 46.0, 42.0]);
-        assert!(equal(m10, m11));
+        assert_eq!(m10, m11);
 
         // p.28 Scenario: A matrix multiplied by a tuple
         let m12 = create_matrix(4, 4, &vec![1.0, 2.0, 3.0, 4.0,
@@ -238,6 +242,6 @@ mod tests
 			2.0, 4.0, 8.0, 16.0,
 			4.0, 8.0, 16.0, 32.0]);
         let m15 = m14.multiply(&Matrix::identity(4));
-        assert!(equal(m14, m15));
+        assert_eq!(m14, m15);
     }
 }
