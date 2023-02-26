@@ -34,6 +34,22 @@ impl Matrix
 		}
 		Matrix{rows: self.rows, columns: b.columns, cells: cells}
 	}
+
+	pub fn multiply_tuple(&self, b: Tuple) -> Tuple
+	{
+		let bv = b.get_vec();
+		let mut mv = Vec::new();
+		for y in 0..self.rows
+		{
+			let mut total = 0.0;
+			for x in 0..self.columns
+			{
+				total = total + (self.cells[y][x] * bv[x]);
+			}
+			mv.push(total);
+		}
+		create_tuple(mv[0], mv[1], mv[2], mv[3])
+	}
 }
 
 impl fmt::Display for Matrix
@@ -138,22 +154,6 @@ pub fn equal(a: Matrix, b: Matrix) -> bool
     return true;
 }
 
-pub fn multiply_tuple(a: Matrix, b: Tuple) -> Tuple
-{
-	let bv = b.get_vec();
-    let mut mv = Vec::new();
-    for y in 0..a.rows
-    {
-        let mut total = 0.0;
-        for x in 0..a.columns
-        {
-            total = total + (a.cells[y][x] * bv[x]);
-        }
-        mv.push(total);
-	}
-	create_tuple(mv[0], mv[1], mv[2], mv[3])
-}
-
 #[cfg(test)]
 mod tests
 {
@@ -229,7 +229,7 @@ mod tests
             2.0, 4.0, 4.0, 2.0,
 			8.0, 6.0, 4.0, 1.0,
 			0.0, 0.0, 0.0, 1.0]);
-        let t13 = multiply_tuple(m12, create_tuple(1.0, 2.0, 3.0, 1.0));
+        let t13 = m12.multiply_tuple(create_tuple(1.0, 2.0, 3.0, 1.0));
         assert!(crate::tuple::equal(t13, create_tuple(18.0, 24.0, 33.0, 1.0)));
 
         // p.32 Scenario: Multiplying a matrix by the identity matrix
