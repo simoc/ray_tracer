@@ -39,7 +39,7 @@ impl Canvas
         return self.pixels[y][x];
     }
 
-    pub fn canvas_to_ppm(&self) -> String
+    pub fn to_ppm(&self) -> String
     {
         let max_value = 255;
         let mut ppm = format!("P3\n{} {}\n{}\n", self.width, self.height, max_value);
@@ -107,7 +107,7 @@ mod tests
 
         // p.20 Scenario: Constructing the PPM header
         let c3 = Canvas::new(5, 3);
-        let ppm3 = c3.canvas_to_ppm();
+        let ppm3 = c3.to_ppm();
         let mut lines3 = ppm3.lines();
         assert_eq!(lines3.next(), Some("P3"));
         assert_eq!(lines3.next(), Some("5 3"));
@@ -118,7 +118,7 @@ mod tests
         c4.write_pixel(0, 0, create_color(1.5, 0.0, 0.0));
         c4.write_pixel(2, 1, create_color(0.0, 0.5, 0.0));
         c4.write_pixel(4, 2, create_color(-0.5, 0.0, 1.0));
-        let ppm4 = c4.canvas_to_ppm();
+        let ppm4 = c4.to_ppm();
         let mut lines4 = ppm4.lines();
         lines4.next();
         lines4.next();
@@ -136,7 +136,7 @@ mod tests
                 c5.write_pixel(x, y, create_color(1.0, 0.8, 0.6));
             }
         }
-        let ppm5 = c5.canvas_to_ppm();
+        let ppm5 = c5.to_ppm();
         let mut lines5 = ppm5.lines();
         lines5.next();
         lines5.next();
@@ -148,7 +148,7 @@ mod tests
 
         // p.22 Scenario: PPM files are terminated by a newline character
         let c6 = Canvas::new(5, 3);
-        let ppm6 = c6.canvas_to_ppm();
+        let ppm6 = c6.to_ppm();
         assert!(ppm6.ends_with("\n"));
     }
 }
