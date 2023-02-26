@@ -157,8 +157,8 @@ impl PartialEq for Matrix
 
 pub fn matrix_from(cell_values: &str) -> Matrix
 {
-    let cells = Vec::new();
     let mut columns = 0;
+    let mut cells = Vec::new();
     let without_separators = cell_values.replace("|", " ");
     let lines = without_separators.lines();
     for line in lines
@@ -169,6 +169,7 @@ pub fn matrix_from(cell_values: &str) -> Matrix
             row.push(n.parse::<f64>().unwrap());
         }
         columns = row.len();
+        cells.push(row);
     }
     Matrix{rows: cells.len(), columns: columns, cells: cells}
 }
