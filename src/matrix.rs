@@ -42,10 +42,10 @@ impl Matrix
 
     pub fn multiply(&self, b: &Matrix) -> Matrix
     {
-        let mut cells = Vec::new();
+        let mut cells = Vec::with_capacity(self.rows);
         for y in 0..self.rows
         {
-            let mut row = Vec::new();
+            let mut row = Vec::with_capacity(self.columns);
             for x in 0..self.columns
             {
                 let mut total = 0.0;
@@ -78,10 +78,10 @@ impl Matrix
 
     pub fn identity(dimension: usize) -> Matrix
     {
-        let mut cells = Vec::new();
+        let mut cells = Vec::with_capacity(dimension);
         for y in 0..dimension
         {
-            let mut row = Vec::new();
+            let mut row = Vec::with_capacity(dimension);
             for x in 0..dimension
             {
                 if x == y
@@ -100,10 +100,10 @@ impl Matrix
 
     pub fn transpose(&self) -> Matrix
     {
-        let mut cells = Vec::new();
+        let mut cells = Vec::with_capacity(self.rows);
         for y in 0..self.rows
         {
-            let mut row = Vec::new();
+            let mut row = Vec::with_capacity(self.columns);
             for x in 0..self.columns
             {
                 row.push(self.at(x, y));
