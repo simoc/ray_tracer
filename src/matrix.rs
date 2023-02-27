@@ -167,6 +167,11 @@ impl Matrix
             -minor
         }
     }
+
+    pub fn invertible(&self) -> bool
+    {
+        !fuzzy_equal(self.determinant(), 0.0)
+    }
 }
 
 impl fmt::Display for Matrix
@@ -382,5 +387,19 @@ mod tests
         assert!(fuzzy_equal(m25.cofactor(0, 2), 210.0));
         assert!(fuzzy_equal(m25.cofactor(0, 3), 51.0));
         assert!(fuzzy_equal(m25.determinant(), -4071.0));
+
+        // p.39 Scenario: Testing an invertible matrix for invertibility
+        let m26 = Matrix::new(4, 4, &vec![6.0, 4.0, 4.0, 4.0,
+            5.0, 5.0, 7.0, 6.0,
+            4.0, -9.0, 3.0, -7.0,
+            9.0, 1.0, 7.0, -6.0]);
+        assert!(m26.invertible());
+
+        // p.39 Scenario: Testing an noninvertible matrix for invertibility
+        let m27 = Matrix::new(4, 4, &vec![-4.0, 2.0, -2.0, -3.0,
+            9.0, 6.0, 2.0, 6.0,
+            0.0, -5.0, 1.0, -5.0,
+            0.0, 0.0, 0.0, 0.0]);
+        assert!(!m27.invertible());
     }
 }
