@@ -26,6 +26,7 @@ impl Matrix
             for _ in 0..columns
             {
                 row.push(cell_values[cell_index]);
+                cell_index = cell_index + 1;
             }
             cells.push(row);
         }
@@ -134,6 +135,12 @@ impl Matrix
             }
         }
         Matrix{rows: self.rows - 1, columns: self.columns - 1, cells: cells}
+    }
+
+    pub fn minor(&self, row: usize, column: usize) -> f64
+    {
+        let submatrix = self.submatrix(row, column);
+        submatrix.determinant()
     }
 }
 
@@ -308,7 +315,7 @@ mod tests
         let m19 = Matrix::new(2, 2, &vec![-3.0, 2.0, 0.0, 6.0]);
         assert_eq!(m18.submatrix(0, 2), m19);
 
-        // p.36 Scenario: A submatrix of a 4x4 matrix is a 3x3 matrix
+        // p.35 Scenario: A submatrix of a 4x4 matrix is a 3x3 matrix
         let m20 = Matrix::new(4, 4, &vec![-6.0, 1.0, 1.0, 6.0,
             -8.0, 5.0, 8.0, 6.0,
             -1.0, 0.0, 8.0, 2.0,
@@ -318,5 +325,11 @@ mod tests
             -8.0, 8.0, 6.0,
             -7.0, -1.0, 1.0]);
         assert_eq!(m20.submatrix(2, 1), m21);
+
+        // p.35 Scenario: Calculating a minor of a 3x3 matrix
+        let m22 = Matrix::new(3, 3, &vec![3.0, 5.0, 0.0,
+            2.0, -1.0, 7.0,
+            6.0, -1.0, 5.0]);
+        assert!(fuzzy_equal(m22.minor(1, 0), 25.0));
     }
 }
