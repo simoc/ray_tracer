@@ -310,5 +310,16 @@ mod tests
             0.0, 6.0, -3.0]);
         let m19 = Matrix::new(2, 2, &vec![-3.0, 2.0, 0.0, 6.0]);
         assert_eq!(m18.submatrix(0, 2), m19);
+
+        // p.36 Scenario: A submatrix of a 4x4 matrix is a 3x3 matrix
+        let m20 = Matrix::new(4, 4, &vec![-6.0, 1.0, 1.0, 6.0,
+            -8.0, 5.0, 8.0, 6.0,
+            -1.0, 0.0, 8.0, 2.0,
+            -7.0, 1.0, -1.0, 1.0]);
+        print!("m20 {}", m20);
+        let m21 = Matrix::new(3, 3, &vec![-6.0, 1.0, 6.0,
+            -8.0, 8.0, 6.0,
+            -7.0, -1.0, 1.0]);
+        assert_eq!(m20.submatrix(2, 1), m21);
     }
 }
