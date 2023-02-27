@@ -142,6 +142,19 @@ impl Matrix
         let submatrix = self.submatrix(row, column);
         submatrix.determinant()
     }
+
+    pub fn cofactor(&self, row: usize, column: usize) -> f64
+    {
+        let minor = self.minor(row, column);
+        if ((row + column) % 2) == 0
+        {
+            minor
+        }
+        else
+        {
+            -minor
+        }
+    }
 }
 
 impl fmt::Display for Matrix
@@ -320,7 +333,6 @@ mod tests
             -8.0, 5.0, 8.0, 6.0,
             -1.0, 0.0, 8.0, 2.0,
             -7.0, 1.0, -1.0, 1.0]);
-        print!("m20 {}", m20);
         let m21 = Matrix::new(3, 3, &vec![-6.0, 1.0, 6.0,
             -8.0, 8.0, 6.0,
             -7.0, -1.0, 1.0]);
@@ -331,5 +343,12 @@ mod tests
             2.0, -1.0, 7.0,
             6.0, -1.0, 5.0]);
         assert!(fuzzy_equal(m22.minor(1, 0), 25.0));
+
+        // p.36 Scenario: Calculating a cofactor of a 3x3 matrix
+        let m23 = Matrix::new(3, 3, &vec![3.0, 5.0, 0.0,
+            2.0, -1.0, -7.0,
+            6.0, -1.0, 5.0]);
+        assert!(fuzzy_equal(m23.cofactor(0, 0), -12.0));
+        assert!(fuzzy_equal(m23.cofactor(1, 0), -25.0));
     }
 }
