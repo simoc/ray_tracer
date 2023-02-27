@@ -13,6 +13,11 @@ impl Matrix
 {
     pub fn new(rows: usize, columns: usize, cell_values: &Vec<f64>) -> Self
     {
+        if rows * columns != cell_values.len()
+        {
+            panic!("Wrong number of elements for a {}x{} matrix: {}",
+                rows, columns, cell_values.len());
+        }
         let mut cell_index = 0;
         let mut cells = Vec::with_capacity(rows);
         for _ in 0..rows
@@ -20,15 +25,7 @@ impl Matrix
             let mut row = Vec::with_capacity(columns);
             for _ in 0..columns
             {
-                if cell_index < cell_values.len()
-                {
-                    row.push(cell_values[cell_index]);
-                    cell_index = cell_index + 1;
-                }
-                else
-                {
-                    row.push(0.0);
-                }
+                row.push(cell_values[cell_index]);
             }
             cells.push(row);
         }
