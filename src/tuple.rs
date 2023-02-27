@@ -1,4 +1,5 @@
 use std::fmt;
+use crate::arithmetic::*;
 
 #[derive(Copy, Clone)]
 pub struct Tuple
@@ -97,13 +98,6 @@ pub fn cross_product(a: Tuple, b: Tuple) -> Tuple
 pub fn hadamard_product(a: Tuple, b: Tuple) -> Tuple
 {
     create_color(a.x * b.x, a.y * b.y, a.z * b.z)
-}
-
-pub fn fuzzy_equal(a: f64, b: f64) -> bool
-{
-    let epsilon = 0.00001;
-    let diff = a - b;
-    diff.abs() < epsilon
 }
 
 pub fn equal(a: Tuple, b: Tuple) -> bool

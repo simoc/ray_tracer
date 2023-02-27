@@ -1,5 +1,6 @@
 use std::fmt;
 use crate::tuple::*;
+use crate::arithmetic::*;
 
 #[derive(Debug)]
 pub struct Matrix
