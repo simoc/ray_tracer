@@ -113,7 +113,18 @@ impl Matrix
 
     pub fn determinant(&self) -> f64
     {
-        (self.at(0, 0) * self.at(1, 1)) - (self.at(0, 1) * self.at(1, 0))
+        if self.rows == 2 && self.columns == 2
+        {
+            return (self.at(0, 0) * self.at(1, 1)) - (self.at(0, 1) * self.at(1, 0));
+        }
+        let mut det = 0.0;
+        for x in 0..self.columns
+        {
+            let n = self.at(0, x);
+            let cofactor = self.cofactor(0, x);
+            det = det + (n * cofactor);
+        }
+        det
     }
 
     pub fn submatrix(&self, omit_row: usize, omit_column: usize) -> Matrix
