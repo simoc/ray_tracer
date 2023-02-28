@@ -172,6 +172,26 @@ impl Matrix
     {
         !fuzzy_equal(self.determinant(), 0.0)
     }
+
+    pub fn inverse(&self) -> Matrix
+    {
+        let m_det = self.determinant();
+        if fuzzy_equal(m_det, 0.0)
+        {
+            panic!("Matrix is not invertible");
+        }
+
+        let mut m2 = Matrix::identity(self.rows);
+        for y in 0..self.rows
+        {
+            for x in 0..self.columns
+            {
+                let c = self.cofactor(y, x);
+                m2.cells[x][y] = c / m_det;
+            }
+        }
+        m2
+    }
 }
 
 impl fmt::Display for Matrix
@@ -401,5 +421,22 @@ mod tests
             0.0, -5.0, 1.0, -5.0,
             0.0, 0.0, 0.0, 0.0]);
         assert!(!m27.invertible());
+
+        // p.39 Scenario: Calculating the inverse of a matrix
+        let m28 = Matrix::new(4, 4, &vec![-5.0, 2.0, 6.0, -8.0,
+            1.0, -5.0, 1.0, 8.0,
+            7.0, 7.0, -6.0, -7.0,
+            1.0, -3.0, 7.0, 4.0]);
+        let m29 = m28.inverse();
+        assert!(fuzzy_equal(m28.determinant(), 532.0));
+        assert!(fuzzy_equal(m28.cofactor(2, 3), -160.0));
+        assert!(fuzzy_equal(m29.at(3, 2), -160.0 / 532.0));
+        assert!(fuzzy_equal(m28.cofactor(3, 2), 105.0));
+        assert!(fuzzy_equal(m29.at(2, 3), 105.0 / 532.0));
+        let m30 = Matrix::new(4, 4, &vec![0.21805, 0.45113, 0.24060, -0.04511,
+            -0.80827, -1.45677, -0.44361, 0.52068,
+            -0.07895, -0.22368, -0.05263, 0.19737,
+            -0.52256, -0.81391, -0.30075, 0.30639]);
+        assert_eq!(m29, m30);
     }
 }
