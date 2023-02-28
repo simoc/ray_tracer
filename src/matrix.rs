@@ -421,7 +421,11 @@ mod tests
             0.0, -5.0, 1.0, -5.0,
             0.0, 0.0, 0.0, 0.0]);
         assert!(!m27.invertible());
+    }
 
+    #[test]
+    fn test_matrices_feature_inverse()
+    {
         // p.39 Scenario: Calculating the inverse of a matrix
         let m28 = Matrix::new(4, 4, &vec![-5.0, 2.0, 6.0, -8.0,
             1.0, -5.0, 1.0, 8.0,
@@ -438,5 +442,17 @@ mod tests
             -0.07895, -0.22368, -0.05263, 0.19737,
             -0.52256, -0.81391, -0.30075, 0.30639]);
         assert_eq!(m29, m30);
+
+        // p.41 Scenario: Calculating the inverse of another matrix
+        let m31 = Matrix::new(4, 4, &vec![8.0, -5.0, 9.0, 2.0,
+            7.0, 5.0, 6.0, 1.0,
+            -6.0, 0.0, 9.0, 6.0,
+            -3.0, 0.0, -9.0, -4.0]);
+        let m32 = m31.inverse();
+        let m33 = Matrix::new(4, 4, &vec![-0.15385, -0.15385, -0.28205, -0.53846,
+            -0.07692, 0.12308, 0.02564, 0.03077,
+            0.35897, 0.35897, 0.43590, 0.92308,
+            -0.69231, -0.69231, -0.76923, -1.92308]);
+        assert_eq!(m32, m33);
     }
 }
