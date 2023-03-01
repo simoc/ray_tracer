@@ -309,8 +309,16 @@ mod tests
             4.0, 3.0, 2.0, 1.0];
         let m7 = Matrix::new(4, 4, &v7);
         assert_ne!(m6, m7);
+    }
 
+    #[test]
+    fn test_matrices_feature_multiply()
+    {
         // p.28 Scenario: Multiplying two matrices
+        let v4 = vec![1.0, 2.0, 3.0, 4.0,
+            5.0, 6.0, 7.0, 8.0,
+            9.0, 8.0, 7.0, 6.0,
+            5.0, 4.0, 3.0, 2.0];
         let m8 = Matrix::new(4, 4, &v4);
         let v9 = vec![-2.0, 1.0, 2.0, 3.0,
             3.0, 2.0, 1.0, -1.0,
@@ -339,7 +347,11 @@ mod tests
             4.0, 8.0, 16.0, 32.0]);
         let m15 = m14.multiply(&Matrix::identity(4));
         assert_eq!(m14, m15);
+    }
 
+    #[test]
+    fn test_matrices_feature_transpose()
+    {
         // p.33 Scenario: Transposing a matrix
         let m16 = Matrix::new(4, 4, &vec![0.0, 9.0, 3.0, 0.0,
             9.0, 8.0, 0.0, 8.0,
@@ -353,7 +365,11 @@ mod tests
 
         // p.33 Scenario: Transposing the identity matrix
         assert_eq!(Matrix::identity(4), Matrix::identity(4).transpose());
+    }
 
+    #[test]
+    fn test_matrices_feature_determinant()
+    {
         // p.34 Scenario: Calculating the determinant of a 2x2 matrix
         let d1 = Matrix::new(2, 2, &vec![1.0, 5.0, -3.0, 2.0]).determinant();
         assert!(fuzzy_equal(d1, 17.0));
@@ -407,6 +423,11 @@ mod tests
         assert!(fuzzy_equal(m25.cofactor(0, 2), 210.0));
         assert!(fuzzy_equal(m25.cofactor(0, 3), 51.0));
         assert!(fuzzy_equal(m25.determinant(), -4071.0));
+    }
+
+    #[test]
+    fn test_matrices_feature_invertibility()
+    {
 
         // p.39 Scenario: Testing an invertible matrix for invertibility
         let m26 = Matrix::new(4, 4, &vec![6.0, 4.0, 4.0, 4.0,
