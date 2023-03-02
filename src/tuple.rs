@@ -31,6 +31,11 @@ impl Tuple
     {
         Tuple{x: -self.x, y: -self.y, z: -self.z, w: -self.w}
     }
+
+    pub fn multiply(&self, scalar: f64) -> Tuple
+    {
+        Tuple{x: self.x * scalar, y: self.y * scalar, z: self.z * scalar, w: self.w * scalar}
+    }
 }
 
 impl fmt::Display for Tuple
@@ -59,11 +64,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn multiply(a: Tuple, scalar: f64) -> Tuple
-{
-    Tuple{x: a.x * scalar, y: a.y * scalar, z: a.z * scalar, w: a.w * scalar}
 }
 
 pub fn divide(a: Tuple, scalar: f64) -> Tuple
@@ -171,12 +171,12 @@ mod tests
         assert!(equal(n1, n2));
 
         // p.8 Scenario: Multiplying a tuple by a scalar
-        let m1 = multiply(create_tuple(1.0, -2.0, 3.0, -4.0), 3.5);
+        let m1 = create_tuple(1.0, -2.0, 3.0, -4.0).multiply(3.5);
         let m2 = create_tuple(3.5, -7.0, 10.5, -14.0);
         assert!(equal(m1, m2));
 
         // p.8 Scenario: Multiplying a tuple by a fraction
-        let m3 = multiply(create_tuple(1.0, -2.0, 3.0, -4.0), 0.5);
+        let m3 = create_tuple(1.0, -2.0, 3.0, -4.0).multiply(0.5);
         let m4 = create_tuple(0.5, -1.0, 1.5, -2.0);
         assert!(equal(m3, m4));
 
@@ -251,7 +251,7 @@ mod tests
         assert!(equal(c4, c5));
 
         // p.17 Scenario: Mutiplying a color by a scalar
-        let c6 = multiply(create_color(0.2, 0.3, 0.4), 2.0);
+        let c6 = create_color(0.2, 0.3, 0.4).multiply(2.0);
         let c7 = create_color(0.4, 0.6, 0.8);
         assert!(equal(c6, c7));
 
