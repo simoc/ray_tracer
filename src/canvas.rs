@@ -95,7 +95,7 @@ mod tests
         {
             for x in 0..c1.width
             {
-                assert!(equal(c1.pixel_at(x, y), create_color(0.0, 0.0, 0.0)));
+                assert_eq!(c1.pixel_at(x, y), create_color(0.0, 0.0, 0.0));
             }
         }
 
@@ -103,7 +103,7 @@ mod tests
         let mut c2 = Canvas::new(10, 20);
         let color_red = create_color(1.0, 0.0, 0.0);
         c2.write_pixel(2, 3, color_red);
-        assert!(equal(c2.pixel_at(2, 3), color_red));
+        assert_eq!(c2.pixel_at(2, 3), color_red);
 
         // p.20 Scenario: Constructing the PPM header
         let c3 = Canvas::new(5, 3);

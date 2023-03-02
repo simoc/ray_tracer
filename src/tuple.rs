@@ -1,7 +1,7 @@
 use std::fmt;
 use crate::arithmetic::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Tuple
 {
     x: f64,
@@ -100,12 +100,15 @@ pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
     Tuple{x: x, y: y, z: z, w: w}
 }
 
-pub fn equal(a: Tuple, b: Tuple) -> bool
+impl PartialEq for Tuple
 {
-    fuzzy_equal(a.x, b.x) &&
-        fuzzy_equal(a.y, b.y) &&
-        fuzzy_equal(a.z, b.z) &&
-        fuzzy_equal(a.w, b.w)
+    fn eq(&self, other: &Self) -> bool
+    {
+        fuzzy_equal(self.x, other.x) &&
+            fuzzy_equal(self.y, other.y) &&
+            fuzzy_equal(self.z, other.z) &&
+            fuzzy_equal(self.w, other.w)
+    }
 }
 
 #[cfg(test)]
@@ -145,45 +148,45 @@ mod tests
         let s1 = create_point(3.0, 2.0, 1.0)
             .sub(create_point(5.0, 6.0, 7.0));
         let s2 = create_vector(-2.0, -4.0, -6.0);
-        assert!(equal(s1, s2));
+        assert_eq!(s1, s2);
 
         // p.5 Scenario: Subtracting a vector from a point
         let s3 = create_point(3.0, 2.0, 1.0)
             .sub(create_vector(5.0, 6.0, 7.0));
         let s4 = create_point(-2.0, -4.0, -6.0);
-        assert!(equal(s3, s4));
+        assert_eq!(s3, s4);
 
         // p.7 Scenario: Subtracting two vectors
         let s5 = create_vector(3.0, 2.0, 1.0)
             .sub(create_vector(5.0, 6.0, 7.0));
         let s6 = create_vector(-2.0, -4.0, -6.0);
-        assert!(equal(s5, s6));
+        assert_eq!(s5, s6);
 
         // p.7 Scenario: Subtracting a vector from the zero vector
         let s7 = create_vector(0.0, 0.0, 0.0)
             .sub(create_vector(1.0, -2.0, 3.0));
         let s8 = create_vector(-1.0, 2.0, -3.0);
-        assert!(equal(s7, s8));
+        assert_eq!(s7, s8);
 
         // p.7 Scenario: Negating a tuple
         let n1 = create_tuple(1.0, -2.0, 3.0, -4.0).negate();
         let n2 = create_tuple(-1.0, 2.0, -3.0, 4.0);
-        assert!(equal(n1, n2));
+        assert_eq!(n1, n2);
 
         // p.8 Scenario: Multiplying a tuple by a scalar
         let m1 = create_tuple(1.0, -2.0, 3.0, -4.0).multiply(3.5);
         let m2 = create_tuple(3.5, -7.0, 10.5, -14.0);
-        assert!(equal(m1, m2));
+        assert_eq!(m1, m2);
 
         // p.8 Scenario: Multiplying a tuple by a fraction
         let m3 = create_tuple(1.0, -2.0, 3.0, -4.0).multiply(0.5);
         let m4 = create_tuple(0.5, -1.0, 1.5, -2.0);
-        assert!(equal(m3, m4));
+        assert_eq!(m3, m4);
 
         // p.8 Scenario: Dividing a tuple by a scalar
         let d1 = create_tuple(1.0, -2.0, 3.0, -4.0).divide(2.0);
         let d2 = create_tuple(0.5, -1.0, 1.5, -2.0);
-        assert!(equal(d1, d2));
+        assert_eq!(d1, d2);
 
         // p.8 Scenario: Computing the magnitude of vector(1, 0, 0)
         let m1 = create_vector(1.0, 0.0, 0.0).magnitude();
@@ -208,12 +211,12 @@ mod tests
         // p.10 Scenario: Normalizing the vector (4, 0, 0) gives (1, 0, 0)
         let no1 = create_vector(4.0, 0.0, 0.0).normalize();
         let no2 = create_vector(1.0, 0.0, 0.0);
-        assert!(equal(no1, no2));
+        assert_eq!(no1, no2);
 
         // p.10 Scenario: Normalizing the vector (1, 2, 3)
         let no3 = create_vector(1.0, 2.0, 3.0).normalize();
         let no4 = create_vector(0.26726, 0.53452, 0.80178);
-        assert!(equal(no3, no4));
+        assert_eq!(no3, no4);
 
         // p.10 Scenario: The magnitude of a normalized vector
         let m6 = no3.magnitude();
@@ -227,10 +230,10 @@ mod tests
         // p.11 Scenario: The cross product of two vectors
         let cp1 = create_vector(1.0, 2.0, 3.0)
             .cross_product(create_vector(2.0, 3.0, 4.0));
-        assert!(equal(cp1, create_vector(-1.0, 2.0, -1.0)));
+        assert_eq!(cp1, create_vector(-1.0, 2.0, -1.0));
         let cp2 = create_vector(2.0, 3.0, 4.0)
             .cross_product(create_vector(1.0, 2.0, 3.0));
-        assert!(equal(cp2, create_vector(1.0, -2.0, 1.0)));
+        assert_eq!(cp2, create_vector(1.0, -2.0, 1.0));
 
         // p.16 Scenario: Colors are (red, green, blue) tuples
         let c1 = create_color(-0.5, 0.4, 1.7).get_vec();
@@ -242,23 +245,23 @@ mod tests
         let c2 = create_color(0.9, 0.6, 0.75)
             .add(create_color(0.7, 0.1, 0.25));
         let c3 = create_color(1.6, 0.7, 1.0);
-        assert!(equal(c2, c3));
+        assert_eq!(c2, c3);
 
         // p.17 Scenario: Subtracting colors
         let c4 = create_color(0.9, 0.6, 0.75)
             .sub(create_color(0.7, 0.1, 0.25));
         let c5 = create_color(0.2, 0.5, 0.5);
-        assert!(equal(c4, c5));
+        assert_eq!(c4, c5);
 
         // p.17 Scenario: Mutiplying a color by a scalar
         let c6 = create_color(0.2, 0.3, 0.4).multiply(2.0);
         let c7 = create_color(0.4, 0.6, 0.8);
-        assert!(equal(c6, c7));
+        assert_eq!(c6, c7);
 
         // p.17 Scenario: Mutiplying colors
         let c8 = create_color(1.0, 0.2, 0.4)
             .hadamard_product(create_color(0.9, 1.0, 0.1));
         let c9 = create_color(0.9, 0.2, 0.04);
-        assert!(equal(c8, c9));
+        assert_eq!(c8, c9);
     }
 }

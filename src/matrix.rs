@@ -338,7 +338,7 @@ mod tests
             8.0, 6.0, 4.0, 1.0,
             0.0, 0.0, 0.0, 1.0]);
         let t13 = m12.multiply_tuple(create_tuple(1.0, 2.0, 3.0, 1.0));
-        assert!(crate::tuple::equal(t13, create_tuple(18.0, 24.0, 33.0, 1.0)));
+        assert_eq!(t13, create_tuple(18.0, 24.0, 33.0, 1.0));
 
         // p.32 Scenario: Multiplying a matrix by the identity matrix
         let m14 = Matrix::new(4, 4, &vec![0.0, 1.0, 2.0, 4.0,
