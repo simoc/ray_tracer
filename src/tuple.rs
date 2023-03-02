@@ -21,6 +21,11 @@ impl Tuple
     {
         Tuple{x: self.x + b.x, y: self.y + b.y, z: self.z + b.z, w: self.w + b.w}
     }
+
+    pub fn sub(&self, b: Tuple) -> Tuple
+    {
+        Tuple{x: self.x - b.x, y: self.y - b.y, z: self.z - b.z, w: self.w - b.w}
+    }
 }
 
 impl fmt::Display for Tuple
@@ -49,11 +54,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn sub(a: Tuple, b: Tuple) -> Tuple
-{
-    Tuple{x: a.x - b.x, y: a.y - b.y, z: a.z - b.z, w: a.w - b.w}
 }
 
 pub fn negate(a: Tuple) -> Tuple
@@ -142,26 +142,26 @@ mod tests
         assert!(fuzzy_equal(a1[3], 1.0));
 
         // p.5 Scenario: Subtracting two points
-        let s1 = sub(create_point(3.0, 2.0, 1.0),
-            create_point(5.0, 6.0, 7.0));
+        let s1 = create_point(3.0, 2.0, 1.0)
+            .sub(create_point(5.0, 6.0, 7.0));
         let s2 = create_vector(-2.0, -4.0, -6.0);
         assert!(equal(s1, s2));
 
         // p.5 Scenario: Subtracting a vector from a point
-        let s3 = sub(create_point(3.0, 2.0, 1.0),
-            create_vector(5.0, 6.0, 7.0));
+        let s3 = create_point(3.0, 2.0, 1.0)
+            .sub(create_vector(5.0, 6.0, 7.0));
         let s4 = create_point(-2.0, -4.0, -6.0);
         assert!(equal(s3, s4));
 
         // p.7 Scenario: Subtracting two vectors
-        let s5 = sub(create_vector(3.0, 2.0, 1.0),
-            create_vector(5.0, 6.0, 7.0));
+        let s5 = create_vector(3.0, 2.0, 1.0)
+            .sub(create_vector(5.0, 6.0, 7.0));
         let s6 = create_vector(-2.0, -4.0, -6.0);
         assert!(equal(s5, s6));
 
         // p.7 Scenario: Subtracting a vector from the zero vector
-        let s7 = sub(create_vector(0.0, 0.0, 0.0),
-            create_vector(1.0, -2.0, 3.0));
+        let s7 = create_vector(0.0, 0.0, 0.0)
+            .sub(create_vector(1.0, -2.0, 3.0));
         let s8 = create_vector(-1.0, 2.0, -3.0);
         assert!(equal(s7, s8));
 
@@ -245,8 +245,8 @@ mod tests
         assert!(equal(c2, c3));
 
         // p.17 Scenario: Subtracting colors
-        let c4 = sub(create_color(0.9, 0.6, 0.75),
-            create_color(0.7, 0.1, 0.25));
+        let c4 = create_color(0.9, 0.6, 0.75)
+            .sub(create_color(0.7, 0.1, 0.25));
         let c5 = create_color(0.2, 0.5, 0.5);
         assert!(equal(c4, c5));
 
