@@ -53,6 +53,11 @@ impl Tuple
         let m = self.magnitude();
         Tuple{x: self.x / m, y: self.y / m, z: self.z / m, w: self.w / m}
     }
+
+    pub fn dot_product(&self, b: Tuple) -> f64
+    {
+        self.x * b.x + self.y * b.y + self.z * b.z + self.w * b.w
+    }
 }
 
 impl fmt::Display for Tuple
@@ -81,11 +86,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn dot_product(a: Tuple, b: Tuple) -> f64
-{
-    a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
 }
 
 pub fn cross_product(a: Tuple, b: Tuple) -> Tuple
@@ -220,8 +220,8 @@ mod tests
         assert!(fuzzy_equal(m6, 1.0));
 
         // p.10 Scenario: The dot product of two tuples
-        let dp1 = dot_product(create_vector(1.0, 2.0, 3.0),
-            create_vector(2.0, 3.0, 4.0));
+        let dp1 = create_vector(1.0, 2.0, 3.0)
+            .dot_product(create_vector(2.0, 3.0, 4.0));
         assert!(fuzzy_equal(dp1, 20.0));
 
         // p.11 Scenario: The cross product of two vectors
