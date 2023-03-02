@@ -47,6 +47,12 @@ impl Tuple
         let n = (self.x * self.x) + (self.y * self.y) + (self.z * self.z) + (self.w * self.w);
         n.sqrt()
     }
+
+    pub fn normalize(&self) -> Tuple
+    {
+        let m = self.magnitude();
+        Tuple{x: self.x / m, y: self.y / m, z: self.z / m, w: self.w / m}
+    }
 }
 
 impl fmt::Display for Tuple
@@ -75,12 +81,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn normalize(v: Tuple) -> Tuple
-{
-    let m = v.magnitude();
-    Tuple{x: v.x / m, y: v.y / m, z: v.z / m, w: v.w / m}
 }
 
 pub fn dot_product(a: Tuple, b: Tuple) -> f64
@@ -206,12 +206,12 @@ mod tests
         assert!(fuzzy_equal(m5, 14.0_f64.sqrt()));
 
         // p.10 Scenario: Normalizing the vector (4, 0, 0) gives (1, 0, 0)
-        let no1 = normalize(create_vector(4.0, 0.0, 0.0));
+        let no1 = create_vector(4.0, 0.0, 0.0).normalize();
         let no2 = create_vector(1.0, 0.0, 0.0);
         assert!(equal(no1, no2));
 
         // p.10 Scenario: Normalizing the vector (1, 2, 3)
-        let no3 = normalize(create_vector(1.0, 2.0, 3.0));
+        let no3 = create_vector(1.0, 2.0, 3.0).normalize();
         let no4 = create_vector(0.26726, 0.53452, 0.80178);
         assert!(equal(no3, no4));
 
