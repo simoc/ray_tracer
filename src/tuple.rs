@@ -58,6 +58,13 @@ impl Tuple
     {
         self.x * b.x + self.y * b.y + self.z * b.z + self.w * b.w
     }
+
+    pub fn cross_product(&self, b: Tuple) -> Tuple
+    {
+        create_vector(self.y * b.z - self.z * b.y,
+            self.z * b.x - self.x * b.z,
+            self.x * b.y - self.y * b.x)
+    }
 }
 
 impl fmt::Display for Tuple
@@ -86,13 +93,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn cross_product(a: Tuple, b: Tuple) -> Tuple
-{
-    create_vector(a.y * b.z - a.z * b.y,
-        a.z * b.x - a.x * b.z,
-        a.x * b.y - a.y * b.x)
 }
 
 pub fn hadamard_product(a: Tuple, b: Tuple) -> Tuple
@@ -225,11 +225,11 @@ mod tests
         assert!(fuzzy_equal(dp1, 20.0));
 
         // p.11 Scenario: The cross product of two vectors
-        let cp1 = cross_product(create_vector(1.0, 2.0, 3.0),
-            create_vector(2.0, 3.0, 4.0));
+        let cp1 = create_vector(1.0, 2.0, 3.0)
+            .cross_product(create_vector(2.0, 3.0, 4.0));
         assert!(equal(cp1, create_vector(-1.0, 2.0, -1.0)));
-        let cp2 = cross_product(create_vector(2.0, 3.0, 4.0),
-            create_vector(1.0, 2.0, 3.0));
+        let cp2 = create_vector(2.0, 3.0, 4.0)
+            .cross_product(create_vector(1.0, 2.0, 3.0));
         assert!(equal(cp2, create_vector(1.0, -2.0, 1.0)));
 
         // p.16 Scenario: Colors are (red, green, blue) tuples
