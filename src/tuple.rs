@@ -41,6 +41,12 @@ impl Tuple
     {
         Tuple{x: self.x / scalar, y: self.y / scalar, z: self.z / scalar, w: self.w / scalar}
     }
+
+    pub fn magnitude(&self) -> f64
+    {
+        let n = (self.x * self.x) + (self.y * self.y) + (self.z * self.z) + (self.w * self.w);
+        n.sqrt()
+    }
 }
 
 impl fmt::Display for Tuple
@@ -71,15 +77,9 @@ pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
     Tuple{x: x, y: y, z: z, w: w}
 }
 
-pub fn magnitude(v: Tuple) -> f64
-{
-    let n = (v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w);
-    n.sqrt()
-}
-
 pub fn normalize(v: Tuple) -> Tuple
 {
-    let m = magnitude(v);
+    let m = v.magnitude();
     Tuple{x: v.x / m, y: v.y / m, z: v.z / m, w: v.w / m}
 }
 
@@ -186,23 +186,23 @@ mod tests
         assert!(equal(d1, d2));
 
         // p.8 Scenario: Computing the magnitude of vector(1, 0, 0)
-        let m1 = magnitude(create_vector(1.0, 0.0, 0.0));
+        let m1 = create_vector(1.0, 0.0, 0.0).magnitude();
         assert!(fuzzy_equal(m1, 1.0));
 
         // p.9 Scenario: Computing the magnitude of vector(0, 1, 0)
-        let m2 = magnitude(create_vector(0.0, 1.0, 0.0));
+        let m2 = create_vector(0.0, 1.0, 0.0).magnitude();
         assert!(fuzzy_equal(m2, 1.0));
 
         // p.9 Scenario: Computing the magnitude of vector(0, 0, 1)
-        let m3 = magnitude(create_vector(0.0, 0.0, 1.0));
+        let m3 = create_vector(0.0, 0.0, 1.0).magnitude();
         assert!(fuzzy_equal(m3, 1.0));
 
         // p.9 Scenario: Computing the magnitude of vector(1, 2, 3)
-        let m4 = magnitude(create_vector(1.0, 2.0, 3.0));
+        let m4 = create_vector(1.0, 2.0, 3.0).magnitude();
         assert!(fuzzy_equal(m4, 14.0_f64.sqrt()));
 
         // p.9 Scenario: Computing the magnitude of vector(-1, -2, -3)
-        let m5 = magnitude(create_vector(-1.0, -2.0, -3.0));
+        let m5 = create_vector(-1.0, -2.0, -3.0).magnitude();
         assert!(fuzzy_equal(m5, 14.0_f64.sqrt()));
 
         // p.10 Scenario: Normalizing the vector (4, 0, 0) gives (1, 0, 0)
@@ -216,7 +216,7 @@ mod tests
         assert!(equal(no3, no4));
 
         // p.10 Scenario: The magnitude of a normalized vector
-        let m6 = magnitude(no3);
+        let m6 = no3.magnitude();
         assert!(fuzzy_equal(m6, 1.0));
 
         // p.10 Scenario: The dot product of two tuples
