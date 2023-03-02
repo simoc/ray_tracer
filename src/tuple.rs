@@ -16,6 +16,11 @@ impl Tuple
     {
         vec![self.x, self.y, self.z, self.w]
     }
+
+    pub fn add(&self, b: Tuple) -> Tuple
+    {
+        Tuple{x: self.x + b.x, y: self.y + b.y, z: self.z + b.z, w: self.w + b.w}
+    }
 }
 
 impl fmt::Display for Tuple
@@ -44,11 +49,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn add(a: Tuple, b: Tuple) -> Tuple
-{
-    Tuple{x: a.x + b.x, y: a.y + b.y, z: a.z + b.z, w: a.w + b.w}
 }
 
 pub fn sub(a: Tuple, b: Tuple) -> Tuple
@@ -133,8 +133,8 @@ mod tests
         assert!(fuzzy_equal(v1[3], 0.0));
 
         // p.5 Scenario: Adding two tuples
-        let a1 = add(create_point(3.0, -2.0, 5.0),
-            create_vector(-2.0, 3.0, 1.0)).get_vec();
+        let a1 = create_point(3.0, -2.0, 5.0)
+            .add(create_vector(-2.0, 3.0, 1.0)).get_vec();
         assert_eq!(a1.len(), 4);
         assert!(fuzzy_equal(a1[0], 1.0));
         assert!(fuzzy_equal(a1[1], 1.0));
@@ -239,8 +239,8 @@ mod tests
         assert!(fuzzy_equal(c1[2], 1.7));
 
         // p.17 Scenario: Adding colors
-        let c2 = add(create_color(0.9, 0.6, 0.75),
-            create_color(0.7, 0.1, 0.25));
+        let c2 = create_color(0.9, 0.6, 0.75)
+            .add(create_color(0.7, 0.1, 0.25));
         let c3 = create_color(1.6, 0.7, 1.0);
         assert!(equal(c2, c3));
 
