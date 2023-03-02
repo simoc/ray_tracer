@@ -26,6 +26,11 @@ impl Tuple
     {
         Tuple{x: self.x - b.x, y: self.y - b.y, z: self.z - b.z, w: self.w - b.w}
     }
+
+    pub fn negate(&self) -> Tuple
+    {
+        Tuple{x: -self.x, y: -self.y, z: -self.z, w: -self.w}
+    }
 }
 
 impl fmt::Display for Tuple
@@ -54,11 +59,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn negate(a: Tuple) -> Tuple
-{
-    Tuple{x: -a.x, y: -a.y, z: -a.z, w: -a.w}
 }
 
 pub fn multiply(a: Tuple, scalar: f64) -> Tuple
@@ -166,7 +166,7 @@ mod tests
         assert!(equal(s7, s8));
 
         // p.7 Scenario: Negating a tuple
-        let n1 = negate(create_tuple(1.0, -2.0, 3.0, -4.0));
+        let n1 = create_tuple(1.0, -2.0, 3.0, -4.0).negate();
         let n2 = create_tuple(-1.0, 2.0, -3.0, 4.0);
         assert!(equal(n1, n2));
 
