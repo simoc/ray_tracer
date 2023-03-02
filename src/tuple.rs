@@ -65,6 +65,11 @@ impl Tuple
             self.z * b.x - self.x * b.z,
             self.x * b.y - self.y * b.x)
     }
+
+    pub fn hadamard_product(&self, b: Tuple) -> Tuple
+    {
+        create_color(self.x * b.x, self.y * b.y, self.z * b.z)
+    }
 }
 
 impl fmt::Display for Tuple
@@ -93,11 +98,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn hadamard_product(a: Tuple, b: Tuple) -> Tuple
-{
-    create_color(a.x * b.x, a.y * b.y, a.z * b.z)
 }
 
 pub fn equal(a: Tuple, b: Tuple) -> bool
@@ -256,8 +256,8 @@ mod tests
         assert!(equal(c6, c7));
 
         // p.17 Scenario: Mutiplying colors
-        let c8 = hadamard_product(create_color(1.0, 0.2, 0.4),
-            create_color(0.9, 1.0, 0.1));
+        let c8 = create_color(1.0, 0.2, 0.4)
+            .hadamard_product(create_color(0.9, 1.0, 0.1));
         let c9 = create_color(0.9, 0.2, 0.04);
         assert!(equal(c8, c9));
     }
