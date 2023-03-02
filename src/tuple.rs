@@ -36,6 +36,11 @@ impl Tuple
     {
         Tuple{x: self.x * scalar, y: self.y * scalar, z: self.z * scalar, w: self.w * scalar}
     }
+
+    pub fn divide(&self, scalar: f64) -> Tuple
+    {
+        Tuple{x: self.x / scalar, y: self.y / scalar, z: self.z / scalar, w: self.w / scalar}
+    }
 }
 
 impl fmt::Display for Tuple
@@ -64,11 +69,6 @@ pub fn create_color(r: f64, g: f64, b: f64) -> Tuple
 pub fn create_tuple(x: f64, y: f64, z: f64, w: f64) -> Tuple
 {
     Tuple{x: x, y: y, z: z, w: w}
-}
-
-pub fn divide(a: Tuple, scalar: f64) -> Tuple
-{
-    Tuple{x: a.x / scalar, y: a.y / scalar, z: a.z / scalar, w: a.w / scalar}
 }
 
 pub fn magnitude(v: Tuple) -> f64
@@ -181,7 +181,7 @@ mod tests
         assert!(equal(m3, m4));
 
         // p.8 Scenario: Dividing a tuple by a scalar
-        let d1 = divide(create_tuple(1.0, -2.0, 3.0, -4.0), 2.0);
+        let d1 = create_tuple(1.0, -2.0, 3.0, -4.0).divide(2.0);
         let d2 = create_tuple(0.5, -1.0, 1.5, -2.0);
         assert!(equal(d1, d2));
 
