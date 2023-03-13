@@ -192,6 +192,15 @@ impl Matrix
         }
         m2
     }
+
+    pub fn translation(x: f64, y: f64, z: f64) -> Matrix
+    {
+        let mut m = Matrix::identity(4);
+        m.cells[0][3] = x;
+        m.cells[1][3] = y;
+        m.cells[2][3] = z;
+        m
+    }
 }
 
 impl fmt::Display for Matrix
@@ -499,5 +508,22 @@ mod tests
             6.0, -2.0, 0.0, 5.0]);
         let m39 = m37.multiply(&m38);
         assert_eq!(m39.multiply(&m38.inverse()), m37);
+    }
+
+    #[test]
+    fn test_transformations_feature_translation()
+    {
+        // p.45 Scenario: Multiplying by a translation matrix
+        let transform1 = Matrix::translation(5.0, -3.0, 2.0);
+        let p1 = create_point(-3.0, 4.0, 5.0);
+        assert_eq!(transform1.multiply_tuple(p1), create_point(2.0, 1.0, 7.0));
+
+        // p.45 Scenario: Multiplying by the inverse of a translation matrix
+        let inverse1 = transform1.inverse();
+        assert_eq!(inverse1.multiply_tuple(p1), create_point(-8.0, 7.0, 3.0));
+
+        // p.45 Scenario: Translation does not affect vectors
+        let v1 = create_vector(-3.0, 4.0, 5.0);
+        assert_eq!(transform1.multiply_tuple(v1), v1);
     }
 }
