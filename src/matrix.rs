@@ -201,6 +201,15 @@ impl Matrix
         m.cells[2][3] = z;
         m
     }
+
+    pub fn scaling(x: f64, y: f64, z: f64) -> Matrix
+    {
+        let mut m = Matrix::identity(4);
+        m.cells[0][0] = x;
+        m.cells[1][1] = y;
+        m.cells[2][2] = z;
+        m
+    }
 }
 
 impl fmt::Display for Matrix
@@ -525,5 +534,22 @@ mod tests
         // p.45 Scenario: Translation does not affect vectors
         let v1 = create_vector(-3.0, 4.0, 5.0);
         assert_eq!(transform1.multiply_tuple(v1), v1);
+    }
+
+    #[test]
+    fn test_transformations_feature_scaling()
+    {
+        // p.46 Scenario: A scaling matrix applied to a point
+        let scaling1 = Matrix::scaling(2.0, 3.0, 4.0);
+        let p1 = create_point(-4.0, 6.0, 8.0);
+        assert_eq!(scaling1.multiply_tuple(p1), create_point(-8.0, 18.0, 32.0));
+
+        // p.46 Scenario: A scaling matrix applied to a vector
+        let v1 = create_vector(-4.0, 6.0, 8.0);
+        assert_eq!(scaling1.multiply_tuple(v1), create_vector(-8.0, 18.0, 32.0));
+
+        // p.46 Scenario: Multiplying by the inverse of a scaling matrix
+        let inverse1 = scaling1.inverse();
+        assert_eq!(inverse1.multiply_tuple(v1), create_vector(-2.0, 2.0, 2.0));
     }
 }
