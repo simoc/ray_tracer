@@ -551,5 +551,10 @@ mod tests
         // p.46 Scenario: Multiplying by the inverse of a scaling matrix
         let inverse1 = scaling1.inverse();
         assert_eq!(inverse1.multiply_tuple(v1), create_vector(-2.0, 2.0, 2.0));
+
+        // p.47 Scenario: Reflection is scaling by a negative value
+        let scaling2 = Matrix::scaling(-1.0, 1.0, 1.0);
+        let p2 = create_point(2.0, 3.0, 4.0);
+        assert_eq!(scaling2.multiply_tuple(p2), create_point(-2.0, 3.0, 4.0));
     }
 }
