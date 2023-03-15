@@ -221,6 +221,16 @@ impl Matrix
         m.cells[2][2] = r.cos();
         m
     }
+
+    pub fn rotation_y(r: f64) -> Matrix
+    {
+        let mut m = Matrix::identity(4);
+        m.cells[0][0] = r.cos();
+        m.cells[0][2] = r.sin();
+        m.cells[2][0] = -r.sin();
+        m.cells[2][2] = r.cos();
+        m
+    }
 }
 
 impl fmt::Display for Matrix
@@ -583,5 +593,12 @@ mod tests
         // p.49 Scenario: The inverse of an x-rotation rotates in the opposite direction
         let inverse1 = half_quarter1.inverse();
         assert_eq!(inverse1.multiply_tuple(p1), create_point(0.0, two.sqrt() / 2.0, -two.sqrt() / 2.0));
+
+        // p.49 Scenario: Rotating a point around the y axis
+        let p2 = create_point(0.0, 0.0, 1.0);
+        let half_quarter2 = Matrix::rotation_y(PI / 4.0);
+        let full_quarter2 = Matrix::rotation_y(PI / 2.0);
+        assert_eq!(half_quarter2.multiply_tuple(p2), create_point(two.sqrt() / 2.0, 0.0, two.sqrt() / 2.0));
+        assert_eq!(full_quarter2.multiply_tuple(p2), create_point(1.0, 0.0, 0.0));
     }
 }
