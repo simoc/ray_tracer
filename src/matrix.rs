@@ -231,6 +231,16 @@ impl Matrix
         m.cells[2][2] = r.cos();
         m
     }
+
+    pub fn rotation_z(r: f64) -> Matrix
+    {
+        let mut m = Matrix::identity(4);
+        m.cells[0][0] = r.cos();
+        m.cells[0][1] = -r.sin();
+        m.cells[1][0] = r.sin();
+        m.cells[1][1] = r.cos();
+        m
+    }
 }
 
 impl fmt::Display for Matrix
@@ -600,5 +610,12 @@ mod tests
         let full_quarter2 = Matrix::rotation_y(PI / 2.0);
         assert_eq!(half_quarter2.multiply_tuple(p2), create_point(two.sqrt() / 2.0, 0.0, two.sqrt() / 2.0));
         assert_eq!(full_quarter2.multiply_tuple(p2), create_point(1.0, 0.0, 0.0));
+
+        // p.50 Scenario: Rotating a point around the y axis
+        let p3 = create_point(0.0, 1.0, 0.0);
+        let half_quarter3 = Matrix::rotation_z(PI / 4.0);
+        let full_quarter3 = Matrix::rotation_z(PI / 2.0);
+        assert_eq!(half_quarter3.multiply_tuple(p3), create_point(-two.sqrt() / 2.0, two.sqrt() / 2.0, 0.0));
+        assert_eq!(full_quarter3.multiply_tuple(p3), create_point(-1.0, 0.0, 0.0));
     }
 }
