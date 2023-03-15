@@ -241,6 +241,18 @@ impl Matrix
         m.cells[1][1] = r.cos();
         m
     }
+
+    pub fn shearing(xy: f64, xz: f64, yx: f64, yz: f64, zx: f64, zy: f64) -> Matrix
+    {
+        let mut m = Matrix::identity(4);
+        m.cells[0][1] = xy;
+        m.cells[0][2] = xz;
+        m.cells[1][0] = yx;
+        m.cells[1][2] = yz;
+        m.cells[2][0] = zx;
+        m.cells[2][1] = zy;
+        m
+    }
 }
 
 impl fmt::Display for Matrix
@@ -617,5 +629,39 @@ mod tests
         let full_quarter3 = Matrix::rotation_z(PI / 2.0);
         assert_eq!(half_quarter3.multiply_tuple(p3), create_point(-two.sqrt() / 2.0, two.sqrt() / 2.0, 0.0));
         assert_eq!(full_quarter3.multiply_tuple(p3), create_point(-1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn test_transformations_feature_shearing()
+    {
+        // p.52 Scenario: A shearing transformation moves x in proportion to y
+        let shearing1 = Matrix::shearing(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        let p1 = create_point(2.0, 3.0, 4.0);
+        assert_eq!(shearing1.multiply_tuple(p1), create_point(5.0, 3.0, 4.0));
+
+        // p.52 Scenario: A shearing transformation moves x in proportion to z
+        let shearing2 = Matrix::shearing(0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+        let p2 = create_point(2.0, 3.0, 4.0);
+        assert_eq!(shearing2.multiply_tuple(p2), create_point(6.0, 3.0, 4.0));
+
+        // p.52 Scenario: A shearing transformation moves y in proportion to x
+        let shearing3 = Matrix::shearing(0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        let p3 = create_point(2.0, 3.0, 4.0);
+        assert_eq!(shearing3.multiply_tuple(p3), create_point(2.0, 5.0, 4.0));
+
+        // p.52 Scenario: A shearing transformation moves y in proportion to z
+        let shearing4 = Matrix::shearing(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+        let p4 = create_point(2.0, 3.0, 4.0);
+        assert_eq!(shearing4.multiply_tuple(p4), create_point(2.0, 7.0, 4.0));
+
+        // p.52 Scenario: A shearing transformation moves z in proportion to x
+        let shearing5 = Matrix::shearing(0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        let p5 = create_point(2.0, 3.0, 4.0);
+        assert_eq!(shearing5.multiply_tuple(p5), create_point(2.0, 3.0, 6.0));
+
+        // p.53 Scenario: A shearing transformation moves z in proportion to y
+        let shearing6 = Matrix::shearing(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        let p6 = create_point(2.0, 3.0, 4.0);
+        assert_eq!(shearing6.multiply_tuple(p6), create_point(2.0, 3.0, 7.0));
     }
 }
