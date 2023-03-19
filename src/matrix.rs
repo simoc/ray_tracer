@@ -664,4 +664,24 @@ mod tests
         let p6 = create_point(2.0, 3.0, 4.0);
         assert_eq!(shearing6.multiply_tuple(p6), create_point(2.0, 3.0, 7.0));
     }
+
+    #[test]
+    fn test_transformations_feature_sequences()
+    {
+        // p.54 Scenario: Individual transformations are applied in sequence
+        let p = create_point(1.0, 0.0, 1.0);
+        let a = Matrix::rotation_x(PI / 2.0);
+        let b = Matrix::scaling(5.0, 5.0, 5.0);
+        let c = Matrix::translation(10.0, 5.0, 7.0);
+        let p2 = a.multiply_tuple(p);
+        assert_eq!(p2, create_point(1.0, -1.0, 0.0));
+        let p3 = b.multiply_tuple(p2);
+        assert_eq!(p3, create_point(5.0, -5.0, 0.0));
+        let p4 = c.multiply_tuple(p3);
+        assert_eq!(p4, create_point(15.0, 0.0, 7.0));
+
+        // p.54 Scenario: Chained transformations must be applied in reverse order
+        let t = c.multiply(&b.multiply(&a));
+        assert_eq!(t.multiply_tuple(p), create_point(15.0, 0.0, 7.0));
+    }
 }
