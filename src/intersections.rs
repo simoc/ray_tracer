@@ -100,7 +100,7 @@ mod tests
         let j32 = Intersection::new(2.0, s3);
         let xs3 = Intersections::new(vec![j31, j32]);
         let j3 = xs3.hit();
-        match (j3)
+        match j3
         {
             Some(x) => assert_eq!(x, j31),
             None => assert!(false),
@@ -112,7 +112,7 @@ mod tests
         let j42 = Intersection::new(1.0, s4);
         let xs4 = Intersections::new(vec![j41, j42]);
         let j4 = xs4.hit();
-        match (j4)
+        match j4
         {
             Some(x) => assert_eq!(x, j42),
             None => assert!(false),
@@ -124,7 +124,7 @@ mod tests
         let j52 = Intersection::new(-1.0, s5);
         let xs5 = Intersections::new(vec![j51, j52]);
         let j5 = xs5.hit();
-        match (j5)
+        match j5
         {
             Some(_) => assert!(false),
             None => assert!(true),
@@ -138,7 +138,7 @@ mod tests
         let j64 = Intersection::new(2.0, s6);
         let xs6 = Intersections::new(vec![j61, j62, j63, j64]);
         let j6 = xs6.hit();
-        match (j6)
+        match j6
         {
             Some(x) => assert_eq!(x, j64),
             None => assert!(false),
