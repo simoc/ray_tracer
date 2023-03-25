@@ -38,6 +38,16 @@ impl Sphere
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
         return vec![t1, t2];
     }
+
+    pub fn get_transform(&self) -> Matrix
+    {
+        self.transform.clone()
+    }
+
+    pub fn set_transform(&mut self, transform: Matrix)
+    {
+        self.transform = transform;
+    }
 }
 
 impl PartialEq for Sphere
@@ -106,5 +116,15 @@ mod tests
         assert_eq!(xs7.len(), 2);
         assert_eq!(xs7[0], -6.0);
         assert_eq!(xs7[1], -4.0);
+
+        // p.69 Scenario: A sphere's default transformation
+        let s8 = Sphere::new(8);
+        assert_eq!(s8.get_transform(), Matrix::identity(4));
+
+        // p.69 Scenario: Changing a sphere's transformation
+        let mut s9 = Sphere::new(9);
+        let t9 = Matrix::translation(2.0, 3.0, 4.0);
+        s9.set_transform(t9.clone());
+        assert_eq!(s9.get_transform(), t9);
     }
 }
