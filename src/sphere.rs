@@ -19,12 +19,14 @@ impl Sphere
 
     pub fn intersect(&self, ray: Ray) -> Vec<f64>
     {
+        let ray2 = ray.transform(self.transform.inverse());
+
         // the vector from the sphere's centre, to the ray origin
         // remember: the sphere is centred at the world origin
-        let sphere_to_ray = ray.origin.sub(create_point(0.0, 0.0, 0.0));
+        let sphere_to_ray = ray2.origin.sub(create_point(0.0, 0.0, 0.0));
 
-        let a = ray.direction.dot_product(ray.direction);
-        let b = 2.0 * sphere_to_ray.dot_product(ray.direction);
+        let a = ray2.direction.dot_product(ray2.direction);
+        let b = 2.0 * sphere_to_ray.dot_product(ray2.direction);
         let c = sphere_to_ray.dot_product(sphere_to_ray) - 1.0;
 
         let discriminant = b * b - 4.0 * a * c;
@@ -126,5 +128,21 @@ mod tests
         let t9 = Matrix::translation(2.0, 3.0, 4.0);
         s9.set_transform(t9.clone());
         assert_eq!(s9.get_transform(), t9);
+
+        // p.70 Scenario: Intersecting a scaled sphere with a ray
+        let r10 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let mut s10 = Sphere::new(10);
+        s10.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        let xs10 = s10.intersect(r10);
+        assert_eq!(xs10.len(), 2);
+        assert_eq!(xs10[0], 3.0);
+        assert_eq!(xs10[1], 7.0);
+
+        // p.70 Scenario: Intersecting a translated sphere with a ray
+        let r11 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let mut s11 = Sphere::new(11);
+        s11.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        let xs11 = s11.intersect(r11);
+        assert_eq!(xs11.len(), 0);
     }
 }
