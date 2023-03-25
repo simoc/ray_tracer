@@ -1,18 +1,20 @@
 use std::fmt;
 use crate::tuple::*;
 use crate::ray::*;
+use crate::matrix::*;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Sphere
 {
     id: i32,
+    transform: Matrix,
 }
 
 impl Sphere
 {
     pub fn new(id: i32) -> Self
     {
-        Sphere{id: id}
+        Sphere{id: id, transform: Matrix::identity(4)}
     }
 
     pub fn intersect(&self, ray: Ray) -> Vec<f64>

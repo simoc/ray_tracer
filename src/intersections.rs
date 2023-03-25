@@ -1,7 +1,7 @@
 use std::fmt;
 use crate::sphere::*;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Intersection
 {
     pub t: f64,
@@ -54,7 +54,7 @@ impl Intersections
 
     pub fn get_intersection(&self, index: usize) -> Intersection
     {
-        self.intersections[index]
+        self.intersections[index].clone()
     }
 
     pub fn hit(&self) -> Option<Intersection>
@@ -64,7 +64,7 @@ impl Intersections
             // Return intersection with lowest non-negative t value.
             if self.intersections[i].t >= 0.0
             {
-                return Some(self.intersections[i]);
+                return Some(self.intersections[i].clone());
             }
         }
         return None;
@@ -81,24 +81,24 @@ mod tests
     {
         // p.63 Scenario: An intersection encapsulates t and object
         let s = Sphere::new(1);
-        let i = Intersection::new(3.5, s);
+        let i = Intersection::new(3.5, s.clone());
         assert_eq!(i.t, 3.5);
         assert_eq!(i.object, s);
 
         // p.64 Scenario: Aggregating intersections
         let s2 = Sphere::new(2);
-        let i1 = Intersection::new(1.0, s2);
-        let i2 = Intersection::new(2.0, s2);
-        let xs = Intersections::new(vec![i1, i2]);
+        let i1 = Intersection::new(1.0, s2.clone());
+        let i2 = Intersection::new(2.0, s2.clone());
+        let xs = Intersections::new(vec![i1.clone(), i2.clone()]);
         assert_eq!(xs.count(), 2);
-        assert_eq!(xs.get_intersection(0).object, s2);
-        assert_eq!(xs.get_intersection(1).object, s2);
+        assert_eq!(xs.get_intersection(0).object, s2.clone());
+        assert_eq!(xs.get_intersection(1).object, s2.clone());
 
         // p.65 Scenario: The hit, when all intersections have positive t
         let s3 = Sphere::new(3);
-        let j31 = Intersection::new(1.0, s3);
-        let j32 = Intersection::new(2.0, s3);
-        let xs3 = Intersections::new(vec![j31, j32]);
+        let j31 = Intersection::new(1.0, s3.clone());
+        let j32 = Intersection::new(2.0, s3.clone());
+        let xs3 = Intersections::new(vec![j31.clone(), j32.clone()]);
         let j3 = xs3.hit();
         match j3
         {
@@ -108,9 +108,9 @@ mod tests
 
         // p.65 Scenario: The hit, when some intersections have negative t
         let s4 = Sphere::new(4);
-        let j41 = Intersection::new(-1.0, s4);
-        let j42 = Intersection::new(1.0, s4);
-        let xs4 = Intersections::new(vec![j41, j42]);
+        let j41 = Intersection::new(-1.0, s4.clone());
+        let j42 = Intersection::new(1.0, s4.clone());
+        let xs4 = Intersections::new(vec![j41.clone(), j42.clone()]);
         let j4 = xs4.hit();
         match j4
         {
@@ -120,9 +120,9 @@ mod tests
 
         // p.65 Scenario: The hit, when some intersections have negative t
         let s5 = Sphere::new(5);
-        let j51 = Intersection::new(-2.0, s5);
-        let j52 = Intersection::new(-1.0, s5);
-        let xs5 = Intersections::new(vec![j51, j52]);
+        let j51 = Intersection::new(-2.0, s5.clone());
+        let j52 = Intersection::new(-1.0, s5.clone());
+        let xs5 = Intersections::new(vec![j51.clone(), j52.clone()]);
         let j5 = xs5.hit();
         match j5
         {
@@ -132,11 +132,11 @@ mod tests
 
         // p.66 Scenario: The hit is always the lowest non-negative intersection
         let s6 = Sphere::new(6);
-        let j61 = Intersection::new(5.0, s6);
-        let j62 = Intersection::new(7.0, s6);
-        let j63 = Intersection::new(-3.0, s6);
-        let j64 = Intersection::new(2.0, s6);
-        let xs6 = Intersections::new(vec![j61, j62, j63, j64]);
+        let j61 = Intersection::new(5.0, s6.clone());
+        let j62 = Intersection::new(7.0, s6.clone());
+        let j63 = Intersection::new(-3.0, s6.clone());
+        let j64 = Intersection::new(2.0, s6.clone());
+        let xs6 = Intersections::new(vec![j61.clone(), j62.clone(), j63.clone(), j64.clone()]);
         let j6 = xs6.hit();
         match j6
         {

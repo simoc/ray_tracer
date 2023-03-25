@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 use crate::tuple::*;
 use crate::arithmetic::*;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Matrix
 {
     pub rows: usize,
