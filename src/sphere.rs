@@ -50,6 +50,12 @@ impl Sphere
     {
         self.transform = transform;
     }
+
+    pub fn normal_at(&self, p: Tuple) -> Tuple
+    {
+        let v = p.sub(create_point(0.0, 0.0, 0.0));
+        v.normalize()
+    }
 }
 
 impl PartialEq for Sphere
@@ -144,5 +150,14 @@ mod tests
         s11.set_transform(Matrix::translation(5.0, 0.0, 0.0));
         let xs11 = s11.intersect(r11);
         assert_eq!(xs11.len(), 0);
+    }
+
+    #[test]
+    fn test_spheres_feature_shading()
+    {
+        // p.78 Scenario: The normal on a sphere at a point on the x axis
+        let s1 = Sphere::new(1);
+        let n1 = s1.normal_at(create_point(1.0, 0.0, 0.0));
+        assert_eq!(n1, create_vector(1.0, 0.0, 0.0));
     }
 }
