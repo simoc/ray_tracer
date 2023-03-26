@@ -56,7 +56,7 @@ fn main()
                 let h = is.hit();
                 match h
                 {
-                    Some(h) => c.write_pixel(usize::from(x), usize::from(y), red_color),
+                    Some(_h) => c.write_pixel(usize::from(x), usize::from(y), red_color),
                     _ => (),
                 }
             }
