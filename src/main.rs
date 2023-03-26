@@ -29,7 +29,7 @@ fn main()
     let half_wall_size = wall_size / 2.0;
 
     let mut c = Canvas::new(usize::from(canvas_pixels), usize::from(canvas_pixels));
-    let red_color = create_color(1.0, 1.0, 1.0);
+    let red_color = create_color(1.0, 0.0, 0.0);
 
     let shape = Sphere::new(1);
 
