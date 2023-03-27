@@ -1,4 +1,5 @@
 use std::fmt;
+use std::f64::consts::PI;
 use crate::tuple::*;
 use crate::ray::*;
 use crate::matrix::*;
@@ -51,10 +52,15 @@ impl Sphere
         self.transform = transform;
     }
 
-    pub fn normal_at(&self, p: Tuple) -> Tuple
+    pub fn normal_at(&self, world_point: Tuple) -> Tuple
     {
-        let v = p.sub(create_point(0.0, 0.0, 0.0));
-        v.normalize()
+        let inverse = self.transform.inverse();
+        let object_point = inverse.clone().multiply_tuple(world_point);
+        let object_normal = object_point.sub(create_point(0.0, 0.0, 0.0));
+        let world_normal = inverse.transpose().multiply_tuple(object_normal);
+        let v = world_normal.get_vec();
+        let v2 = create_vector(v[0], v[1], v[2]); // resets world_normal.w to zero
+        v2.normalize()
     }
 }
 
@@ -181,5 +187,18 @@ mod tests
         let s5 = Sphere::new(5);
         let n5 = s5.normal_at(create_point(position5, position5, position5));
         assert_eq!(n5.normalize(), create_vector(position5, position5, position5));
+
+        // p.80 Scenario: Computing the normal on a translated sphere
+        let mut s6 = Sphere::new(6);
+        s6.set_transform(Matrix::translation(0.0, 1.0, 0.0));
+        let n6 = s6.normal_at(create_point(0.0, 1.70711, -0.70711));
+        assert_eq!(n6.normalize(), create_vector(0.0, 0.70711, -0.70711));
+
+        // p.80 Scenario: Computing the normal on a transformed sphere
+        let mut s7 = Sphere::new(7);
+        s7.set_transform(Matrix::scaling(1.0, 0.5, 1.0).multiply(&Matrix::rotation_z(PI / 5.0_f64)));
+        let position7 = 2.0_f64.sqrt() / 2.0_f64;
+        let n7 = s7.normal_at(create_point(0.0, position7, -position7));
+        assert_eq!(n7.normalize(), create_vector(0.0, 0.97014, -0.24254));
     }
 }
