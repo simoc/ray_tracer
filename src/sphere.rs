@@ -159,5 +159,27 @@ mod tests
         let s1 = Sphere::new(1);
         let n1 = s1.normal_at(create_point(1.0, 0.0, 0.0));
         assert_eq!(n1, create_vector(1.0, 0.0, 0.0));
+
+        // p.78 Scenario: The normal on a sphere at a point on the y axis
+        let s2 = Sphere::new(2);
+        let n2 = s2.normal_at(create_point(0.0, 1.0, 0.0));
+        assert_eq!(n2, create_vector(0.0, 1.0, 0.0));
+
+        // p.78 Scenario: The normal on a sphere at a point on the z axis
+        let s3 = Sphere::new(3);
+        let n3 = s3.normal_at(create_point(0.0, 0.0, 1.0));
+        assert_eq!(n3, create_vector(0.0, 0.0, 1.0));
+
+        // p.78 Scenario: The normal on a sphere at a nonaxial point
+        let position4 = 3.0_f64.sqrt() / 3.0;
+        let s4 = Sphere::new(4);
+        let n4 = s4.normal_at(create_point(position4, position4, position4));
+        assert_eq!(n4, create_vector(position4, position4, position4));
+
+        // p.78 Scenario: The normal is a normalized vector
+        let position5 = 3.0_f64.sqrt() / 3.0;
+        let s5 = Sphere::new(5);
+        let n5 = s5.normal_at(create_point(position5, position5, position5));
+        assert_eq!(n5.normalize(), create_vector(position5, position5, position5));
     }
 }
