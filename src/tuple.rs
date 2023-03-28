@@ -70,6 +70,11 @@ impl Tuple
     {
         create_color(self.x * b.x, self.y * b.y, self.z * b.z)
     }
+
+    pub fn reflect(&self, normal: Tuple) -> Tuple
+    {
+        self.sub(normal.multiply(2.0 * self.dot_product(normal)))
+    }
 }
 
 impl fmt::Display for Tuple
@@ -263,5 +268,18 @@ mod tests
             .hadamard_product(create_color(0.9, 1.0, 0.1));
         let c9 = create_color(0.9, 0.2, 0.04);
         assert_eq!(c8, c9);
+
+        // p.83 Scenario: Reflecting a vector approaching at 45 degrees
+        let v10 = create_vector(1.0, -1.0, 0.0);
+        let n10 = create_vector(0.0, 1.0, 0.0);
+        let r10 = v10.reflect(n10);
+        assert_eq!(r10, create_vector(1.0, 1.0, 0.0));
+
+        // p.83 Scenario: Reflecting a vector off a slanted surface
+        let v11 = create_vector(0.0, -1.0, 0.0);
+        let sqrt2 = 2.0_f64.sqrt();
+        let n11 = create_vector(sqrt2 / 2.0, sqrt2 / 2.0, 0.0);
+        let r11 = v11.reflect(n11);
+        assert_eq!(r11, create_vector(1.0, 0.0, 0.0));
     }
 }
