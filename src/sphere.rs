@@ -3,19 +3,21 @@ use std::f64::consts::PI;
 use crate::tuple::*;
 use crate::ray::*;
 use crate::matrix::*;
+use crate::material::*;
 
 #[derive(Clone, Debug)]
 pub struct Sphere
 {
     id: i32,
     transform: Matrix,
+    material: Material
 }
 
 impl Sphere
 {
     pub fn new(id: i32) -> Self
     {
-        Sphere{id: id, transform: Matrix::identity(4)}
+        Sphere{id: id, transform: Matrix::identity(4), material: Material::new()}
     }
 
     pub fn intersect(&self, ray: Ray) -> Vec<f64>
@@ -62,6 +64,17 @@ impl Sphere
         let v2 = create_vector(v[0], v[1], v[2]); // resets world_normal.w to zero
         v2.normalize()
     }
+
+    pub fn get_material(&self) -> Material
+    {
+        self.material
+    }
+
+    pub fn set_material(&mut self, material: Material)
+    {
+        self.material = material;
+    }
+
 }
 
 impl PartialEq for Sphere
@@ -200,5 +213,16 @@ mod tests
         let position7 = 2.0_f64.sqrt() / 2.0_f64;
         let n7 = s7.normal_at(create_point(0.0, position7, -position7));
         assert_eq!(n7.normalize(), create_vector(0.0, 0.97014, -0.24254));
+
+        // p.85 Scenario: The default material
+        let s8 = Sphere::new(8);
+        assert_eq!(s8.get_material(), Material::new());
+
+        // p.85 Scenario: A sphere may be assigned a material
+        let mut s9 = Sphere::new(9);
+        let mut m9 = Material::new();
+        m9.ambient = 1.0;
+        s9.set_material(m9);
+        assert_eq!(s9.get_material(), m9);
     }
 }

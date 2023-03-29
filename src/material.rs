@@ -1,4 +1,5 @@
 use crate::tuple::*;
+use crate::arithmetic::*;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Material
@@ -18,6 +19,19 @@ impl Material
             specular: 0.9, shininess: 200.0}
     }
 }
+
+impl PartialEq for Material
+{
+    fn eq(&self, other: &Self) -> bool
+    {
+        self.color == other.color &&
+            fuzzy_equal(self.ambient, other.ambient) &&
+            fuzzy_equal(self.diffuse, other.diffuse) &&
+            fuzzy_equal(self.specular, other.specular) &&
+            fuzzy_equal(self.shininess, other.shininess)
+    }
+}
+
 
 #[cfg(test)]
 mod tests
