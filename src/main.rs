@@ -5,12 +5,14 @@ mod sphere;
 mod matrix;
 mod ray;
 mod intersections;
+mod material;
 
 use crate::tuple::*;
 use crate::canvas::*;
 use crate::sphere::*;
 use crate::ray::*;
 use crate::intersections::*;
+use crate::material::*;
 
 fn main()
 {
