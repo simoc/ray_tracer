@@ -1,5 +1,6 @@
 use crate::tuple::*;
 use crate::arithmetic::*;
+use crate::pointlight::*;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Material
@@ -17,6 +18,56 @@ impl Material
     {
         Material{color: create_color(1.0, 1.0, 1.0), ambient: 0.1, diffuse: 0.9,
             specular: 0.9, shininess: 200.0}
+    }
+
+    pub fn lighting(&self, light: PointLight, point: Tuple, eyev: Tuple, normalv: Tuple) -> Tuple
+    {
+        // combine the surface color with the light's color/intensity
+        let effective_color = self.color.multiply_intensity(light.intensity);
+
+        // find the direction to the light source
+        let lightv = light.position.sub(point).normalize();
+
+        // compute the ambient contribution
+        let ambient = effective_color.multiply(self.ambient);
+
+        // light_dot_normal represents the cosine of the angle between the
+        // light vector and the normal vector. A negative number means the
+        // light is on the other side of the surface.
+        let light_dot_normal = lightv.dot_product(normalv);
+        let mut diffuse: Tuple;
+        let mut specular: Tuple;
+        let color_black = create_color(0.0, 0.0, 0.0);
+        if light_dot_normal < 0.0
+        {
+            diffuse = color_black;
+            specular = color_black;
+        }
+        else
+        {
+            // compute the diffuse contribution
+            diffuse = effective_color.multiply(self.diffuse).multiply(light_dot_normal);
+
+            // reflect_dot_eye represents the cosine of the angle between the
+            // reflection vector and the eye vector. A negative number means the
+            // light reflects away from the eye.
+            let reflectv = lightv.negate().reflect(normalv);
+            let reflect_dot_eye = reflectv.dot_product(eyev);
+
+            if reflect_dot_eye <= 0.0
+            {
+                specular = color_black;
+            }
+            else
+            {
+                // compute the specular contribution
+                let factor = reflect_dot_eye.powf(self.shininess);
+                specular = light.intensity.multiply(self.specular).multiply(factor);
+            }
+        }
+
+        // Add the three contributions together to get the final shading
+        ambient.add(diffuse).add(specular)
     }
 }
 
@@ -48,5 +99,24 @@ mod tests
         assert_eq!(material1.diffuse, 0.9);
         assert_eq!(material1.specular, 0.9);
         assert_eq!(material1.shininess, 200.0);
+
+        // p.86 Scenario: Lighting with the eye between the light and the surface
+        let material2 = Material::new();
+        let position2 = create_point(0.0, 0.0, 0.0);
+        let eyev2 = create_vector(0.0, 0.0, -1.0);
+        let normalv2 = create_vector(0.0, 0.0, -1.0);
+        let light2 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
+        let result2 = material2.lighting(light2, position2, eyev2, normalv2);
+        assert_eq!(result2, create_color(1.9, 1.9, 1.9));
+
+        // p.86 Scenario: Lighting with the eye between the light and the surface, eye offset 45 degrees
+        let material3 = Material::new();
+        let position3 = create_point(0.0, 0.0, 0.0);
+        let sqrt2 = 2.0_f64.sqrt();
+        let eyev3 = create_vector(0.0, sqrt2 / 2.0, -sqrt2 / 2.0);
+        let normalv3 = create_vector(0.0, 0.0, -1.0);
+        let light3 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
+        let result3 = material3.lighting(light3, position3, eyev3, normalv3);
+        assert_eq!(result3, create_color(1.0, 1.0, 1.0));
     }
 }

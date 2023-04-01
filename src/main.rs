@@ -6,6 +6,7 @@ mod matrix;
 mod ray;
 mod intersections;
 mod material;
+mod pointlight;
 
 use crate::tuple::*;
 use crate::canvas::*;
@@ -13,6 +14,7 @@ use crate::sphere::*;
 use crate::ray::*;
 use crate::intersections::*;
 use crate::material::*;
+use crate::pointlight::*;
 
 fn main()
 {
