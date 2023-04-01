@@ -118,5 +118,32 @@ mod tests
         let light3 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
         let result3 = material3.lighting(light3, position3, eyev3, normalv3);
         assert_eq!(result3, create_color(1.0, 1.0, 1.0));
+
+        // p.87 Scenario: Lighting with eye opposite surface, light offset 45 degrees
+        let material4 = Material::new();
+        let position4 = create_point(0.0, 0.0, 0.0);
+        let eyev4 = create_vector(0.0, 0.0, -1.0);
+        let normalv4 = create_vector(0.0, 0.0, -1.0);
+        let light4 = PointLight::new(create_point(0.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
+        let result4 = material4.lighting(light4, position4, eyev4, normalv4);
+        assert_eq!(result4, create_color(0.7364, 0.7364, 0.7364));
+
+        // p.87 Scenario: Lighting with eye in the path of the reflection vector
+        let material5 = Material::new();
+        let position5 = create_point(0.0, 0.0, 0.0);
+        let eyev5 = create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0);
+        let normalv5 = create_vector(0.0, 0.0, -1.0);
+        let light5 = PointLight::new(create_point(0.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
+        let result5 = material5.lighting(light5, position5, eyev5, normalv5);
+        assert_eq!(result5, create_color(1.6364, 1.6364, 1.6364));
+
+        // p.88 Scenario: Lighting with the light behind the surface
+        let material6 = Material::new();
+        let position6 = create_point(0.0, 0.0, 0.0);
+        let eyev6 = create_vector(0.0, 0.0, -1.0);
+        let normalv6 = create_vector(0.0, 0.0, -1.0);
+        let light6 = PointLight::new(create_point(0.0, 0.0, 10.0), create_color(1.0, 1.0, 1.0));
+        let result6 = material6.lighting(light6, position6, eyev6, normalv6);
+        assert_eq!(result6, create_color(0.1, 0.1, 0.1));
     }
 }
