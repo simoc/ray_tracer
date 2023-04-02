@@ -56,7 +56,7 @@ fn main()
             // describe the point on the wall that the ray will target
             let position = create_point(world_x, world_y, wall_z);
 
-            let r = Ray::new(ray_origin, position.sub(ray_origin));
+            let r = Ray::new(ray_origin, position.sub(ray_origin).normalize());
             let xs = shape.intersect(r);
             if xs.len() == 2
             {
