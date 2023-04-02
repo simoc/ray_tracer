@@ -75,12 +75,6 @@ impl Tuple
     {
         self.sub(normal.multiply(2.0 * self.dot_product(normal)))
     }
-
-    // Multiply color components by intensity components
-    pub fn multiply_intensity(&self, intensity: Tuple) -> Tuple
-    {
-        Tuple{x: self.x * intensity.x, y: self.y * intensity.y, z: self.z * intensity.z, w: self.w * intensity.w}
-    }
 }
 
 impl fmt::Display for Tuple
