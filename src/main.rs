@@ -72,7 +72,7 @@ fn main()
                         let normal = hit.object.normal_at(point);
                         let eye = r.direction.negate();
                         let color = hit.object.get_material().lighting(light, point, eye, normal);
-                        c.write_pixel(usize::from(x), usize::from(y), color)
+                        c.write_pixel(usize::from(x), usize::from(y), color);
                     },
                     _ => (),
                 }
