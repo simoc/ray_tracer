@@ -33,9 +33,15 @@ fn main()
     let half_wall_size = wall_size / 2.0;
 
     let mut c = Canvas::new(usize::from(canvas_pixels), usize::from(canvas_pixels));
-    let red_color = create_color(1.0, 0.0, 0.0);
 
-    let shape = Sphere::new(1);
+    let mut shape = Sphere::new(1);
+    let mut material = Material::new();
+    material.color = create_color(1.0, 0.2, 1.0);
+    shape.set_material(material);
+
+    let light_position = create_point(-10.0, 10.0, -10.0);
+    let light_color = create_color(1.0, 1.0, 1.0);
+    let light = PointLight::new(light_position, light_color);
 
     // for each row of ipxels in the canvas
     for y in 0..canvas_pixels - 1
@@ -60,7 +66,14 @@ fn main()
                 let h = is.hit();
                 match h
                 {
-                    Some(_h) => c.write_pixel(usize::from(x), usize::from(y), red_color),
+                    Some(hit) =>
+                    {
+                        let point = r.position(hit.t);
+                        let normal = hit.object.normal_at(point);
+                        let eye = r.direction.negate();
+                        let color = hit.object.get_material().lighting(light, point, eye, normal);
+                        c.write_pixel(usize::from(x), usize::from(y), color)
+                    },
                     _ => (),
                 }
             }
