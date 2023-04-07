@@ -15,7 +15,7 @@ and borrow checking as simple as possible.
 - [x] Chapter 3 - Matrices
 - [x] Chapter 4 - Matrix Transformations
 - [x] Chapter 5 - Ray-Sphere Intersections
-- [ ] Chapter 6 - Light and Shading
+- [x] Chapter 6 - Light and Shading
 - [ ] Chapter 7 - Making a Scene
 - [ ] Chapter 8 - Shadows
 - [ ] Chapter 9 - Planes
