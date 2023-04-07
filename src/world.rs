@@ -73,5 +73,17 @@ mod tests
         assert!(fuzzy_equal(xs.get_intersection(1).t, 4.5));
         assert!(fuzzy_equal(xs.get_intersection(2).t, 5.5));
         assert!(fuzzy_equal(xs.get_intersection(3).t, 6.0));
+
+        // p.93 Scenario: Precomputing the state of an intersection
+        let world3 = World::default_world();
+        let ray3 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let shape3 = Sphere::new(3);
+        let intersection3 = Intersection::new(4.0, shape3.clone());
+        let comps3 = intersection3.prepare_computation(ray3);
+        assert!(fuzzy_equal(comps3.t, intersection3.t));
+        assert_eq!(comps3.object, intersection3.object);
+        assert_eq!(comps3.point, create_point(0.0, 0.0, -1.0));
+        assert_eq!(comps3.eyev, create_vector(0.0, 0.0, -1.0));
+        assert_eq!(comps3.normalv, create_vector(0.0, 0.0, -1.0));
     }
 }

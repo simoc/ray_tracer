@@ -1,4 +1,6 @@
 use std::fmt;
+use crate::computations::*;
+use crate::ray::*;
 use crate::sphere::*;
 
 #[derive(Clone, Debug)]
@@ -13,6 +15,15 @@ impl Intersection
     pub fn new(t: f64, object: Sphere) -> Self
     {
         Intersection{t: t, object: object}
+    }
+
+    pub fn prepare_computation(&self, ray: Ray) -> Computations
+    {
+        // precompute some useful values
+        let point = ray.position(self.t);
+        Computations::new(self.t, self.object.clone(), point,
+            ray.direction.negate(),
+            self.object.normal_at(point))
     }
 }
 
