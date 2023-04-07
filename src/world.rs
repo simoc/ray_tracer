@@ -1,6 +1,9 @@
+use crate::arithmetic::*;
+use crate::intersections::*;
 use crate::material::*;
 use crate::matrix::*;
 use crate::pointlight::*;
+use crate::ray::*;
 use crate::sphere::*;
 use crate::tuple::*;
 
@@ -30,6 +33,20 @@ impl World
 
         World{light: light, objects: vec![sphere1, sphere2]}
     }
+
+    pub fn intersect_world(&self, ray: Ray) -> Intersections
+    {
+        let mut intersections = Vec::new();
+        for object in &self.objects
+        {
+            let xs = object.intersect(ray);
+            for t in xs
+            {
+                intersections.push(Intersection::new(t, object.clone()));
+            }
+        }
+        Intersections::new(intersections)
+    }
 }
 
 #[cfg(test)]
@@ -46,5 +63,15 @@ mod tests
         assert_eq!(world1.light.intensity, create_color(1.0, 1.0, 1.0));
         assert!(world1.objects.contains(&Sphere::new(1)));
         assert!(world1.objects.contains(&Sphere::new(2)));
+
+        // p.92 Scenario: Intersect a world with a ray
+        let world2 = World::default_world();
+        let ray2 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let xs = world2.intersect_world(ray2);
+        assert_eq!(xs.count(), 4);
+        assert!(fuzzy_equal(xs.get_intersection(0).t, 4.0));
+        assert!(fuzzy_equal(xs.get_intersection(1).t, 4.5));
+        assert!(fuzzy_equal(xs.get_intersection(2).t, 5.5));
+        assert!(fuzzy_equal(xs.get_intersection(3).t, 6.0));
     }
 }
