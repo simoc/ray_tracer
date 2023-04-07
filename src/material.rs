@@ -35,8 +35,8 @@ impl Material
         // light vector and the normal vector. A negative number means the
         // light is on the other side of the surface.
         let light_dot_normal = lightv.dot_product(normalv);
-        let mut diffuse: Tuple;
-        let mut specular: Tuple;
+        let diffuse: Tuple;
+        let specular: Tuple;
         let color_black = create_color(0.0, 0.0, 0.0);
         if light_dot_normal < 0.0
         {
