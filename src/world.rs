@@ -85,5 +85,25 @@ mod tests
         assert_eq!(comps3.point, create_point(0.0, 0.0, -1.0));
         assert_eq!(comps3.eyev, create_vector(0.0, 0.0, -1.0));
         assert_eq!(comps3.normalv, create_vector(0.0, 0.0, -1.0));
+
+        // p.94 Scenario: The hit, when an intersection occurs on the outside
+        let world4 = World::default_world();
+        let ray4 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let shape4 = Sphere::new(4);
+        let intersection4 = Intersection::new(4.0, shape4.clone());
+        let comps4 = intersection4.prepare_computation(ray4);
+        assert!(comps4.inside == false);
+
+        // p.95 Scenario: The hit, when an intersection occurs on the inside
+        let world5 = World::default_world();
+        let ray5 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 0.0, 1.0));
+        let shape5 = Sphere::new(5);
+        let intersection5 = Intersection::new(1.0, shape5.clone());
+        let comps5 = intersection5.prepare_computation(ray5);
+        assert_eq!(comps5.point, create_point(0.0, 0.0, 1.0));
+        assert_eq!(comps5.eyev, create_vector(0.0, 0.0, -1.0));
+        assert!(comps5.inside);
+        // normal would have been (0, 0, 1), but is inverted!
+        assert_eq!(comps5.normalv, create_vector(0.0, 0.0, -1.0));
     }
 }

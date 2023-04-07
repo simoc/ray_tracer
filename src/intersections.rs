@@ -21,9 +21,20 @@ impl Intersection
     {
         // precompute some useful values
         let point = ray.position(self.t);
+        let eyev = ray.direction.negate();
+        let mut normalv = self.object.normal_at(point);
+        let inside: bool;
+        if normalv.dot_product(eyev) < 0.0
+        {
+            inside = true;
+            normalv = normalv.negate();
+        }
+        else
+        {
+            inside = false;
+        }
         Computations::new(self.t, self.object.clone(), point,
-            ray.direction.negate(),
-            self.object.normal_at(point))
+            eyev, normalv, inside)
     }
 }
 
