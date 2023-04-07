@@ -6,9 +6,9 @@ use crate::arithmetic::*;
 #[derive(Clone, Debug)]
 pub struct Matrix
 {
-    pub rows: usize,
-    pub columns: usize,
-    pub cells: Vec<Vec<f64>>,
+    rows: usize,
+    columns: usize,
+    cells: Vec<Vec<f64>>,
 }
 
 impl Matrix
