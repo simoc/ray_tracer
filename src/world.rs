@@ -97,7 +97,6 @@ mod tests
         assert!(fuzzy_equal(xs.get_intersection(3).t, 6.0));
 
         // p.93 Scenario: Precomputing the state of an intersection
-        let world3 = World::default_world();
         let ray3 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let shape3 = Sphere::new(3);
         let intersection3 = Intersection::new(4.0, shape3.clone());
@@ -109,7 +108,6 @@ mod tests
         assert_eq!(comps3.normalv, create_vector(0.0, 0.0, -1.0));
 
         // p.94 Scenario: The hit, when an intersection occurs on the outside
-        let world4 = World::default_world();
         let ray4 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let shape4 = Sphere::new(4);
         let intersection4 = Intersection::new(4.0, shape4.clone());
@@ -117,7 +115,6 @@ mod tests
         assert!(comps4.inside == false);
 
         // p.95 Scenario: The hit, when an intersection occurs on the inside
-        let world5 = World::default_world();
         let ray5 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 0.0, 1.0));
         let shape5 = Sphere::new(5);
         let intersection5 = Intersection::new(1.0, shape5.clone());
@@ -148,13 +145,13 @@ mod tests
         assert_eq!(color7, create_color(0.90498, 0.90498, 0.90498));
 
         // p.96 Scenario: Color when a ray misses
-        let mut world8 = World::default_world();
+        let world8 = World::default_world();
         let ray8 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 1.0, 0.0));
         let color8 = world8.color_at(ray8);
         assert_eq!(color8, create_color(0.0, 0.0, 0.0));
 
         // p.96 Scenario: Color when a ray hits
-        let mut world9 = World::default_world();
+        let world9 = World::default_world();
         let ray9 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let color9 = world9.color_at(ray9);
         assert_eq!(color9, create_color(0.38066, 0.47583, 0.2855));
