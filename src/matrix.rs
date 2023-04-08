@@ -253,6 +253,43 @@ impl Matrix
         m.cells[2][1] = zy;
         m
     }
+
+    pub fn view_transform(from: Tuple, to: Tuple, up: Tuple) -> Matrix
+    {
+        let forward = to.sub(from).normalize();
+        let upn = up.normalize();
+        let left = forward.cross_product(upn);
+        let true_up = left.cross_product(forward);
+
+        let left_vec = left.get_vec();
+        let true_up_vec = true_up.get_vec();
+        let forward_vec = forward.get_vec();
+
+        let mut orientation = Matrix::identity(4);
+
+        orientation.cells[0][0] = left_vec[0];
+        orientation.cells[0][1] = left_vec[1];
+        orientation.cells[0][2] = left_vec[2];
+        orientation.cells[0][3] = 0.0;
+
+        orientation.cells[1][0] = true_up_vec[0];
+        orientation.cells[1][1] = true_up_vec[1];
+        orientation.cells[1][2] = true_up_vec[2];
+        orientation.cells[1][3] = 0.0;
+
+        orientation.cells[2][0] = -forward_vec[0];
+        orientation.cells[2][1] = -forward_vec[1];
+        orientation.cells[2][2] = -forward_vec[2];
+        orientation.cells[2][3] = 0.0;
+
+        orientation.cells[3][0] = 0.0;
+        orientation.cells[3][1] = 0.0;
+        orientation.cells[3][2] = 0.0;
+        orientation.cells[3][3] = 1.0;
+
+        let from_vec = from.get_vec();
+        orientation.multiply(&Matrix::translation(-from_vec[0], -from_vec[1], -from_vec[2]))
+    }
 }
 
 impl fmt::Display for Matrix
@@ -683,5 +720,40 @@ mod tests
         // p.54 Scenario: Chained transformations must be applied in reverse order
         let t = c.multiply(&b.multiply(&a));
         assert_eq!(t.multiply_tuple(p), create_point(15.0, 0.0, 7.0));
+    }
+
+    #[test]
+    fn test_view_transformations_feature()
+    {
+        // p.98 Scenario: The transformation matrix for the default orientation
+        let from1 = create_point(0.0, 0.0, 0.0);
+        let to1 = create_point(0.0, 0.0, -1.0);
+        let up1 = create_vector(0.0, 1.0, 0.0);
+        let t1 = Matrix::view_transform(from1, to1, up1);
+        assert_eq!(t1, Matrix::identity(4));
+
+        // p.98 Scenario: A view transformation matrix looking in positive z direction
+        let from2 = create_point(0.0, 0.0, 0.0);
+        let to2 = create_point(0.0, 0.0, 1.0);
+        let up2 = create_vector(0.0, 1.0, 0.0);
+        let t2 = Matrix::view_transform(from2, to2, up2);
+        assert_eq!(t2, Matrix::scaling(-1.0, 1.0, -1.0));
+
+        // p.99 Scenario: The view transformation moves the world
+        let from3 = create_point(0.0, 0.0, 8.0);
+        let to3 = create_point(0.0, 0.0, 0.0);
+        let up3 = create_vector(0.0, 1.0, 0.0);
+        let t3 = Matrix::view_transform(from3, to3, up3);
+        assert_eq!(t3, Matrix::translation(0.0, 0.0, -8.0));
+
+        // p.99 Scenario: An arbitrary view transformation
+        let from4 = create_point(1.0, 3.0, 2.0);
+        let to4 = create_point(4.0, -2.0, 8.0);
+        let up4 = create_vector(1.0, 1.0, 0.0);
+        let t4 = Matrix::view_transform(from4, to4, up4);
+        assert_eq!(t4, matrix_from("| -0.50709 | 0.50709 |  0.67612 | -2.36643 |\n\
+                                    |  0.76772 | 0.60609 |  0.12122 | -2.82843 |\n\
+                                    | -0.35857 | 0.59761 | -0.71714 |  0.00000 |\n\
+                                    |  0.00000 | 0.00000 |  0.00000 |  1.00000 |\n"));
     }
 }
