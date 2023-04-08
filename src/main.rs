@@ -8,6 +8,8 @@ mod intersections;
 mod material;
 mod pointlight;
 mod computations;
+mod world;
+mod camera;
 
 use crate::tuple::*;
 use crate::canvas::*;
@@ -17,6 +19,8 @@ use crate::intersections::*;
 use crate::material::*;
 use crate::pointlight::*;
 use crate::computations::*;
+use crate::world::*;
+use crate::camera::*;
 
 fn main()
 {
