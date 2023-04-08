@@ -1,4 +1,5 @@
 use crate::arithmetic::*;
+use crate::computations::*;
 use crate::intersections::*;
 use crate::material::*;
 use crate::matrix::*;
@@ -46,6 +47,12 @@ impl World
             }
         }
         Intersections::new(intersections)
+    }
+
+    pub fn shade_hit(&self, comps: Computations) -> Tuple
+    {
+        comps.object.get_material().lighting(self.light, comps.point,
+            comps.eyev, comps.normalv)
     }
 }
 
@@ -105,5 +112,24 @@ mod tests
         assert!(comps5.inside);
         // normal would have been (0, 0, 1), but is inverted!
         assert_eq!(comps5.normalv, create_vector(0.0, 0.0, -1.0));
+
+        // p.95 Scenario: Shading an intersection
+        let world6 = World::default_world();
+        let ray6 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let shape6 = world6.objects[0].clone();
+        let intersection6 = Intersection::new(4.0, shape6.clone());
+        let comps6 = intersection6.prepare_computation(ray6);
+        let color6 = world6.shade_hit(comps6);
+        assert_eq!(color6, create_color(0.38066, 0.47583, 0.2855));
+
+        // p.95 Scenario: Shading an intersection
+        let mut world7 = World::default_world();
+        world7.light = PointLight::new(create_point(0.0, 0.25, 0.0), create_color(1.0, 1.0, 1.0));
+        let ray7 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 0.0, 1.0));
+        let shape7 = world7.objects[1].clone();
+        let intersection7 = Intersection::new(0.5, shape7.clone());
+        let comps7 = intersection7.prepare_computation(ray7);
+        let color7 = world7.shade_hit(comps7);
+        assert_eq!(color7, create_color(0.90498, 0.90498, 0.90498));
     }
 }
