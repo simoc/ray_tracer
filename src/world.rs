@@ -54,6 +54,21 @@ impl World
         comps.object.get_material().lighting(self.light, comps.point,
             comps.eyev, comps.normalv)
     }
+
+    pub fn color_at(&self, ray: Ray) -> Tuple
+    {
+        let intersections = self.intersect_world(ray);
+        match intersections.hit()
+        {
+            Some(intersection) =>
+            {
+                let comps = intersection.prepare_computation(ray);
+                self.shade_hit(comps)
+            },
+            None => create_color(0.0, 0.0, 0.0),
+        }
+    }
+
 }
 
 #[cfg(test)]
@@ -131,5 +146,33 @@ mod tests
         let comps7 = intersection7.prepare_computation(ray7);
         let color7 = world7.shade_hit(comps7);
         assert_eq!(color7, create_color(0.90498, 0.90498, 0.90498));
+
+        // p.96 Scenario: Color when a ray misses
+        let mut world8 = World::default_world();
+        let ray8 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 1.0, 0.0));
+        let color8 = world8.color_at(ray8);
+        assert_eq!(color8, create_color(0.0, 0.0, 0.0));
+
+        // p.96 Scenario: Color when a ray hits
+        let mut world9 = World::default_world();
+        let ray9 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let color9 = world9.color_at(ray9);
+        assert_eq!(color9, create_color(0.38066, 0.47583, 0.2855));
+
+        // p.97 Scenario: The color with an intersection behind the ray
+        let mut world10 = World::default_world();
+        let mut outer10 = world10.objects[0].clone();
+        let mut outer_material10 = outer10.get_material();
+        outer_material10.ambient = 1.0;
+        outer10.set_material(outer_material10);
+        world10.objects[0] = outer10;
+        let mut inner10 = world10.objects[1].clone();
+        let mut inner_material10 = inner10.get_material();
+        inner_material10.ambient = 1.0;
+        inner10.set_material(inner_material10);
+        world10.objects[1] = inner10;
+        let ray10 = Ray::new(create_point(0.0, 0.0, 0.75), create_vector(0.0, 0.0, -1.0));
+        let color10 = world10.color_at(ray10);
+        assert_eq!(color10, inner_material10.color);
     }
 }
