@@ -1,9 +1,11 @@
 use std::fmt;
 use std::f64::consts::PI;
 use crate::arithmetic::*;
+use crate::canvas::*;
 use crate::matrix::*;
 use crate::ray::*;
 use crate::tuple::*;
+use crate::world::*;
 
 #[derive(Clone, Debug)]
 pub struct Camera
@@ -60,6 +62,21 @@ impl Camera
         let direction = pixel.sub(origin).normalize();
         Ray{origin: origin, direction: direction}
     }
+
+    pub fn render(&self, world: World) -> Canvas
+    {
+        let mut image = Canvas::new(self.hsize.into(), self.vsize.into());
+        for y in 0..self.vsize - 1
+        {
+            for x in 0..self.hsize - 1
+            {
+                let ray = self.ray_for_pixel(x.into(), y.into());
+                let color = world.color_at(ray);
+                image.write_pixel(x.into(), y.into(), color);
+            }
+        }
+        image
+    }
 }
 
 #[cfg(test)]
@@ -104,5 +121,15 @@ mod tests
         assert_eq!(r6.origin, create_point(0.0, 2.0, -5.0));
         let sqrt2 = 2.0_f64.sqrt();
         assert_eq!(r6.direction, create_vector(sqrt2 / 2.0, 0.0, -sqrt2 / 2.0));
+
+        // p.104 Scenario: Rendering a world with a camera
+        let world7 = World::default_world();
+        let mut c7 = Camera::new(11, 11, PI / 2.0);
+        let from7 = create_point(0.0, 0.0, -5.0);
+        let to7 = create_point(0.0, 0.0, 0.0);
+        let up7 = create_point(0.0, 1.0, 0.0);
+        c7.transform = Matrix::view_transform(from7, to7, up7);
+        let image7 = c7.render(world7);
+        assert_eq!(image7.pixel_at(5, 5), create_color(0.38066, 0.47583, 0.2855));
     }
 }
