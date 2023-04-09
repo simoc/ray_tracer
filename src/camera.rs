@@ -2,6 +2,7 @@ use std::fmt;
 use std::f64::consts::PI;
 use crate::arithmetic::*;
 use crate::matrix::*;
+use crate::ray::*;
 use crate::tuple::*;
 
 #[derive(Clone, Debug)]
@@ -39,6 +40,26 @@ impl Camera
             half_width, half_height, pixel_size,
             transform: Matrix::identity(4)}
     }
+
+    pub fn ray_for_pixel(&self, px: u16, py: u16) -> Ray
+    {
+        // the offset from the edge of the canvas to the pixel's center.
+        let xoffset = (f64::from(px) + 0.5) * self.pixel_size;
+        let yoffset = (f64::from(py) + 0.5) * self.pixel_size;
+
+        // the untransformed coordinates of the pixel in world space.
+        let world_x = self.half_width - xoffset;
+        let world_y = self.half_height - yoffset;
+
+        // using the camera matrix, transform the canvas point and the origin,
+        // and then compute the ray's direction vector.
+        // (remember that the camera is at z=-1).
+        let inverse = self.transform.inverse();
+        let pixel = inverse.multiply_tuple(create_point(world_x, world_y, -1.0));
+        let origin = inverse.multiply_tuple(create_point(0.0, 0.0, 0.0));
+        let direction = pixel.sub(origin).normalize();
+        Ray{origin: origin, direction: direction}
+    }
 }
 
 #[cfg(test)]
@@ -63,5 +84,25 @@ mod tests
         // p.101 Scenario: The pixel size for a vertical canvas
         let c3 = Camera::new(125, 200, PI / 2.0);
         assert!(fuzzy_equal(c3.pixel_size, 0.01));
+
+        // p.103 Scenario: Constructing a ray through the center of the canvas
+        let c4 = Camera::new(201, 101, PI / 2.0);
+        let r4 = c4.ray_for_pixel(100, 50);
+        assert_eq!(r4.origin, create_point(0.0, 0.0, 0.0));
+        assert_eq!(r4.direction, create_vector(0.0, 0.0, -1.0));
+
+        // p.103 Scenario: Constructing a ray through a corner of the canvas
+        let c5 = Camera::new(201, 101, PI / 2.0);
+        let r5 = c5.ray_for_pixel(0, 0);
+        assert_eq!(r5.origin, create_point(0.0, 0.0, 0.0));
+        assert_eq!(r5.direction, create_vector(0.66519, 0.33259, -0.66851));
+
+        // p.103 Scenario: Constructing a ray when the camera is transformed
+        let mut c6 = Camera::new(201, 101, PI / 2.0);
+        c6.transform = Matrix::rotation_y(PI / 4.0).multiply(&Matrix::translation(0.0, -2.0, 5.0));
+        let r6 = c6.ray_for_pixel(100, 50);
+        assert_eq!(r6.origin, create_point(0.0, 2.0, -5.0));
+        let sqrt2 = 2.0_f64.sqrt();
+        assert_eq!(r6.direction, create_vector(sqrt2 / 2.0, 0.0, -sqrt2 / 2.0));
     }
 }
