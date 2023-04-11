@@ -69,6 +69,20 @@ impl World
         }
     }
 
+    pub fn is_shadowed(&self, point: Tuple) -> bool
+    {
+        let v = self.light.position.sub(point);
+        let distance = v.magnitude();
+        let direction = v.normalize();
+        let r = Ray::new(point, direction);
+        let intersections = self.intersect_world(r);
+        let h = intersections.hit();
+        match h
+        {
+            Some(intersection) => intersection.t < distance,
+            None => false
+        }
+    }
 }
 
 #[cfg(test)]
@@ -171,5 +185,29 @@ mod tests
         let ray10 = Ray::new(create_point(0.0, 0.0, 0.75), create_vector(0.0, 0.0, -1.0));
         let color10 = world10.color_at(ray10);
         assert_eq!(color10, inner_material10.color);
+    }
+
+    #[test]
+    fn test_world_shadow_feature()
+    {
+        // p.111 Scenario: There is no shadow when nothing collinear with point and light
+        let world1 = World::default_world();
+        let point1 = create_point(0.0, 10.0, 0.0);
+        assert!(world1.is_shadowed(point1) == false);
+
+        // p.112 Scenario: The shadow when an object is between the point and light
+        let world2 = World::default_world();
+        let point2 = create_point(10.0, -10.0, 10.0);
+        assert!(world2.is_shadowed(point2));
+
+        // p.112 Scenario: There is no shadow when object is behind the light
+        let world3 = World::default_world();
+        let point3 = create_point(-20.0, 20.0, -20.0);
+        assert!(world3.is_shadowed(point3) == false);
+
+        // p.112 Scenario: There is no shadow when object is behind the point
+        let world4 = World::default_world();
+        let point4 = create_point(-2.0, 2.0, -2.0);
+        assert!(world2.is_shadowed(point4) == false);
     }
 }
