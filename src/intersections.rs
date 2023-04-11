@@ -36,7 +36,7 @@ impl Intersection
         {
             inside = false;
         }
-        let over_point = point.add(normalv).multiply(EPSILON);
+        let over_point = point.add(normalv.multiply(EPSILON));
         Computations::new(self.t, self.object.clone(), point,
             eyev, normalv, inside, over_point)
     }
