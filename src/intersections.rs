@@ -181,5 +181,6 @@ mod tests
         let i1 = Intersection::new(5.0, shape1);
         let comps1 = i1.prepare_computation(r1);
         assert!(comps1.over_point.get_vec()[2] < -EPSILON / 2.0);
+        assert!(comps1.point.get_vec()[2] > comps1.over_point.get_vec()[2]);
     }
 }
