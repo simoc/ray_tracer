@@ -52,7 +52,7 @@ impl World
     pub fn shade_hit(&self, comps: Computations) -> Tuple
     {
         comps.object.get_material().lighting(self.light, comps.point,
-            comps.eyev, comps.normalv)
+            comps.eyev, comps.normalv, false)
     }
 
     pub fn color_at(&self, ray: Ray) -> Tuple

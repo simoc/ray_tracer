@@ -20,7 +20,8 @@ impl Material
             specular: 0.9, shininess: 200.0}
     }
 
-    pub fn lighting(&self, light: PointLight, point: Tuple, eyev: Tuple, normalv: Tuple) -> Tuple
+    pub fn lighting(&self, light: PointLight, point: Tuple, eyev: Tuple,
+    normalv: Tuple, in_shadow: bool) -> Tuple
     {
         // combine the surface color with the light's color/intensity
         let effective_color = self.color.hadamard_product(light.intensity);
@@ -106,7 +107,7 @@ mod tests
         let eyev2 = create_vector(0.0, 0.0, -1.0);
         let normalv2 = create_vector(0.0, 0.0, -1.0);
         let light2 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result2 = material2.lighting(light2, position2, eyev2, normalv2);
+        let result2 = material2.lighting(light2, position2, eyev2, normalv2, false);
         assert_eq!(result2, create_color(1.9, 1.9, 1.9));
 
         // p.86 Scenario: Lighting with the eye between the light and the surface, eye offset 45 degrees
@@ -116,7 +117,7 @@ mod tests
         let eyev3 = create_vector(0.0, sqrt2 / 2.0, -sqrt2 / 2.0);
         let normalv3 = create_vector(0.0, 0.0, -1.0);
         let light3 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result3 = material3.lighting(light3, position3, eyev3, normalv3);
+        let result3 = material3.lighting(light3, position3, eyev3, normalv3, false);
         assert_eq!(result3, create_color(1.0, 1.0, 1.0));
 
         // p.87 Scenario: Lighting with eye opposite surface, light offset 45 degrees
@@ -125,7 +126,7 @@ mod tests
         let eyev4 = create_vector(0.0, 0.0, -1.0);
         let normalv4 = create_vector(0.0, 0.0, -1.0);
         let light4 = PointLight::new(create_point(0.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result4 = material4.lighting(light4, position4, eyev4, normalv4);
+        let result4 = material4.lighting(light4, position4, eyev4, normalv4, false);
         assert_eq!(result4, create_color(0.7364, 0.7364, 0.7364));
 
         // p.87 Scenario: Lighting with eye in the path of the reflection vector
@@ -134,7 +135,7 @@ mod tests
         let eyev5 = create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0);
         let normalv5 = create_vector(0.0, 0.0, -1.0);
         let light5 = PointLight::new(create_point(0.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result5 = material5.lighting(light5, position5, eyev5, normalv5);
+        let result5 = material5.lighting(light5, position5, eyev5, normalv5, false);
         assert_eq!(result5, create_color(1.6364, 1.6364, 1.6364));
 
         // p.88 Scenario: Lighting with the light behind the surface
@@ -143,7 +144,17 @@ mod tests
         let eyev6 = create_vector(0.0, 0.0, -1.0);
         let normalv6 = create_vector(0.0, 0.0, -1.0);
         let light6 = PointLight::new(create_point(0.0, 0.0, 10.0), create_color(1.0, 1.0, 1.0));
-        let result6 = material6.lighting(light6, position6, eyev6, normalv6);
+        let result6 = material6.lighting(light6, position6, eyev6, normalv6, false);
         assert_eq!(result6, create_color(0.1, 0.1, 0.1));
+
+        // p.110 Scenario: Lighting with the surface in shadow
+        let material7 = Material::new();
+        let position7 = create_point(0.0, 0.0, 0.0);
+        let eyev7 = create_vector(0.0, 0.0, -1.0);
+        let normalv7 = create_vector(0.0, 0.0, -1.0);
+        let light7 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
+        let in_shadow = true;
+        let result7 = material7.lighting(light7, position7, eyev7, normalv7, in_shadow);
+        assert_eq!(result7, create_color(0.1, 0.1, 0.1));
     }
 }
