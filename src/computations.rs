@@ -10,13 +10,14 @@ pub struct Computations
     pub eyev: Tuple,
     pub normalv: Tuple,
     pub inside: bool,
+    pub over_point: Tuple,
 }
 
 impl Computations
 {
     pub fn new(t: f64, object: Sphere, point: Tuple, eyev: Tuple,
-         normalv: Tuple, inside: bool) -> Self
+         normalv: Tuple, inside: bool, over_point: Tuple) -> Self
     {
-        Computations{t, object, point, eyev, normalv, inside}
+        Computations{t, object, point, eyev, normalv, inside, over_point}
     }
 }
