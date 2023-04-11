@@ -51,8 +51,9 @@ impl World
 
     pub fn shade_hit(&self, comps: Computations) -> Tuple
     {
+        let shadowed = self.is_shadowed(comps.over_point);
         comps.object.get_material().lighting(self.light, comps.point,
-            comps.eyev, comps.normalv, false)
+            comps.eyev, comps.normalv, shadowed)
     }
 
     pub fn color_at(&self, ray: Ray) -> Tuple
@@ -209,5 +210,18 @@ mod tests
         let world4 = World::default_world();
         let point4 = create_point(-2.0, 2.0, -2.0);
         assert!(world2.is_shadowed(point4) == false);
+
+        // p.114 Scenario: shade_hit() is given an intersection in shadow
+        let mut world5 = World::default_world();
+        world5.light = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
+        let sphere1 = Sphere::new(1);
+        let mut sphere2 = Sphere::new(2);
+        sphere2.set_transform(Matrix::translation(10.0, 0.0, 0.0));
+        world5.objects = vec![sphere1.clone(), sphere2.clone()];
+        let ray5 = Ray::new(create_point(0.0, 0.0, 5.0), create_vector(0.0, 0.0, 1.0));
+        let intersection5 = Intersection::new(4.0, sphere2);
+        let comps5 = intersection5.prepare_computation(ray5);
+        let color5 = world5.shade_hit(comps5);
+        assert_eq!(color5, create_color(0.1, 0.1, 0.1));
     }
 }
