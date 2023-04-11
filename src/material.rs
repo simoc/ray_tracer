@@ -39,7 +39,12 @@ impl Material
         let diffuse: Tuple;
         let specular: Tuple;
         let color_black = create_color(0.0, 0.0, 0.0);
-        if light_dot_normal < 0.0
+        if in_shadow
+        {
+            diffuse = color_black;
+            specular = color_black;
+        }
+        else if light_dot_normal < 0.0
         {
             diffuse = color_black;
             specular = color_black;
@@ -153,8 +158,8 @@ mod tests
         let eyev7 = create_vector(0.0, 0.0, -1.0);
         let normalv7 = create_vector(0.0, 0.0, -1.0);
         let light7 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let in_shadow = true;
-        let result7 = material7.lighting(light7, position7, eyev7, normalv7, in_shadow);
+        let in_shadow7 = true;
+        let result7 = material7.lighting(light7, position7, eyev7, normalv7, in_shadow7);
         assert_eq!(result7, create_color(0.1, 0.1, 0.1));
     }
 }
