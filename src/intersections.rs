@@ -1,7 +1,10 @@
 use std::fmt;
+use crate::arithmetic::*;
 use crate::computations::*;
+use crate::matrix::*;
 use crate::ray::*;
 use crate::sphere::*;
+use crate::tuple::*;
 
 #[derive(Clone, Debug)]
 pub struct Intersection
@@ -33,8 +36,9 @@ impl Intersection
         {
             inside = false;
         }
+        let over_point = point.add(normalv).multiply(EPSILON);
         Computations::new(self.t, self.object.clone(), point,
-            eyev, normalv, inside)
+            eyev, normalv, inside, over_point)
     }
 }
 
@@ -165,5 +169,17 @@ mod tests
             Some(x) => assert_eq!(x, j64),
             None => assert!(false),
         }
+    }
+
+    #[test]
+    fn test_intersections_shadow_feature()
+    {
+        // p.115 Scenario: The hit should offset the point
+        let r1 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let mut shape1 = Sphere::new(1);
+        shape1.set_transform(Matrix::translation(0.0, 0.0, 1.0));
+        let i1 = Intersection::new(5.0, shape1);
+        let comps1 = i1.prepare_computation(r1);
+        assert!(comps1.over_point.get_vec()[2] < -EPSILON / 2.0);
     }
 }
