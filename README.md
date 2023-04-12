@@ -17,7 +17,7 @@ and borrow checking as simple as possible.
 - [x] Chapter 5 - Ray-Sphere Intersections
 - [x] Chapter 6 - Light and Shading
 - [x] Chapter 7 - Making a Scene
-- [ ] Chapter 8 - Shadows
+- [x] Chapter 8 - Shadows
 - [ ] Chapter 9 - Planes
 - [ ] Chapter 10 - Patterns
 - [ ] Chapter 11 - Reflection and Refraction
@@ -27,5 +27,5 @@ and borrow checking as simple as possible.
 - [ ] Chapter 15 - Triangles
 - [ ] Chapter 16 - Constructive Solid Geometry (CSG)
 - [ ] Chapter 17 - Next Steps
-- [ ] A1 - Rendering the Cover Image
+- [ ] Appendix 1 - Rendering the Cover Image
 
