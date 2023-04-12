@@ -4,6 +4,7 @@ use crate::tuple::*;
 use crate::ray::*;
 use crate::matrix::*;
 use crate::material::*;
+use crate::shape::*;
 
 #[derive(Clone, Debug)]
 pub struct Sphere
@@ -11,6 +12,29 @@ pub struct Sphere
     id: i32,
     transform: Matrix,
     material: Material
+}
+
+impl Shape for Sphere
+{
+    fn get_transform(&self) -> Matrix
+    {
+        self.transform.clone()
+    }
+
+    fn set_transform(&mut self, transform: Matrix)
+    {
+        self.transform = transform;
+    }
+
+    fn get_material(&self) -> Material
+    {
+        self.material
+    }
+
+    fn set_material(&mut self, material: Material)
+    {
+        self.material = material;
+    }
 }
 
 impl Sphere
@@ -44,16 +68,6 @@ impl Sphere
         return vec![t1, t2];
     }
 
-    pub fn get_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
-    }
-
     pub fn normal_at(&self, world_point: Tuple) -> Tuple
     {
         let inverse = self.transform.inverse();
@@ -64,17 +78,6 @@ impl Sphere
         let v2 = create_vector(v[0], v[1], v[2]); // resets world_normal.w to zero
         v2.normalize()
     }
-
-    pub fn get_material(&self) -> Material
-    {
-        self.material
-    }
-
-    pub fn set_material(&mut self, material: Material)
-    {
-        self.material = material;
-    }
-
 }
 
 impl PartialEq for Sphere

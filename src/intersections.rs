@@ -3,6 +3,7 @@ use crate::arithmetic::*;
 use crate::computations::*;
 use crate::matrix::*;
 use crate::ray::*;
+use crate::shape::*;
 use crate::sphere::*;
 use crate::tuple::*;
 

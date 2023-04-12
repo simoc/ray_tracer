@@ -10,6 +10,7 @@ mod pointlight;
 mod computations;
 mod world;
 mod camera;
+mod shape;
 
 use std::f64::consts::PI;
 use crate::tuple::*;
@@ -23,6 +24,7 @@ use crate::computations::*;
 use crate::world::*;
 use crate::camera::*;
 use crate::matrix::*;
+use crate::shape::*;
 
 fn main()
 {

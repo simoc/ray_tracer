@@ -5,6 +5,7 @@ use crate::material::*;
 use crate::matrix::*;
 use crate::pointlight::*;
 use crate::ray::*;
+use crate::shape::*;
 use crate::sphere::*;
 use crate::tuple::*;
 
