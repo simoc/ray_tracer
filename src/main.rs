@@ -31,7 +31,7 @@ fn main()
     // p.107 Chapter 7, Putting It Together
 
     // 1. The floor is an extremely flattened sphere with a matte texture.
-    let mut floor = Sphere::new(1);
+    let mut floor = Shape::new_sphere(1);
     floor.set_transform(Matrix::scaling(10.0, 0.1, 10.0));
     let mut floor_material = Material::new();
     floor_material.color = create_color(1.0, 0.9, 0.9);
@@ -40,7 +40,7 @@ fn main()
 
     // 2. The wall on the left has the same scale and color as the floor,
     // but is also rotated and translated into place.
-    let mut left_wall = Sphere::new(2);
+    let mut left_wall = Shape::new_sphere(2);
     let left_wall_translation = Matrix::translation(0.0, 0.0, 5.0);
     let left_wall_rotation_y = Matrix::rotation_y(-PI / 4.0);
     let left_wall_rotation_x = Matrix::rotation_x(PI / 2.0);
@@ -51,7 +51,7 @@ fn main()
 
     // 3. The wall on the right is identical to the left wall, but is rotated
     // the opposite direction in y.
-    let mut right_wall = Sphere::new(3);
+    let mut right_wall = Shape::new_sphere(3);
     let right_wall_translation = left_wall_translation;
     let right_wall_rotation_y = Matrix::rotation_y(PI / 4.0);
     let right_wall_rotation_x = left_wall_rotation_x;
@@ -62,7 +62,7 @@ fn main()
 
     // 4. The large sphere in the middle is a unit sphere, translated upward
     // slightly and colored green.
-    let mut middle_sphere = Sphere::new(4);
+    let mut middle_sphere = Shape::new_sphere(4);
     middle_sphere.set_transform(Matrix::translation(-0.5, 1.0, 0.5));
     let mut middle_sphere_material = Material::new();
     middle_sphere_material.color = create_color(0.1, 1.0, 0.5);
@@ -71,7 +71,7 @@ fn main()
     middle_sphere.set_material(middle_sphere_material);
 
     // 5. The smaller green sphere on the right is scalled in half.
-    let mut right_sphere = Sphere::new(5);
+    let mut right_sphere = Shape::new_sphere(5);
     let right_sphere_translation = Matrix::translation(1.5, 0.5, -0.5);
     let right_sphere_scaling = Matrix::scaling(0.5, 0.5, 0.5);
     right_sphere.set_transform(right_sphere_translation.multiply(&right_sphere_scaling));
@@ -82,7 +82,7 @@ fn main()
     right_sphere.set_material(right_sphere_material);
 
     // 6. The smallest sphere is scalled by a third, before being translated.
-    let mut left_sphere = Sphere::new(6);
+    let mut left_sphere = Shape::new_sphere(6);
     let left_sphere_translation = Matrix::translation(-1.5, 0.33, -0.75);
     let left_sphere_scaling = Matrix::scaling(0.33, 0.33, 0.33);
     left_sphere.set_transform(left_sphere_translation.multiply(&left_sphere_scaling));

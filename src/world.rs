@@ -13,7 +13,7 @@ use crate::tuple::*;
 pub struct World
 {
     pub light: PointLight,
-    pub objects: Vec<Sphere>,
+    pub objects: Vec<Shape>,
 }
 
 impl World
@@ -23,14 +23,14 @@ impl World
         let point = create_point(-10.0, 10.0, -10.0);
         let intensity = create_color(1.0, 1.0, 1.0);
         let light = PointLight::new(point, intensity);
-        let mut sphere1 = Sphere::new(1);
+        let mut sphere1 = Shape::new_sphere(1);
         let mut material = Material::new();
         material.color = create_color(0.8, 1.0, 0.6);
         material.diffuse = 0.7;
         material.specular = 0.2;
         sphere1.set_material(material);
 
-        let mut sphere2 = Sphere::new(2);
+        let mut sphere2 = Shape::new_sphere(2);
         sphere2.set_transform(Matrix::scaling(0.5, 0.5, 0.5));
 
         World{light: light, objects: vec![sphere1, sphere2]}
@@ -41,7 +41,7 @@ impl World
         let mut intersections = Vec::new();
         for object in &self.objects
         {
-            let xs = object.intersect(ray);
+            let xs = object.clone().intersect(ray);
             for t in xs
             {
                 intersections.push(Intersection::new(t, object.clone()));
@@ -99,8 +99,8 @@ mod tests
         let world1 = World::default_world();
         assert_eq!(world1.light.position, create_point(-10.0, 10.0, -10.0));
         assert_eq!(world1.light.intensity, create_color(1.0, 1.0, 1.0));
-        assert!(world1.objects.contains(&Sphere::new(1)));
-        assert!(world1.objects.contains(&Sphere::new(2)));
+        assert!(world1.objects.contains(&Shape::new_sphere(1)));
+        assert!(world1.objects.contains(&Shape::new_sphere(2)));
 
         // p.92 Scenario: Intersect a world with a ray
         let world2 = World::default_world();
@@ -114,7 +114,7 @@ mod tests
 
         // p.93 Scenario: Precomputing the state of an intersection
         let ray3 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
-        let shape3 = Sphere::new(3);
+        let shape3 = Shape::new_sphere(3);
         let intersection3 = Intersection::new(4.0, shape3.clone());
         let comps3 = intersection3.prepare_computation(ray3);
         assert!(fuzzy_equal(comps3.t, intersection3.t));
@@ -125,14 +125,14 @@ mod tests
 
         // p.94 Scenario: The hit, when an intersection occurs on the outside
         let ray4 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
-        let shape4 = Sphere::new(4);
+        let shape4 = Shape::new_sphere(4);
         let intersection4 = Intersection::new(4.0, shape4.clone());
         let comps4 = intersection4.prepare_computation(ray4);
         assert!(comps4.inside == false);
 
         // p.95 Scenario: The hit, when an intersection occurs on the inside
         let ray5 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 0.0, 1.0));
-        let shape5 = Sphere::new(5);
+        let shape5 = Shape::new_sphere(5);
         let intersection5 = Intersection::new(1.0, shape5.clone());
         let comps5 = intersection5.prepare_computation(ray5);
         assert_eq!(comps5.point, create_point(0.0, 0.0, 1.0));
@@ -210,13 +210,13 @@ mod tests
         // p.112 Scenario: There is no shadow when object is behind the point
         let world4 = World::default_world();
         let point4 = create_point(-2.0, 2.0, -2.0);
-        assert!(world2.is_shadowed(point4) == false);
+        assert!(world4.is_shadowed(point4) == false);
 
         // p.114 Scenario: shade_hit() is given an intersection in shadow
         let mut world5 = World::default_world();
         world5.light = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let sphere1 = Sphere::new(1);
-        let mut sphere2 = Sphere::new(2);
+        let sphere1 = Shape::new_sphere(1);
+        let mut sphere2 = Shape::new_sphere(2);
         sphere2.set_transform(Matrix::translation(10.0, 0.0, 0.0));
         world5.objects = vec![sphere1.clone(), sphere2.clone()];
         let ray5 = Ray::new(create_point(0.0, 0.0, 5.0), create_vector(0.0, 0.0, 1.0));

@@ -1,3 +1,4 @@
+use crate::shape::*;
 use crate::sphere::*;
 use crate::tuple::*;
 
@@ -5,7 +6,7 @@ use crate::tuple::*;
 pub struct Computations
 {
     pub t: f64,
-    pub object: Sphere,
+    pub object: Shape,
     pub point: Tuple,
     pub eyev: Tuple,
     pub normalv: Tuple,
@@ -15,7 +16,7 @@ pub struct Computations
 
 impl Computations
 {
-    pub fn new(t: f64, object: Sphere, point: Tuple, eyev: Tuple,
+    pub fn new(t: f64, object: Shape, point: Tuple, eyev: Tuple,
          normalv: Tuple, inside: bool, over_point: Tuple) -> Self
     {
         Computations{t, object, point, eyev, normalv, inside, over_point}
