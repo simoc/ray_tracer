@@ -58,9 +58,14 @@ impl Shape
 
     pub fn intersect(&mut self, ray: Ray) -> Vec<f64>
     {
+        let local_ray = ray.transform(self.get_transform().inverse());
         match self
         {
-            Shape::Sphere(s) => s.local_intersect(ray),
+            Shape::Sphere(s) =>
+            {
+                s.local_set_saved_ray(local_ray);
+                s.local_intersect(local_ray)
+            },
         }
     }
 
@@ -144,5 +149,13 @@ mod tests
         let _xs5 = s5.intersect(r5);
         assert_eq!(s5.get_saved_ray().origin, create_point(0.0, 0.0, -2.5));
         assert_eq!(s5.get_saved_ray().direction, create_vector(0.0, 0.0, 0.5));
+
+        // p.120 Scenario: Intersecting a translated shape with a ray
+        let r6 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let mut s6 = Shape::test_shape(6);
+        s6.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        let _xs6 = s6.intersect(r6);
+        assert_eq!(s6.get_saved_ray().origin, create_point(-5.0, 0.0, -5.0));
+        assert_eq!(s6.get_saved_ray().direction, create_vector(0.0, 0.0, 1.0));
     }
 }

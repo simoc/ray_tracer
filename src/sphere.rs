@@ -57,8 +57,7 @@ impl Sphere
 
     pub fn local_intersect(&mut self, ray: Ray) -> Vec<f64>
     {
-        let ray2 = ray.transform(self.transform.inverse());
-        self.saved_ray = ray2;
+        let ray2 = ray;
 
         // the vector from the sphere's centre, to the ray origin
         // remember: the sphere is centred at the world origin
@@ -83,6 +82,11 @@ impl Sphere
     pub fn local_get_saved_ray(&self) -> Ray
     {
         self.saved_ray
+    }
+
+    pub fn local_set_saved_ray(&mut self, saved_ray: Ray)
+    {
+        self.saved_ray = saved_ray;
     }
 
     pub fn local_normal_at(&self, world_point: Tuple) -> Tuple
