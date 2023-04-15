@@ -60,7 +60,7 @@ impl Camera
         let pixel = inverse.multiply_tuple(create_point(world_x, world_y, -1.0));
         let origin = inverse.multiply_tuple(create_point(0.0, 0.0, 0.0));
         let direction = pixel.sub(origin).normalize();
-        Ray{origin: origin, direction: direction}
+        Ray::new(origin, direction)
     }
 
     pub fn render(&self, world: World) -> Canvas
