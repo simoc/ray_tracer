@@ -1,6 +1,7 @@
 use std::fmt;
 use std::f64::consts::PI;
 use crate::arithmetic::*;
+use crate::intersections::*;
 use crate::tuple::*;
 use crate::ray::*;
 use crate::matrix::*;
@@ -58,13 +59,13 @@ impl Plane
 
     pub fn local_intersect(&mut self, ray: Ray) -> Vec<f64>
     {
-        if ray.direction.get_vec()[2] < EPSILON
+        if ray.direction.get_vec()[1].abs() < EPSILON
         {
             // empty set -- no intersection
             return Vec::new();
         }
-        // TODO: remaining intersection logic goes here
-        return Vec::new();
+        let t = -ray.origin.get_vec()[1] / ray.direction.get_vec()[1];
+        return vec![t];
     }
 
     pub fn local_get_saved_ray(&self) -> Ray
@@ -127,5 +128,19 @@ mod tests
         let r3 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 0.0, 1.0));
         let xs3 = p3.local_intersect(r3);
         assert_eq!(xs3.len(), 0);
+
+        // p.123 Scenario: A ray intersecting a plane from above
+        let mut p4 = Plane::new(4);
+        let r4 = Ray::new(create_point(0.0, 1.0, 0.0), create_vector(0.0, -1.0, 0.0));
+        let xs4 = p4.local_intersect(r4);
+        assert_eq!(xs4.len(), 1);
+        assert!(fuzzy_equal(xs4[0], 1.0));
+
+        // p.123 Scenario: A ray intersecting a plane from below
+        let mut p5 = Plane::new(5);
+        let r5 = Ray::new(create_point(0.0, -1.0, 0.0), create_vector(0.0, 1.0, 0.0));
+        let xs5 = p5.local_intersect(r5);
+        assert_eq!(xs5.len(), 1);
+        assert!(fuzzy_equal(xs5[0], 1.0));
     }
 }
