@@ -3,6 +3,7 @@ use std::fmt;
 use crate::sphere::*;
 use crate::material::*;
 use crate::matrix::*;
+use crate::plane::*;
 use crate::ray::*;
 use crate::tuple::*;
 
@@ -10,6 +11,7 @@ use crate::tuple::*;
 pub enum Shape
 {
     Sphere(Sphere),
+    Plane(Plane),
 }
 
 impl Shape
@@ -17,6 +19,11 @@ impl Shape
     pub fn new_sphere(id: i32) -> Shape
     {
         Shape::Sphere(Sphere::new(id))
+    }
+
+    pub fn new_plane(id: i32) -> Shape
+    {
+        Shape::Plane(Plane::new(id))
     }
 
     pub fn test_shape(id: i32) -> Shape
@@ -29,6 +36,7 @@ impl Shape
         match &self
         {
             Shape::Sphere(s) => s.get_local_transform(),
+            Shape::Plane(p) => p.get_local_transform(),
         }
     }
 
@@ -37,6 +45,7 @@ impl Shape
         match self
         {
             Shape::Sphere(s) => s.set_local_transform(transform),
+            Shape::Plane(p) => p.set_local_transform(transform),
         }
     }
 
@@ -45,6 +54,7 @@ impl Shape
         match self
         {
             Shape::Sphere(s) => s.get_local_material(),
+            Shape::Plane(p) => p.get_local_material(),
         }
     }
 
@@ -53,6 +63,7 @@ impl Shape
         match self
         {
             Shape::Sphere(s) => s.set_local_material(material),
+            Shape::Plane(p) => p.set_local_material(material),
         }
     }
 
@@ -66,6 +77,11 @@ impl Shape
                 s.local_set_saved_ray(local_ray);
                 s.local_intersect(local_ray)
             },
+            Shape::Plane(p) =>
+            {
+                p.local_set_saved_ray(local_ray);
+                p.local_intersect(local_ray)
+            },
         }
     }
 
@@ -74,6 +90,7 @@ impl Shape
         match self
         {
             Shape::Sphere(s) => s.local_get_saved_ray(),
+            Shape::Plane(p) => p.local_get_saved_ray(),
         }
     }
 
@@ -84,6 +101,7 @@ impl Shape
         let local_normal = match self
         {
             Shape::Sphere(s) => s.local_normal_at(local_point),
+            Shape::Plane(p) => p.local_normal_at(local_point),
         };
         let world_normal = inverse.transpose().multiply_tuple(local_normal);
         let v = world_normal.get_vec();
@@ -103,6 +121,15 @@ impl PartialEq for Shape
                 match other
                 {
                     Shape::Sphere(s2) => s1.get_id() == s2.get_id(),
+                    _ => false,
+                }
+            },
+            Shape::Plane(p1) =>
+            {
+                match other
+                {
+                    Shape::Plane(p2) => p1.get_id() == p2.get_id(),
+                    _ => false,
                 }
             },
         }
@@ -116,6 +143,7 @@ impl fmt::Display for Shape
         match self
         {
             Shape::Sphere(s) => write!(f, "sphere {}", s.get_id()),
+            Shape::Plane(p) => write!(f, "plane {}", p.get_id()),
         }
     }
 }

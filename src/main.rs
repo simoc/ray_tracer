@@ -11,6 +11,7 @@ mod computations;
 mod world;
 mod camera;
 mod shape;
+mod plane;
 
 use std::f64::consts::PI;
 use crate::tuple::*;
@@ -25,6 +26,7 @@ use crate::world::*;
 use crate::camera::*;
 use crate::matrix::*;
 use crate::shape::*;
+use crate::plane::*;
 
 fn main()
 {
