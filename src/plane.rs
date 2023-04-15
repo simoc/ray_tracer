@@ -18,6 +18,7 @@ pub struct Plane
     saved_ray: Ray,
 }
 
+// A plane in x and z axes, passing through the origin
 impl Plane
 {
     pub fn get_local_transform(&self) -> Matrix
