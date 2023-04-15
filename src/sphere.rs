@@ -89,15 +89,10 @@ impl Sphere
         self.saved_ray = saved_ray;
     }
 
-    pub fn local_normal_at(&self, world_point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, local_point: Tuple) -> Tuple
     {
-        let inverse = self.transform.inverse();
-        let object_point = inverse.clone().multiply_tuple(world_point);
-        let object_normal = object_point.sub(create_point(0.0, 0.0, 0.0));
-        let world_normal = inverse.transpose().multiply_tuple(object_normal);
-        let v = world_normal.get_vec();
-        let v2 = create_vector(v[0], v[1], v[2]); // resets world_normal.w to zero
-        v2.normalize()
+        let local_normal = local_point.sub(create_point(0.0, 0.0, 0.0));
+        local_normal
     }
 }
 

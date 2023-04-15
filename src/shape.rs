@@ -79,10 +79,16 @@ impl Shape
 
     pub fn normal_at(&self, world_point: Tuple) -> Tuple
     {
-        match self
+        let inverse = self.get_transform().inverse();
+        let local_point = inverse.clone().multiply_tuple(world_point);
+        let local_normal = match self
         {
-            Shape::Sphere(s) => s.local_normal_at(world_point),
-        }
+            Shape::Sphere(s) => s.local_normal_at(local_point),
+        };
+        let world_normal = inverse.transpose().multiply_tuple(local_normal);
+        let v = world_normal.get_vec();
+        let v2 = create_vector(v[0], v[1], v[2]); // resets world_normal.w to zero
+        v2.normalize()
     }
 }
 
