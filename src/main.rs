@@ -33,34 +33,11 @@ fn main()
     // p.107 Chapter 7, Putting It Together
 
     // 1. The floor is an extremely flattened sphere with a matte texture.
-    let mut floor = Shape::new_sphere(1);
-    floor.set_transform(Matrix::scaling(10.0, 0.1, 10.0));
+    let mut floor = Shape::new_plane(1);
     let mut floor_material = Material::new();
     floor_material.color = create_color(1.0, 0.9, 0.9);
     floor_material.specular = 0.0;
     floor.set_material(floor_material);
-
-    // 2. The wall on the left has the same scale and color as the floor,
-    // but is also rotated and translated into place.
-    let mut left_wall = Shape::new_sphere(2);
-    let left_wall_translation = Matrix::translation(0.0, 0.0, 5.0);
-    let left_wall_rotation_y = Matrix::rotation_y(-PI / 4.0);
-    let left_wall_rotation_x = Matrix::rotation_x(PI / 2.0);
-    let left_wall_scaling = Matrix::scaling(10.0, 0.01, 10.0);
-    left_wall.set_transform(left_wall_translation.multiply(&left_wall_rotation_y).
-        multiply(&left_wall_rotation_x).multiply(&left_wall_scaling));
-    left_wall.set_material(floor_material);
-
-    // 3. The wall on the right is identical to the left wall, but is rotated
-    // the opposite direction in y.
-    let mut right_wall = Shape::new_sphere(3);
-    let right_wall_translation = left_wall_translation;
-    let right_wall_rotation_y = Matrix::rotation_y(PI / 4.0);
-    let right_wall_rotation_x = left_wall_rotation_x;
-    let right_wall_scaling = left_wall_scaling;
-    right_wall.set_transform(right_wall_translation.multiply(&right_wall_rotation_y).
-        multiply(&right_wall_rotation_x).multiply(&right_wall_scaling));
-    right_wall.set_material(floor_material);
 
     // 4. The large sphere in the middle is a unit sphere, translated upward
     // slightly and colored green.
@@ -97,7 +74,7 @@ fn main()
     // The light source is white, shining from above and to the left:
     let mut world = World::default_world();
     world.light = PointLight::new(create_point(-10.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
-    world.objects = vec![floor, left_wall, right_wall,
+    world.objects = vec![floor,
         middle_sphere, right_sphere, left_sphere];
 
     // And the camera is configured like so:
