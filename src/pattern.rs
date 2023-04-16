@@ -19,6 +19,16 @@ impl StripePattern
         StripePattern{a: a, b: b, transform: Matrix::identity(4)}
     }
 
+    pub fn get_transform(&self) -> Matrix
+    {
+        self.transform.clone()
+    }
+
+    pub fn set_transform(&mut self, transform: Matrix)
+    {
+        self.transform = transform;
+    }
+
     pub fn stripe_at(&self, point: Tuple) -> Tuple
     {
         let x = point.get_vec()[0].floor();
@@ -32,11 +42,95 @@ impl StripePattern
         }
     }
 
+    pub fn pattern_at(&self, point: Tuple) -> Tuple
+    {
+        self.stripe_at(point)
+    }
+
     pub fn stripe_at_object(&self, object: Shape, world_point: Tuple) -> Tuple
     {
         let object_point = object.get_transform().inverse().multiply_tuple(world_point);
         let pattern_point = self.transform.inverse().multiply_tuple(object_point);
         self.stripe_at(pattern_point)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct TestPattern
+{
+    pub transform: Matrix,
+}
+
+impl TestPattern
+{
+    pub fn new() -> TestPattern
+    {
+        TestPattern{transform: Matrix::identity(4)}
+    }
+
+    pub fn get_transform(&self) -> Matrix
+    {
+        self.transform.clone()
+    }
+
+    pub fn set_transform(&mut self, transform: Matrix)
+    {
+        self.transform = transform;
+    }
+
+    pub fn pattern_at(&self, point: Tuple) -> Tuple
+    {
+        let v = point.get_vec();
+        create_color(v[0], v[1], v[2])
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum Pattern
+{
+    StripePattern(StripePattern),
+    TestPattern(TestPattern),
+}
+
+impl Pattern
+{
+    pub fn new_stripe_pattern(a: Tuple, b: Tuple) -> Pattern
+    {
+        Pattern::StripePattern(StripePattern::new(a, b))
+    }
+
+    pub fn test_pattern() -> Pattern
+    {
+        Pattern::TestPattern(TestPattern::new())
+    }
+
+    pub fn get_pattern_transform(&self) -> Matrix
+    {
+        match &self
+        {
+            Pattern::StripePattern(s) => s.get_transform(),
+            Pattern::TestPattern(t) => t.get_transform(),
+        }
+    }
+
+    pub fn set_pattern_transform(&mut self, transform: Matrix)
+    {
+        match self
+        {
+            Pattern::StripePattern(s) => s.set_transform(transform),
+            Pattern::TestPattern(t) => t.set_transform(transform),
+        }
+    }
+
+    pub fn pattern_at_shape(&self, shape: Shape, world_point: Tuple) -> Tuple
+    {
+        let object_point = shape.get_transform().inverse().multiply_tuple(world_point);
+        let pattern_point = self.get_pattern_transform().inverse().multiply_tuple(object_point);
+        match self
+        {
+            Pattern::StripePattern(s) => s.pattern_at(pattern_point),
+            Pattern::TestPattern(t) => t.pattern_at(pattern_point),
+        }
     }
 }
 
@@ -80,7 +174,7 @@ mod tests
         // p.129 Scenario: Lighting with a pattern applied
         let mut m5 = Material::new();
         let s5 = Shape::new_sphere(5);
-        m5.pattern = Some(StripePattern::new(white, black));
+        m5.pattern = Some(Pattern::new_stripe_pattern(white, black));
         m5.ambient = 1.0;
         m5.diffuse = 0.0;
         m5.specular = 0.0;
@@ -99,31 +193,62 @@ mod tests
         let mut m6 = Material::new();
         let mut s6 = Shape::new_sphere(6);
         s6.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
-        let p6 = StripePattern::new(white, black);
+        let p6 = Pattern::new_stripe_pattern(white, black);
         m6.pattern = Some(p6.clone());
         s6.set_material(m6);
-        let c6 = p6.stripe_at_object(s6, create_point(1.5, 0.0, 0.0));
+        let c6 = p6.pattern_at_shape(s6, create_point(1.5, 0.0, 0.0));
         assert_eq!(c6, white);
 
         // p.131 Scenario: Stripes with a pattern transformation
         let mut m7 = Material::new();
         let mut s7 = Shape::new_sphere(7);
-        let mut p7 = StripePattern::new(white, black);
-        p7.transform = Matrix::scaling(2.0, 2.0, 2.0);
+        let mut p7 = Pattern::new_stripe_pattern(white, black);
+        p7.set_pattern_transform(Matrix::scaling(2.0, 2.0, 2.0));
         m7.pattern = Some(p7.clone());
         s7.set_material(m7);
-        let c7 = p7.stripe_at_object(s7, create_point(1.5, 0.0, 0.0));
+        let c7 = p7.pattern_at_shape(s7, create_point(1.5, 0.0, 0.0));
         assert_eq!(c7, white);
 
         // p.131 Scenario: Stripes with both an object and a pattern transformation
         let mut m8 = Material::new();
         let mut s8 = Shape::new_sphere(8);
         s8.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
-        let mut p8 = StripePattern::new(white, black);
-        p8.transform = Matrix::translation(0.5, 0.0, 0.0);
+        let mut p8 = Pattern::new_stripe_pattern(white, black);
+        p8.set_pattern_transform(Matrix::translation(0.5, 0.0, 0.0));
         m8.pattern = Some(p8.clone());
         s8.set_material(m8);
-        let c8 = p8.stripe_at_object(s8, create_point(2.5, 0.0, 0.0));
+        let c8 = p8.pattern_at_shape(s8, create_point(2.5, 0.0, 0.0));
         assert_eq!(c8, white);
+
+        // p.133 Scenario: The default pattern transformation
+        let p9 = Pattern::test_pattern();
+        assert_eq!(p9.get_pattern_transform(), Matrix::identity(4));
+
+        // p.133 Scenario: Assigning a transformation
+        let mut p10 = Pattern::test_pattern();
+        p10.set_pattern_transform(Matrix::translation(1.0, 2.0, 3.0));
+        assert_eq!(p10.get_pattern_transform(), Matrix::translation(1.0, 2.0, 3.0));
+
+        // p.134 Scenario: A pattern with an object transformation
+        let mut s11 = Shape::new_sphere(11);
+        s11.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        let p11 = Pattern::test_pattern();
+        let c11 = p11.pattern_at_shape(s11, create_point(2.0, 3.0, 4.0));
+        assert_eq!(c11, create_color(1.0, 1.5, 2.0));
+
+        // p.134 Scenario: A pattern with a pattern transformation
+        let s12 = Shape::new_sphere(12);
+        let mut p12 = Pattern::test_pattern();
+        p12.set_pattern_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        let c12 = p12.pattern_at_shape(s12, create_point(2.0, 3.0, 4.0));
+        assert_eq!(c12, create_color(1.0, 1.5, 2.0));
+
+        // p.134 Scenario: A pattern with both an object and pattern transformation
+        let mut s13 = Shape::new_sphere(13);
+        s13.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        let mut p13 = Pattern::test_pattern();
+        p13.set_pattern_transform(Matrix::translation(0.5, 1.0, 1.5));
+        let c13 = p13.pattern_at_shape(s13, create_point(2.5, 3.0, 3.5));
+        assert_eq!(c13, create_color(0.75, 0.5, 0.25));
     }
 }

@@ -12,7 +12,7 @@ pub struct Material
     pub diffuse: f64,
     pub specular: f64,
     pub shininess: f64,
-    pub pattern: Option<StripePattern>,
+    pub pattern: Option<Pattern>,
 }
 
 impl Material
@@ -29,7 +29,11 @@ impl Material
     {
         let color = match &self.pattern
         {
-            Some(p) => p.stripe_at_object(object, point),
+            Some(p) => match p
+            {
+                Pattern::StripePattern(s) => s.stripe_at_object(object, point),
+                Pattern::TestPattern(t) => t.pattern_at(point),
+            },
             None => self.color,
         };
 

@@ -39,8 +39,10 @@ fn main()
     let mut floor_material = Material::new();
     floor_material.color = create_color(1.0, 0.9, 0.9);
     floor_material.specular = 0.0;
-    floor_material.pattern = Some(StripePattern::new(create_color(0.5, 0.5, 0.0),
-        create_color(0.8, 0.8, 0.0)));
+    let mut floor_pattern = Pattern::new_stripe_pattern(create_color(0.5, 0.5, 0.0),
+        create_color(0.8, 0.8, 0.0));
+    floor_pattern.set_pattern_transform(Matrix::scaling(3.0, 3.0, 3.0));
+    floor_material.pattern = Some(floor_pattern);
     floor.set_material(floor_material);
 
     // 4. The large sphere in the middle is a unit sphere, translated upward
@@ -51,6 +53,9 @@ fn main()
     middle_sphere_material.color = create_color(0.1, 1.0, 0.5);
     middle_sphere_material.diffuse = 0.7;
     middle_sphere_material.specular = 0.3;
+    let middle_sphere_pattern = Pattern::new_stripe_pattern(create_color(0.0, 0.5, 0.5),
+        create_color(0.0, 0.8, 0.8));
+    middle_sphere_material.pattern = Some(middle_sphere_pattern);
     middle_sphere.set_material(middle_sphere_material);
 
     // 5. The smaller green sphere on the right is scalled in half.
