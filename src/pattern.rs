@@ -79,6 +79,7 @@ mod tests
 
         // p.129 Scenario: Lighting with a pattern applied
         let mut m5 = Material::new();
+        let s5 = Shape::new_sphere(5);
         m5.pattern = Some(StripePattern::new(white, black));
         m5.ambient = 1.0;
         m5.diffuse = 0.0;
@@ -87,9 +88,9 @@ mod tests
         let normalv5 = create_vector(0.0, 0.0, -1.0);
         let light5 = PointLight::new(create_point(0.0, 0.0, -10.0),
             create_color(1.0, 1.0, 1.0));
-        let c51 = m5.lighting(light5, create_point(0.9, 0.0, 0.0),
+        let c51 = m5.lighting(s5.clone(), light5, create_point(0.9, 0.0, 0.0),
             eyev5, normalv5, false);
-        let c52 = m5.lighting(light5, create_point(1.1, 0.0, 0.0),
+        let c52 = m5.lighting(s5.clone(), light5, create_point(1.1, 0.0, 0.0),
             eyev5, normalv5, false);
         assert_eq!(c51, white);
         assert_eq!(c52, black);

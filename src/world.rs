@@ -53,7 +53,7 @@ impl World
     pub fn shade_hit(&self, comps: Computations) -> Tuple
     {
         let shadowed = self.is_shadowed(comps.over_point);
-        comps.object.get_material().lighting(self.light, comps.point,
+        comps.object.get_material().lighting(comps.object, self.light, comps.point,
             comps.eyev, comps.normalv, shadowed)
     }
 

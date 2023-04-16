@@ -2,6 +2,7 @@ use crate::tuple::*;
 use crate::arithmetic::*;
 use crate::pointlight::*;
 use crate::pattern::*;
+use crate::shape::*;
 
 #[derive(Clone, Debug)]
 pub struct Material
@@ -22,12 +23,13 @@ impl Material
             specular: 0.9, shininess: 200.0, pattern: None}
     }
 
-    pub fn lighting(&self, light: PointLight, point: Tuple, eyev: Tuple,
-    normalv: Tuple, in_shadow: bool) -> Tuple
+    pub fn lighting(&self, object: Shape, light: PointLight,
+        point: Tuple, eyev: Tuple,
+        normalv: Tuple, in_shadow: bool) -> Tuple
     {
         let color = match &self.pattern
         {
-            Some(p) => p.stripe_at(point),
+            Some(p) => p.stripe_at_object(object, point),
             None => self.color,
         };
 
@@ -115,59 +117,69 @@ mod tests
         assert_eq!(material1.shininess, 200.0);
 
         // p.86 Scenario: Lighting with the eye between the light and the surface
+        let sphere2 = Shape::new_sphere(2);
         let material2 = Material::new();
         let position2 = create_point(0.0, 0.0, 0.0);
         let eyev2 = create_vector(0.0, 0.0, -1.0);
         let normalv2 = create_vector(0.0, 0.0, -1.0);
         let light2 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result2 = material2.lighting(light2, position2, eyev2, normalv2, false);
+        let result2 = material2.lighting(sphere2,
+            light2, position2, eyev2, normalv2, false);
         assert_eq!(result2, create_color(1.9, 1.9, 1.9));
 
         // p.86 Scenario: Lighting with the eye between the light and the surface, eye offset 45 degrees
+        let sphere3 = Shape::new_sphere(3);
         let material3 = Material::new();
         let position3 = create_point(0.0, 0.0, 0.0);
         let sqrt2 = 2.0_f64.sqrt();
         let eyev3 = create_vector(0.0, sqrt2 / 2.0, -sqrt2 / 2.0);
         let normalv3 = create_vector(0.0, 0.0, -1.0);
         let light3 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result3 = material3.lighting(light3, position3, eyev3, normalv3, false);
+        let result3 = material3.lighting(sphere3,
+            light3, position3, eyev3, normalv3, false);
         assert_eq!(result3, create_color(1.0, 1.0, 1.0));
 
         // p.87 Scenario: Lighting with eye opposite surface, light offset 45 degrees
+        let sphere4 = Shape::new_sphere(4);
         let material4 = Material::new();
         let position4 = create_point(0.0, 0.0, 0.0);
         let eyev4 = create_vector(0.0, 0.0, -1.0);
         let normalv4 = create_vector(0.0, 0.0, -1.0);
         let light4 = PointLight::new(create_point(0.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result4 = material4.lighting(light4, position4, eyev4, normalv4, false);
+        let result4 = material4.lighting(sphere4,
+            light4, position4, eyev4, normalv4, false);
         assert_eq!(result4, create_color(0.7364, 0.7364, 0.7364));
 
         // p.87 Scenario: Lighting with eye in the path of the reflection vector
+        let sphere5 = Shape::new_sphere(5);
         let material5 = Material::new();
         let position5 = create_point(0.0, 0.0, 0.0);
         let eyev5 = create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0);
         let normalv5 = create_vector(0.0, 0.0, -1.0);
         let light5 = PointLight::new(create_point(0.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
-        let result5 = material5.lighting(light5, position5, eyev5, normalv5, false);
+        let result5 = material5.lighting(sphere5,
+            light5, position5, eyev5, normalv5, false);
         assert_eq!(result5, create_color(1.6364, 1.6364, 1.6364));
 
         // p.88 Scenario: Lighting with the light behind the surface
+        let sphere6 = Shape::new_sphere(6);
         let material6 = Material::new();
         let position6 = create_point(0.0, 0.0, 0.0);
         let eyev6 = create_vector(0.0, 0.0, -1.0);
         let normalv6 = create_vector(0.0, 0.0, -1.0);
         let light6 = PointLight::new(create_point(0.0, 0.0, 10.0), create_color(1.0, 1.0, 1.0));
-        let result6 = material6.lighting(light6, position6, eyev6, normalv6, false);
+        let result6 = material6.lighting(sphere6, light6, position6, eyev6, normalv6, false);
         assert_eq!(result6, create_color(0.1, 0.1, 0.1));
 
         // p.110 Scenario: Lighting with the surface in shadow
+        let sphere7 = Shape::new_sphere(7);
         let material7 = Material::new();
         let position7 = create_point(0.0, 0.0, 0.0);
         let eyev7 = create_vector(0.0, 0.0, -1.0);
         let normalv7 = create_vector(0.0, 0.0, -1.0);
         let light7 = PointLight::new(create_point(0.0, 0.0, -10.0), create_color(1.0, 1.0, 1.0));
         let in_shadow7 = true;
-        let result7 = material7.lighting(light7, position7, eyev7, normalv7, in_shadow7);
+        let result7 = material7.lighting(sphere7, light7, position7, eyev7, normalv7, in_shadow7);
         assert_eq!(result7, create_color(0.1, 0.1, 0.1));
     }
 }
