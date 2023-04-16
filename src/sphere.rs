@@ -30,7 +30,7 @@ impl Sphere
 
     pub fn get_local_material(&self) -> Material
     {
-        self.material
+        self.material.clone()
     }
 
     pub fn set_local_material(&mut self, material: Material)
@@ -241,7 +241,7 @@ mod tests
         let mut s9 = Shape::new_sphere(9);
         let mut m9 = Material::new();
         m9.ambient = 1.0;
-        s9.set_material(m9);
+        s9.set_material(m9.clone());
         assert_eq!(s9.get_material(), m9);
     }
 }

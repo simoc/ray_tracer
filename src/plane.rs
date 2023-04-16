@@ -33,7 +33,7 @@ impl Plane
 
     pub fn get_local_material(&self) -> Material
     {
-        self.material
+        self.material.clone()
     }
 
     pub fn set_local_material(&mut self, material: Material)

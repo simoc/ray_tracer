@@ -3,7 +3,7 @@ use crate::arithmetic::*;
 use crate::pointlight::*;
 use crate::pattern::*;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Material
 {
     pub color: Tuple,
@@ -25,7 +25,7 @@ impl Material
     pub fn lighting(&self, light: PointLight, point: Tuple, eyev: Tuple,
     normalv: Tuple, in_shadow: bool) -> Tuple
     {
-        let color = match self.pattern
+        let color = match &self.pattern
         {
             Some(p) => p.stripe_at(point),
             None => self.color,

@@ -182,7 +182,7 @@ mod tests
         let mut inner10 = world10.objects[1].clone();
         let mut inner_material10 = inner10.get_material();
         inner_material10.ambient = 1.0;
-        inner10.set_material(inner_material10);
+        inner10.set_material(inner_material10.clone());
         world10.objects[1] = inner10;
         let ray10 = Ray::new(create_point(0.0, 0.0, 0.75), create_vector(0.0, 0.0, -1.0));
         let color10 = world10.color_at(ray10);

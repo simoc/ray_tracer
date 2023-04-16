@@ -173,7 +173,7 @@ mod tests
         let mut s4 = Shape::test_shape(4);
         let mut m4 = Material::new();
         m4.ambient = 1.0;
-        s4.set_material(m4);
+        s4.set_material(m4.clone());
         assert_eq!(s4.get_material(), m4);
 
         // p.120 Scenario: Intersecting a scaled shape with a ray
