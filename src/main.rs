@@ -34,11 +34,13 @@ fn main()
 {
     // p.107 Chapter 7, Putting It Together
 
-    // 1. The floor is an extremely flattened sphere with a matte texture.
+    // 1. The floor is a plane with a matte texture and stripe pattern.
     let mut floor = Shape::new_plane(1);
     let mut floor_material = Material::new();
     floor_material.color = create_color(1.0, 0.9, 0.9);
     floor_material.specular = 0.0;
+    floor_material.pattern = Some(StripePattern::new(create_color(0.5, 0.5, 0.0),
+        create_color(0.8, 0.8, 0.0)));
     floor.set_material(floor_material);
 
     // 4. The large sphere in the middle is a unit sphere, translated upward

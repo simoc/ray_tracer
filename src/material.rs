@@ -1,6 +1,7 @@
 use crate::tuple::*;
 use crate::arithmetic::*;
 use crate::pointlight::*;
+use crate::pattern::*;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Material
@@ -10,6 +11,7 @@ pub struct Material
     pub diffuse: f64,
     pub specular: f64,
     pub shininess: f64,
+    pub pattern: Option<StripePattern>,
 }
 
 impl Material
@@ -17,14 +19,20 @@ impl Material
     pub fn new() -> Self
     {
         Material{color: create_color(1.0, 1.0, 1.0), ambient: 0.1, diffuse: 0.9,
-            specular: 0.9, shininess: 200.0}
+            specular: 0.9, shininess: 200.0, pattern: None}
     }
 
     pub fn lighting(&self, light: PointLight, point: Tuple, eyev: Tuple,
     normalv: Tuple, in_shadow: bool) -> Tuple
     {
+        let color = match self.pattern
+        {
+            Some(p) => p.stripe_at(point),
+            None => self.color,
+        };
+
         // combine the surface color with the light's color/intensity
-        let effective_color = self.color.hadamard_product(light.intensity);
+        let effective_color = color.hadamard_product(light.intensity);
 
         // find the direction to the light source
         let lightv = light.position.sub(point).normalize();
