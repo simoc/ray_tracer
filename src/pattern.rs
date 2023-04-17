@@ -86,10 +86,45 @@ impl TestPattern
 }
 
 #[derive(Clone, Debug)]
+pub struct GradientPattern
+{
+    pub a: Tuple,
+    pub b: Tuple,
+    pub transform: Matrix,
+}
+
+impl GradientPattern
+{
+    pub fn new(a: Tuple, b: Tuple) -> GradientPattern
+    {
+        GradientPattern{a: a, b: b, transform: Matrix::identity(4)}
+    }
+
+    pub fn get_transform(&self) -> Matrix
+    {
+        self.transform.clone()
+    }
+
+    pub fn set_transform(&mut self, transform: Matrix)
+    {
+        self.transform = transform;
+    }
+
+    pub fn pattern_at(&self, point: Tuple) -> Tuple
+    {
+        let distance = self.b.sub(self.a);
+        let x = point.get_vec()[0];
+        let fraction = x - x.floor();
+        self.a.add(distance.multiply(fraction))
+    }
+}
+
+#[derive(Clone, Debug)]
 pub enum Pattern
 {
     StripePattern(StripePattern),
     TestPattern(TestPattern),
+    GradientPattern(GradientPattern),
 }
 
 impl Pattern
@@ -104,12 +139,18 @@ impl Pattern
         Pattern::TestPattern(TestPattern::new())
     }
 
+    pub fn new_gradient_pattern(a: Tuple, b: Tuple) -> Pattern
+    {
+        Pattern::GradientPattern(GradientPattern::new(a, b))
+    }
+
     pub fn get_pattern_transform(&self) -> Matrix
     {
         match &self
         {
             Pattern::StripePattern(s) => s.get_transform(),
             Pattern::TestPattern(t) => t.get_transform(),
+            Pattern::GradientPattern(g) => g.get_transform(),
         }
     }
 
@@ -119,6 +160,7 @@ impl Pattern
         {
             Pattern::StripePattern(s) => s.set_transform(transform),
             Pattern::TestPattern(t) => t.set_transform(transform),
+            Pattern::GradientPattern(g) => g.set_transform(transform),
         }
     }
 
@@ -130,6 +172,7 @@ impl Pattern
         {
             Pattern::StripePattern(s) => s.pattern_at(pattern_point),
             Pattern::TestPattern(t) => t.pattern_at(pattern_point),
+            Pattern::GradientPattern(g) => g.pattern_at(pattern_point),
         }
     }
 }
@@ -250,5 +293,12 @@ mod tests
         p13.set_pattern_transform(Matrix::translation(0.5, 1.0, 1.5));
         let c13 = p13.pattern_at_shape(s13, create_point(2.5, 3.0, 3.5));
         assert_eq!(c13, create_color(0.75, 0.5, 0.25));
+
+        // p.135 Scenario: A gradient linearly interpolates between colors
+        let p14 = GradientPattern::new(white, black);
+        assert_eq!(p14.pattern_at(create_point(0.0, 0.0, 0.0)), white);
+        assert_eq!(p14.pattern_at(create_point(0.25, 0.0, 0.0)), create_color(0.75, 0.75, 0.75));
+        assert_eq!(p14.pattern_at(create_point(0.5, 0.0, 0.0)), create_color(0.5, 0.5, 0.5));
+        assert_eq!(p14.pattern_at(create_point(0.75, 0.0, 0.0)), create_color(0.25, 0.25, 0.25));
     }
 }
