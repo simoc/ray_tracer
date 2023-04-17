@@ -120,11 +120,53 @@ impl GradientPattern
 }
 
 #[derive(Clone, Debug)]
+pub struct RingPattern
+{
+    pub a: Tuple,
+    pub b: Tuple,
+    pub transform: Matrix,
+}
+
+impl RingPattern
+{
+    pub fn new(a: Tuple, b: Tuple) -> RingPattern
+    {
+        RingPattern{a: a, b: b, transform: Matrix::identity(4)}
+    }
+
+    pub fn get_transform(&self) -> Matrix
+    {
+        self.transform.clone()
+    }
+
+    pub fn set_transform(&mut self, transform: Matrix)
+    {
+        self.transform = transform;
+    }
+
+    pub fn pattern_at(&self, point: Tuple) -> Tuple
+    {
+        let x = point.get_vec()[0];
+        let z = point.get_vec()[2];
+        if ((x * x) + (z * z)).sqrt().floor().rem_euclid(2.0_f64) < 1.0
+        {
+            self.a
+        }
+        else
+        {
+            self.b
+        }
+    }
+}
+
+
+#[derive(Clone, Debug)]
 pub enum Pattern
 {
     StripePattern(StripePattern),
     TestPattern(TestPattern),
     GradientPattern(GradientPattern),
+    RingPattern(RingPattern),
 }
 
 impl Pattern
@@ -144,6 +186,11 @@ impl Pattern
         Pattern::GradientPattern(GradientPattern::new(a, b))
     }
 
+    pub fn new_ring_pattern(a: Tuple, b: Tuple) -> Pattern
+    {
+        Pattern::RingPattern(RingPattern::new(a, b))
+    }
+
     pub fn get_pattern_transform(&self) -> Matrix
     {
         match &self
@@ -151,6 +198,7 @@ impl Pattern
             Pattern::StripePattern(s) => s.get_transform(),
             Pattern::TestPattern(t) => t.get_transform(),
             Pattern::GradientPattern(g) => g.get_transform(),
+            Pattern::RingPattern(r) => r.get_transform(),
         }
     }
 
@@ -161,6 +209,7 @@ impl Pattern
             Pattern::StripePattern(s) => s.set_transform(transform),
             Pattern::TestPattern(t) => t.set_transform(transform),
             Pattern::GradientPattern(g) => g.set_transform(transform),
+            Pattern::RingPattern(r) => r.set_transform(transform),
         }
     }
 
@@ -173,6 +222,7 @@ impl Pattern
             Pattern::StripePattern(s) => s.pattern_at(pattern_point),
             Pattern::TestPattern(t) => t.pattern_at(pattern_point),
             Pattern::GradientPattern(g) => g.pattern_at(pattern_point),
+            Pattern::RingPattern(r) => r.pattern_at(pattern_point),
         }
     }
 }
@@ -300,5 +350,12 @@ mod tests
         assert_eq!(p14.pattern_at(create_point(0.25, 0.0, 0.0)), create_color(0.75, 0.75, 0.75));
         assert_eq!(p14.pattern_at(create_point(0.5, 0.0, 0.0)), create_color(0.5, 0.5, 0.5));
         assert_eq!(p14.pattern_at(create_point(0.75, 0.0, 0.0)), create_color(0.25, 0.25, 0.25));
+
+        // p.136 Scenario: A ring should extend in both x and z
+        let p15 = RingPattern::new(white, black);
+        assert_eq!(p15.pattern_at(create_point(0.0, 0.0, 0.0)), white);
+        assert_eq!(p15.pattern_at(create_point(1.0, 0.0, 0.0)), black);
+        assert_eq!(p15.pattern_at(create_point(0.0, 0.0, 1.0)), black);
+        assert_eq!(p15.pattern_at(create_point(0.708, 0.0, 0.708)), black);
     }
 }
