@@ -35,6 +35,7 @@ impl Material
                 Pattern::TestPattern(t) => t.pattern_at(point),
                 Pattern::GradientPattern(_g) => p.pattern_at_shape(object, point),
                 Pattern::RingPattern(_r) => p.pattern_at_shape(object, point),
+                Pattern::CheckerPattern(_c) => p.pattern_at_shape(object, point),
             },
             None => self.color,
         };

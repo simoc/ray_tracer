@@ -159,6 +159,46 @@ impl RingPattern
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct CheckerPattern
+{
+    pub a: Tuple,
+    pub b: Tuple,
+    pub transform: Matrix,
+}
+
+impl CheckerPattern
+{
+    pub fn new(a: Tuple, b: Tuple) -> CheckerPattern
+    {
+        CheckerPattern{a: a, b: b, transform: Matrix::identity(4)}
+    }
+
+    pub fn get_transform(&self) -> Matrix
+    {
+        self.transform.clone()
+    }
+
+    pub fn set_transform(&mut self, transform: Matrix)
+    {
+        self.transform = transform;
+    }
+
+    pub fn pattern_at(&self, point: Tuple) -> Tuple
+    {
+        let v = point.get_vec();
+        let sum = v[0].floor() + v[1].floor() + v[2].floor();
+        if sum.rem_euclid(2.0_f64) < 1.0
+        {
+            self.a
+        }
+        else
+        {
+            self.b
+        }
+    }
+}
+
 
 #[derive(Clone, Debug)]
 pub enum Pattern
@@ -167,6 +207,7 @@ pub enum Pattern
     TestPattern(TestPattern),
     GradientPattern(GradientPattern),
     RingPattern(RingPattern),
+    CheckerPattern(CheckerPattern),
 }
 
 impl Pattern
@@ -191,6 +232,11 @@ impl Pattern
         Pattern::RingPattern(RingPattern::new(a, b))
     }
 
+    pub fn new_checker_pattern(a: Tuple, b: Tuple) -> Pattern
+    {
+        Pattern::CheckerPattern(CheckerPattern::new(a, b))
+    }
+
     pub fn get_pattern_transform(&self) -> Matrix
     {
         match &self
@@ -199,6 +245,7 @@ impl Pattern
             Pattern::TestPattern(t) => t.get_transform(),
             Pattern::GradientPattern(g) => g.get_transform(),
             Pattern::RingPattern(r) => r.get_transform(),
+            Pattern::CheckerPattern(c) => c.get_transform(),
         }
     }
 
@@ -210,6 +257,7 @@ impl Pattern
             Pattern::TestPattern(t) => t.set_transform(transform),
             Pattern::GradientPattern(g) => g.set_transform(transform),
             Pattern::RingPattern(r) => r.set_transform(transform),
+            Pattern::CheckerPattern(c) => c.set_transform(transform),
         }
     }
 
@@ -223,6 +271,7 @@ impl Pattern
             Pattern::TestPattern(t) => t.pattern_at(pattern_point),
             Pattern::GradientPattern(g) => g.pattern_at(pattern_point),
             Pattern::RingPattern(r) => r.pattern_at(pattern_point),
+            Pattern::CheckerPattern(c) => c.pattern_at(pattern_point),
         }
     }
 }
@@ -357,5 +406,23 @@ mod tests
         assert_eq!(p15.pattern_at(create_point(1.0, 0.0, 0.0)), black);
         assert_eq!(p15.pattern_at(create_point(0.0, 0.0, 1.0)), black);
         assert_eq!(p15.pattern_at(create_point(0.708, 0.0, 0.708)), black);
+
+        // p.137 Scenario: Checkers should repeat in x
+        let p16 = CheckerPattern::new(white, black);
+        assert_eq!(p16.pattern_at(create_point(0.0, 0.0, 0.0)), white);
+        assert_eq!(p16.pattern_at(create_point(0.99, 0.0, 0.0)), white);
+        assert_eq!(p16.pattern_at(create_point(1.01, 0.0, 0.0)), black);
+
+        // p.137 Scenario: Checkers should repeat in y
+        let p17 = CheckerPattern::new(white, black);
+        assert_eq!(p17.pattern_at(create_point(0.0, 0.0, 0.0)), white);
+        assert_eq!(p17.pattern_at(create_point(0.0, 0.99, 0.0)), white);
+        assert_eq!(p17.pattern_at(create_point(0.0, 1.01, 0.0)), black);
+
+        // p.137 Scenario: Checkers should repeat in z
+        let p18 = CheckerPattern::new(white, black);
+        assert_eq!(p18.pattern_at(create_point(0.0, 0.0, 0.0)), white);
+        assert_eq!(p18.pattern_at(create_point(0.0, 0.0, 0.99)), white);
+        assert_eq!(p18.pattern_at(create_point(0.0, 0.0, 1.01)), black);
     }
 }
