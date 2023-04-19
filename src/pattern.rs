@@ -138,7 +138,7 @@ impl CheckerPattern
 }
 
 #[derive(Clone, Debug)]
-pub enum PatternCommon
+pub enum PatternSpecific
 {
     StripePattern(StripePattern),
     TestPattern(TestPattern),
@@ -151,44 +151,44 @@ pub enum PatternCommon
 pub struct Pattern
 {
     transform: Matrix,
-    common: PatternCommon,
+    specific: PatternSpecific,
 }
 
 impl Pattern
 {
-    pub fn get_common(&self) -> PatternCommon
+    pub fn get_specific(&self) -> PatternSpecific
     {
-        self.common.clone()
+        self.specific.clone()
     }
 
     pub fn new_stripe_pattern(a: Tuple, b: Tuple) -> Pattern
     {
         Pattern{transform: Matrix::identity(4),
-            common: PatternCommon::StripePattern(StripePattern::new(a, b))}
+            specific: PatternSpecific::StripePattern(StripePattern::new(a, b))}
     }
 
     pub fn test_pattern() -> Pattern
     {
         Pattern{transform: Matrix::identity(4),
-            common: PatternCommon::TestPattern(TestPattern::new())}
+            specific: PatternSpecific::TestPattern(TestPattern::new())}
     }
 
     pub fn new_gradient_pattern(a: Tuple, b: Tuple) -> Pattern
     {
         Pattern{transform: Matrix::identity(4),
-            common: PatternCommon::GradientPattern(GradientPattern::new(a, b))}
+            specific: PatternSpecific::GradientPattern(GradientPattern::new(a, b))}
     }
 
     pub fn new_ring_pattern(a: Tuple, b: Tuple) -> Pattern
     {
         Pattern{transform: Matrix::identity(4),
-            common: PatternCommon::RingPattern(RingPattern::new(a, b))}
+            specific: PatternSpecific::RingPattern(RingPattern::new(a, b))}
     }
 
     pub fn new_checker_pattern(a: Tuple, b: Tuple) -> Pattern
     {
         Pattern{transform: Matrix::identity(4),
-            common: PatternCommon::CheckerPattern(CheckerPattern::new(a, b))}
+            specific: PatternSpecific::CheckerPattern(CheckerPattern::new(a, b))}
     }
 
     pub fn get_pattern_transform(&self) -> Matrix
@@ -205,13 +205,13 @@ impl Pattern
     {
         let object_point = shape.get_transform().inverse().multiply_tuple(world_point);
         let pattern_point = self.get_pattern_transform().inverse().multiply_tuple(object_point);
-        match &self.common
+        match &self.specific
         {
-            PatternCommon::StripePattern(s) => s.pattern_at(pattern_point),
-            PatternCommon::TestPattern(t) => t.pattern_at(pattern_point),
-            PatternCommon::GradientPattern(g) => g.pattern_at(pattern_point),
-            PatternCommon::RingPattern(r) => r.pattern_at(pattern_point),
-            PatternCommon::CheckerPattern(c) => c.pattern_at(pattern_point),
+            PatternSpecific::StripePattern(s) => s.pattern_at(pattern_point),
+            PatternSpecific::TestPattern(t) => t.pattern_at(pattern_point),
+            PatternSpecific::GradientPattern(g) => g.pattern_at(pattern_point),
+            PatternSpecific::RingPattern(r) => r.pattern_at(pattern_point),
+            PatternSpecific::CheckerPattern(c) => c.pattern_at(pattern_point),
         }
     }
 }

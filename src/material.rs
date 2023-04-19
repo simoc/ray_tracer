@@ -29,9 +29,9 @@ impl Material
     {
         let color = match &self.pattern
         {
-            Some(p) => match p.get_common()
+            Some(p) => match p.get_specific()
             {
-                PatternCommon::TestPattern(t) => t.pattern_at(point),
+                PatternSpecific::TestPattern(t) => t.pattern_at(point),
                 _ => p.pattern_at_shape(object, point),
             },
             None => self.color,
