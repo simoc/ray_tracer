@@ -156,16 +156,6 @@ pub struct Pattern
 
 impl Pattern
 {
-    pub fn get_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
-    }
-
     pub fn get_common(&self) -> PatternCommon
     {
         self.common.clone()
