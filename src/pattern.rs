@@ -9,24 +9,13 @@ pub struct StripePattern
 {
     pub a: Tuple,
     pub b: Tuple,
-    pub transform: Matrix,
 }
 
 impl StripePattern
 {
     pub fn new(a: Tuple, b: Tuple) -> StripePattern
     {
-        StripePattern{a: a, b: b, transform: Matrix::identity(4)}
-    }
-
-    pub fn get_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
+        StripePattern{a: a, b: b}
     }
 
     pub fn stripe_at(&self, point: Tuple) -> Tuple
@@ -46,36 +35,18 @@ impl StripePattern
     {
         self.stripe_at(point)
     }
-
-    pub fn stripe_at_object(&self, object: Shape, world_point: Tuple) -> Tuple
-    {
-        let object_point = object.get_transform().inverse().multiply_tuple(world_point);
-        let pattern_point = self.transform.inverse().multiply_tuple(object_point);
-        self.stripe_at(pattern_point)
-    }
 }
 
 #[derive(Clone, Debug)]
 pub struct TestPattern
 {
-    pub transform: Matrix,
 }
 
 impl TestPattern
 {
     pub fn new() -> TestPattern
     {
-        TestPattern{transform: Matrix::identity(4)}
-    }
-
-    pub fn get_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
+        TestPattern{}
     }
 
     pub fn pattern_at(&self, point: Tuple) -> Tuple
@@ -90,24 +61,13 @@ pub struct GradientPattern
 {
     pub a: Tuple,
     pub b: Tuple,
-    pub transform: Matrix,
 }
 
 impl GradientPattern
 {
     pub fn new(a: Tuple, b: Tuple) -> GradientPattern
     {
-        GradientPattern{a: a, b: b, transform: Matrix::identity(4)}
-    }
-
-    pub fn get_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
+        GradientPattern{a: a, b: b}
     }
 
     pub fn pattern_at(&self, point: Tuple) -> Tuple
@@ -124,24 +84,13 @@ pub struct RingPattern
 {
     pub a: Tuple,
     pub b: Tuple,
-    pub transform: Matrix,
 }
 
 impl RingPattern
 {
     pub fn new(a: Tuple, b: Tuple) -> RingPattern
     {
-        RingPattern{a: a, b: b, transform: Matrix::identity(4)}
-    }
-
-    pub fn get_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
+        RingPattern{a: a, b: b}
     }
 
     pub fn pattern_at(&self, point: Tuple) -> Tuple
@@ -164,24 +113,13 @@ pub struct CheckerPattern
 {
     pub a: Tuple,
     pub b: Tuple,
-    pub transform: Matrix,
 }
 
 impl CheckerPattern
 {
     pub fn new(a: Tuple, b: Tuple) -> CheckerPattern
     {
-        CheckerPattern{a: a, b: b, transform: Matrix::identity(4)}
-    }
-
-    pub fn get_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
+        CheckerPattern{a: a, b: b}
     }
 
     pub fn pattern_at(&self, point: Tuple) -> Tuple
@@ -199,9 +137,8 @@ impl CheckerPattern
     }
 }
 
-
 #[derive(Clone, Debug)]
-pub enum Pattern
+pub enum PatternSpecific
 {
     StripePattern(StripePattern),
     TestPattern(TestPattern),
@@ -210,68 +147,71 @@ pub enum Pattern
     CheckerPattern(CheckerPattern),
 }
 
+#[derive(Clone, Debug)]
+pub struct Pattern
+{
+    transform: Matrix,
+    specific: PatternSpecific,
+}
+
 impl Pattern
 {
+    pub fn get_specific(&self) -> PatternSpecific
+    {
+        self.specific.clone()
+    }
+
     pub fn new_stripe_pattern(a: Tuple, b: Tuple) -> Pattern
     {
-        Pattern::StripePattern(StripePattern::new(a, b))
+        Pattern{transform: Matrix::identity(4),
+            specific: PatternSpecific::StripePattern(StripePattern::new(a, b))}
     }
 
     pub fn test_pattern() -> Pattern
     {
-        Pattern::TestPattern(TestPattern::new())
+        Pattern{transform: Matrix::identity(4),
+            specific: PatternSpecific::TestPattern(TestPattern::new())}
     }
 
     pub fn new_gradient_pattern(a: Tuple, b: Tuple) -> Pattern
     {
-        Pattern::GradientPattern(GradientPattern::new(a, b))
+        Pattern{transform: Matrix::identity(4),
+            specific: PatternSpecific::GradientPattern(GradientPattern::new(a, b))}
     }
 
     pub fn new_ring_pattern(a: Tuple, b: Tuple) -> Pattern
     {
-        Pattern::RingPattern(RingPattern::new(a, b))
+        Pattern{transform: Matrix::identity(4),
+            specific: PatternSpecific::RingPattern(RingPattern::new(a, b))}
     }
 
     pub fn new_checker_pattern(a: Tuple, b: Tuple) -> Pattern
     {
-        Pattern::CheckerPattern(CheckerPattern::new(a, b))
+        Pattern{transform: Matrix::identity(4),
+            specific: PatternSpecific::CheckerPattern(CheckerPattern::new(a, b))}
     }
 
     pub fn get_pattern_transform(&self) -> Matrix
     {
-        match &self
-        {
-            Pattern::StripePattern(s) => s.get_transform(),
-            Pattern::TestPattern(t) => t.get_transform(),
-            Pattern::GradientPattern(g) => g.get_transform(),
-            Pattern::RingPattern(r) => r.get_transform(),
-            Pattern::CheckerPattern(c) => c.get_transform(),
-        }
+        self.transform.clone()
     }
 
     pub fn set_pattern_transform(&mut self, transform: Matrix)
     {
-        match self
-        {
-            Pattern::StripePattern(s) => s.set_transform(transform),
-            Pattern::TestPattern(t) => t.set_transform(transform),
-            Pattern::GradientPattern(g) => g.set_transform(transform),
-            Pattern::RingPattern(r) => r.set_transform(transform),
-            Pattern::CheckerPattern(c) => c.set_transform(transform),
-        }
+        self.transform = transform;
     }
 
     pub fn pattern_at_shape(&self, shape: Shape, world_point: Tuple) -> Tuple
     {
         let object_point = shape.get_transform().inverse().multiply_tuple(world_point);
         let pattern_point = self.get_pattern_transform().inverse().multiply_tuple(object_point);
-        match self
+        match &self.specific
         {
-            Pattern::StripePattern(s) => s.pattern_at(pattern_point),
-            Pattern::TestPattern(t) => t.pattern_at(pattern_point),
-            Pattern::GradientPattern(g) => g.pattern_at(pattern_point),
-            Pattern::RingPattern(r) => r.pattern_at(pattern_point),
-            Pattern::CheckerPattern(c) => c.pattern_at(pattern_point),
+            PatternSpecific::StripePattern(s) => s.pattern_at(pattern_point),
+            PatternSpecific::TestPattern(t) => t.pattern_at(pattern_point),
+            PatternSpecific::GradientPattern(g) => g.pattern_at(pattern_point),
+            PatternSpecific::RingPattern(r) => r.pattern_at(pattern_point),
+            PatternSpecific::CheckerPattern(c) => c.pattern_at(pattern_point),
         }
     }
 }

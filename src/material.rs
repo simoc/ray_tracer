@@ -29,13 +29,10 @@ impl Material
     {
         let color = match &self.pattern
         {
-            Some(p) => match p
+            Some(p) => match p.get_specific()
             {
-                Pattern::StripePattern(s) => s.stripe_at_object(object, point),
-                Pattern::TestPattern(t) => t.pattern_at(point),
-                Pattern::GradientPattern(_g) => p.pattern_at_shape(object, point),
-                Pattern::RingPattern(_r) => p.pattern_at_shape(object, point),
-                Pattern::CheckerPattern(_c) => p.pattern_at_shape(object, point),
+                PatternSpecific::TestPattern(t) => t.pattern_at(point),
+                _ => p.pattern_at_shape(object, point),
             },
             None => self.color,
         };
