@@ -53,8 +53,9 @@ fn main()
     middle_sphere_material.color = create_color(0.1, 1.0, 0.5);
     middle_sphere_material.diffuse = 0.7;
     middle_sphere_material.specular = 0.3;
-    let middle_sphere_pattern = Pattern::new_stripe_pattern(create_color(0.0, 0.5, 0.5),
+    let mut middle_sphere_pattern = Pattern::new_checker_pattern(create_color(0.0, 0.5, 0.5),
         create_color(0.0, 0.8, 0.8));
+    middle_sphere_pattern.set_pattern_transform(Matrix::scaling(0.5, 0.5, 0.5));
     middle_sphere_material.pattern = Some(middle_sphere_pattern);
     middle_sphere.set_material(middle_sphere_material);
 
