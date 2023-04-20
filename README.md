@@ -8,6 +8,16 @@ module structure of the program is probably not the best,
 and there are a lot of `foo.clone()` calls to keep the memory handling
 and borrow checking as simple as possible.
 
+The follow commands download the source code,
+build and run the program, then display the
+PPM image output file on a Linux system:
+
+    $ git clone https://github.com/simoc/ray_tracer.git
+    $ cd ray_tracer
+    $ cargo build
+    $ ./target/debug/ray_tracer > a.ppm
+    $ display a.ppm
+
 ## Completed Chapters
 
 - [x] Chapter 1 - Tuples, Points, and Vectors
@@ -19,7 +29,7 @@ and borrow checking as simple as possible.
 - [x] Chapter 7 - Making a Scene
 - [x] Chapter 8 - Shadows
 - [x] Chapter 9 - Planes
-- [ ] Chapter 10 - Patterns
+- [x] Chapter 10 - Patterns
 - [ ] Chapter 11 - Reflection and Refraction
 - [ ] Chapter 12 - Cubes
 - [ ] Chapter 13 - Cylinders
