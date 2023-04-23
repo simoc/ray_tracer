@@ -242,4 +242,27 @@ mod tests
         let color5 = world5.shade_hit(comps5);
         assert_eq!(color5, create_color(0.1, 0.1, 0.1));
     }
+
+    #[test]
+    fn test_world_reflection_feature()
+    {
+        // p.145 Scenario: color_at() with mutually reflective surfaces
+        let mut world1 = World::default_world();
+        world1.light = PointLight::new(create_point(0.0, 0.0, 0.0),
+            create_color(1.0, 1.0, 1.0));
+        let mut lower = Shape::new_plane(1);
+        let mut lower_material = lower.get_material();
+        lower_material.reflective = 1.0;
+        lower.set_material(lower_material);
+        lower.set_transform(Matrix::translation(0.0, -1.0, 0.0));
+        let mut upper = Shape::new_plane(2);
+        let mut upper_material = upper.get_material();
+        upper_material.reflective = 1.0;
+        upper.set_material(upper_material);
+        upper.set_transform(Matrix::translation(0.0, 1.0, 0.0));
+        world1.objects = vec![lower, upper];
+        let ray1 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 1.0, 0.0));
+        // should terminate successfully
+        world1.color_at(ray1);
+    }
 }
