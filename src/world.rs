@@ -18,6 +18,9 @@ pub struct World
 
 impl World
 {
+    // maximum number of times to reflect rays, to avoid infinite recursion
+    pub const REFLECTION_RECURSION: i32 = 4;
+
     pub fn default_world() -> Self
     {
         let point = create_point(-10.0, 10.0, -10.0);
@@ -50,18 +53,18 @@ impl World
         Intersections::new(intersections)
     }
 
-    pub fn shade_hit(&self, comps: Computations) -> Tuple
+    pub fn shade_hit(&self, comps: Computations, remaining: i32) -> Tuple
     {
         let comps2 = comps.clone();
         let shadowed = self.is_shadowed(comps.over_point);
         let surface = comps.object.get_material().lighting(comps.object,
             self.light, comps.point,
             comps.eyev, comps.normalv, shadowed);
-        let reflected = self.reflected_color(comps2);
+        let reflected = self.reflected_color(comps2, remaining);
         surface.add(reflected)
     }
 
-    pub fn color_at(&self, ray: Ray) -> Tuple
+    pub fn color_at(&self, ray: Ray, remaining: i32) -> Tuple
     {
         let intersections = self.intersect_world(ray);
         match intersections.hit()
@@ -69,7 +72,7 @@ impl World
             Some(intersection) =>
             {
                 let comps = intersection.prepare_computation(ray);
-                self.shade_hit(comps)
+                self.shade_hit(comps, remaining)
             },
             None => create_color(0.0, 0.0, 0.0),
         }
@@ -90,15 +93,19 @@ impl World
         }
     }
 
-    pub fn reflected_color(&self, comps: Computations) -> Tuple
+    pub fn reflected_color(&self, comps: Computations, remaining: i32) -> Tuple
     {
+        if remaining <= 0
+        {
+            return create_color(0.0, 0.0, 0.0);
+        }
         if fuzzy_equal(comps.object.get_material().reflective, 0.0)
         {
             return create_color(0.0, 0.0, 0.0);
         }
 
         let reflect_ray = Ray::new(comps.over_point, comps.reflectv);
-        let color = self.color_at(reflect_ray);
+        let color = self.color_at(reflect_ray, remaining - 1);
 
         color.multiply(comps.object.get_material().reflective)
     }
@@ -164,7 +171,7 @@ mod tests
         let shape6 = world6.objects[0].clone();
         let intersection6 = Intersection::new(4.0, shape6.clone());
         let comps6 = intersection6.prepare_computation(ray6);
-        let color6 = world6.shade_hit(comps6);
+        let color6 = world6.shade_hit(comps6, World::REFLECTION_RECURSION);
         assert_eq!(color6, create_color(0.38066, 0.47583, 0.2855));
 
         // p.95 Scenario: Shading an intersection
@@ -174,19 +181,19 @@ mod tests
         let shape7 = world7.objects[1].clone();
         let intersection7 = Intersection::new(0.5, shape7.clone());
         let comps7 = intersection7.prepare_computation(ray7);
-        let color7 = world7.shade_hit(comps7);
+        let color7 = world7.shade_hit(comps7, World::REFLECTION_RECURSION);
         assert_eq!(color7, create_color(0.90498, 0.90498, 0.90498));
 
         // p.96 Scenario: Color when a ray misses
         let world8 = World::default_world();
         let ray8 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 1.0, 0.0));
-        let color8 = world8.color_at(ray8);
+        let color8 = world8.color_at(ray8, World::REFLECTION_RECURSION);
         assert_eq!(color8, create_color(0.0, 0.0, 0.0));
 
         // p.96 Scenario: Color when a ray hits
         let world9 = World::default_world();
         let ray9 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
-        let color9 = world9.color_at(ray9);
+        let color9 = world9.color_at(ray9, World::REFLECTION_RECURSION);
         assert_eq!(color9, create_color(0.38066, 0.47583, 0.2855));
 
         // p.97 Scenario: The color with an intersection behind the ray
@@ -202,7 +209,7 @@ mod tests
         inner10.set_material(inner_material10.clone());
         world10.objects[1] = inner10;
         let ray10 = Ray::new(create_point(0.0, 0.0, 0.75), create_vector(0.0, 0.0, -1.0));
-        let color10 = world10.color_at(ray10);
+        let color10 = world10.color_at(ray10, World::REFLECTION_RECURSION);
         assert_eq!(color10, inner_material10.color);
     }
 
@@ -239,14 +246,14 @@ mod tests
         let ray5 = Ray::new(create_point(0.0, 0.0, 5.0), create_vector(0.0, 0.0, 1.0));
         let intersection5 = Intersection::new(4.0, sphere2);
         let comps5 = intersection5.prepare_computation(ray5);
-        let color5 = world5.shade_hit(comps5);
+        let color5 = world5.shade_hit(comps5, World::REFLECTION_RECURSION);
         assert_eq!(color5, create_color(0.1, 0.1, 0.1));
     }
 
     #[test]
     fn test_world_reflection_feature()
     {
-        // p.145 Scenario: color_at() with mutually reflective surfaces
+        // p.146 Scenario: color_at() with mutually reflective surfaces
         let mut world1 = World::default_world();
         world1.light = PointLight::new(create_point(0.0, 0.0, 0.0),
             create_color(1.0, 1.0, 1.0));
@@ -263,6 +270,6 @@ mod tests
         world1.objects = vec![lower, upper];
         let ray1 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 1.0, 0.0));
         // should terminate successfully
-        world1.color_at(ray1);
+        world1.color_at(ray1, World::REFLECTION_RECURSION);
     }
 }

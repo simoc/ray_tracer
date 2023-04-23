@@ -71,7 +71,7 @@ impl Camera
             for x in 0..self.hsize - 1
             {
                 let ray = self.ray_for_pixel(x.into(), y.into());
-                let color = world.color_at(ray);
+                let color = world.color_at(ray, World::REFLECTION_RECURSION);
                 image.write_pixel(x.into(), y.into(), color);
             }
         }

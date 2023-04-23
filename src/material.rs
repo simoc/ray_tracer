@@ -218,7 +218,7 @@ mod tests
         shape3.set_material(material3);
         let i3 = Intersection::new(1.0, shape3);
         let comps3 = i3.prepare_computation(r3);
-        let color3 = world3.reflected_color(comps3);
+        let color3 = world3.reflected_color(comps3, World::REFLECTION_RECURSION);
         assert_eq!(color3, create_color(0.0, 0.0, 0.0));
 
         // p.144 Scenario: The reflected color for a reflective material
@@ -233,10 +233,10 @@ mod tests
             create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
         let i4 = Intersection::new(sqrt2, plane4);
         let comps4 = i4.prepare_computation(r4);
-        let color4 = world4.reflected_color(comps4);
+        let color4 = world4.reflected_color(comps4, World::REFLECTION_RECURSION);
         assert_eq!(color4, create_color(0.19032, 0.2379, 0.14274));
 
-        // p.145 Scenario: shade_git() with a reflective material
+        // p.145 Scenario: shade_hit() with a reflective material
         let mut world5 = World::default_world();
         let mut plane5 = Shape::new_plane(5);
         plane5.set_transform(Matrix::translation(0.0, -1.0, 0.0));
@@ -248,7 +248,22 @@ mod tests
             create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
         let i5 = Intersection::new(sqrt2, plane5);
         let comps5 = i5.prepare_computation(r5);
-        let color5 = world5.shade_hit(comps5);
+        let color5 = world5.shade_hit(comps5, World::REFLECTION_RECURSION);
         assert_eq!(color4, create_color(0.87677, 0.92436, 0.82918));
+
+        // p.147 Scenario: The reflected color at the maximum recursive depth
+        let mut world6 = World::default_world();
+        let mut plane6 = Shape::new_plane(6);
+        plane6.set_transform(Matrix::translation(0.0, -1.0, 0.0));
+        let mut material6 = plane6.get_material();
+        material6.reflective = 0.5;
+        plane6.set_material(material6);
+        world6.objects.push(plane6.clone());
+        let r6 = Ray::new(create_point(0.0, 0.0, -3.0),
+            create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
+        let i6 = Intersection::new(sqrt2, plane6);
+        let comps6 = i6.prepare_computation(r6);
+        let color6 = world6.reflected_color(comps6, 0);
+        assert_eq!(color6, create_color(0.0, 0.0, 0.0));
     }
 }
