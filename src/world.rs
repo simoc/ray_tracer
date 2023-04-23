@@ -85,6 +85,19 @@ impl World
             None => false
         }
     }
+
+    pub fn reflected_color(&self, comps: Computations) -> Tuple
+    {
+        if fuzzy_equal(comps.object.get_material().reflective, 0.0)
+        {
+            return create_color(0.0, 0.0, 0.0);
+        }
+
+        let reflect_ray = Ray::new(comps.over_point, comps.reflectv);
+        let color = self.color_at(reflect_ray);
+
+        color.multiply(comps.object.get_material().reflective)
+    }
 }
 
 #[cfg(test)]

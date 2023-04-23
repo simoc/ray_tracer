@@ -5,6 +5,8 @@ use crate::pattern::*;
 use crate::shape::*;
 use crate::intersections::*;
 use crate::ray::*;
+use crate::world::*;
+use crate::matrix::*;
 
 #[derive(Clone, Debug)]
 pub struct Material
@@ -203,7 +205,35 @@ mod tests
         let r2 = Ray::new(create_point(0.0, 1.0, -1.0),
             create_vector(0.0, -sqrt2 / 2.0, sqrt2 / 2.0));
         let i2 = Intersection::new(sqrt2, shape2);
-        let comps = i2.prepare_computation(r2);
-        assert_eq!(comps.reflectv, create_vector(0.0, sqrt2 / 2.0, sqrt2 / 2.0));
+        let comps2 = i2.prepare_computation(r2);
+        assert_eq!(comps2.reflectv, create_vector(0.0, sqrt2 / 2.0, sqrt2 / 2.0));
+
+        // p.144 Scenario: The reflected color for a nonreflective material
+        let world3 = World::default_world();
+        let r3 = Ray::new(create_point(0.0, 0.0, 0.0),
+            create_vector(0.0, 0.0, 1.0));
+        let mut shape3 = world3.objects[1].clone();
+        let mut material3 = shape3.get_material();
+        material3.ambient = 1.0;
+        shape3.set_material(material3);
+        let i3 = Intersection::new(1.0, shape3);
+        let comps3 = i3.prepare_computation(r3);
+        let color3 = world3.reflected_color(comps3);
+        assert_eq!(color3, create_color(0.0, 0.0, 0.0));
+
+        // p.144 Scenario: The reflected color for a reflective material
+        let mut world4 = World::default_world();
+        let mut plane4 = Shape::new_plane(4);
+        plane4.set_transform(Matrix::translation(0.0, -1.0, 0.0));
+        let mut material4 = plane4.get_material();
+        material4.reflective = 0.5;
+        plane4.set_material(material4);
+        world4.objects.push(plane4.clone());
+        let r4 = Ray::new(create_point(0.0, 0.0, -3.0),
+            create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
+        let i4 = Intersection::new(sqrt2, plane4);
+        let comps4 = i4.prepare_computation(r4);
+        let color4 = world4.reflected_color(comps4);
+        assert_eq!(color4, create_color(0.19032, 0.2379, 0.14274));
     }
 }
