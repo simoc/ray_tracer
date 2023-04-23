@@ -12,13 +12,16 @@ pub struct Computations
     pub normalv: Tuple,
     pub inside: bool,
     pub over_point: Tuple,
+    pub reflectv: Tuple,
 }
 
 impl Computations
 {
     pub fn new(t: f64, object: Shape, point: Tuple, eyev: Tuple,
-         normalv: Tuple, inside: bool, over_point: Tuple) -> Self
+         normalv: Tuple, inside: bool, over_point: Tuple,
+         reflectv: Tuple) -> Self
     {
-        Computations{t, object, point, eyev, normalv, inside, over_point}
+        Computations{t, object, point, eyev, normalv, inside, over_point,
+            reflectv}
     }
 }

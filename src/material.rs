@@ -3,6 +3,8 @@ use crate::arithmetic::*;
 use crate::pointlight::*;
 use crate::pattern::*;
 use crate::shape::*;
+use crate::intersections::*;
+use crate::ray::*;
 
 #[derive(Clone, Debug)]
 pub struct Material
@@ -13,6 +15,7 @@ pub struct Material
     pub specular: f64,
     pub shininess: f64,
     pub pattern: Option<Pattern>,
+    pub reflective: f64,
 }
 
 impl Material
@@ -20,7 +23,8 @@ impl Material
     pub fn new() -> Self
     {
         Material{color: create_color(1.0, 1.0, 1.0), ambient: 0.1, diffuse: 0.9,
-            specular: 0.9, shininess: 200.0, pattern: None}
+            specular: 0.9, shininess: 200.0, pattern: None,
+            reflective: 0.0}
     }
 
     pub fn lighting(&self, object: Shape, light: PointLight,
@@ -185,5 +189,21 @@ mod tests
         let in_shadow7 = true;
         let result7 = material7.lighting(sphere7, light7, position7, eyev7, normalv7, in_shadow7);
         assert_eq!(result7, create_color(0.1, 0.1, 0.1));
+    }
+
+    fn test_material_reflection_feature()
+    {
+        // p.143 Scenario: Reflectivity for the default material
+        let material1 = Material::new();
+        assert!(fuzzy_equal(material1.reflective, 0.0));
+
+        // p.143 Scenario: Precomputing the reflection vector
+        let shape2 = Shape::new_plane(2);
+        let sqrt2 = 2.0_f64.sqrt();
+        let r2 = Ray::new(create_point(0.0, 1.0, -1.0),
+            create_vector(0.0, -sqrt2 / 2.0, sqrt2 / 2.0));
+        let i2 = Intersection::new(sqrt2, shape2);
+        let comps = i2.prepare_computation(r2);
+        assert_eq!(comps.reflectv, create_vector(0.0, sqrt2 / 2.0, sqrt2 / 2.0));
     }
 }
