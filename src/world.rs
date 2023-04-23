@@ -52,9 +52,13 @@ impl World
 
     pub fn shade_hit(&self, comps: Computations) -> Tuple
     {
+        let comps2 = comps.clone();
         let shadowed = self.is_shadowed(comps.over_point);
-        comps.object.get_material().lighting(comps.object, self.light, comps.point,
-            comps.eyev, comps.normalv, shadowed)
+        let surface = comps.object.get_material().lighting(comps.object,
+            self.light, comps.point,
+            comps.eyev, comps.normalv, shadowed);
+        let reflected = self.reflected_color(comps2);
+        surface.add(reflected)
     }
 
     pub fn color_at(&self, ray: Ray) -> Tuple

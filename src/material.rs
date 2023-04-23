@@ -235,5 +235,20 @@ mod tests
         let comps4 = i4.prepare_computation(r4);
         let color4 = world4.reflected_color(comps4);
         assert_eq!(color4, create_color(0.19032, 0.2379, 0.14274));
+
+        // p.145 Scenario: shade_git() with a reflective material
+        let mut world5 = World::default_world();
+        let mut plane5 = Shape::new_plane(5);
+        plane5.set_transform(Matrix::translation(0.0, -1.0, 0.0));
+        let mut material5 = plane5.get_material();
+        material5.reflective = 0.5;
+        plane5.set_material(material5);
+        world5.objects.push(plane5.clone());
+        let r5 = Ray::new(create_point(0.0, 0.0, -3.0),
+            create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
+        let i5 = Intersection::new(sqrt2, plane5);
+        let comps5 = i5.prepare_computation(r5);
+        let color5 = world5.shade_hit(comps5);
+        assert_eq!(color4, create_color(0.87677, 0.92436, 0.82918));
     }
 }
