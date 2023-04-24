@@ -21,6 +21,17 @@ impl Shape
         Shape::Sphere(Sphere::new(id))
     }
 
+    pub fn glass_sphere(id: i32) -> Shape
+    {
+        let mut sphere = Shape::Sphere(Sphere::new(id));
+        let mut material = sphere.get_material();
+        material.transparency = 1.0;
+        material.refractive_index = 1.5;
+        sphere.set_material(material);
+        sphere.set_transform(Matrix::identity(4));
+        sphere
+    }
+
     pub fn new_plane(id: i32) -> Shape
     {
         Shape::Plane(Plane::new(id))

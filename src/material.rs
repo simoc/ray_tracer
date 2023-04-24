@@ -18,6 +18,8 @@ pub struct Material
     pub shininess: f64,
     pub pattern: Option<Pattern>,
     pub reflective: f64,
+    pub transparency: f64,
+    pub refractive_index: f64,
 }
 
 impl Material
@@ -26,7 +28,8 @@ impl Material
     {
         Material{color: create_color(1.0, 1.0, 1.0), ambient: 0.1, diffuse: 0.9,
             specular: 0.9, shininess: 200.0, pattern: None,
-            reflective: 0.0}
+            reflective: 0.0,
+            transparency: 0.0, refractive_index: 0.0}
     }
 
     pub fn lighting(&self, object: Shape, light: PointLight,
@@ -265,5 +268,19 @@ mod tests
         let comps6 = i6.prepare_computation(r6);
         let color6 = world6.reflected_color(comps6, 0);
         assert_eq!(color6, create_color(0.0, 0.0, 0.0));
+    }
+
+    fn test_material_refraction_feature()
+    {
+        // p.150 Scenario: Transparency and Refractive Index for the default material
+        let material1 = Material::new();
+        assert!(fuzzy_equal(material1.transparency, 0.0));
+        assert!(fuzzy_equal(material1.refractive_index, 1.0));
+
+        // p.151 Scenario: A helper for producing a sphere with a glassy material
+        let sphere2 = Shape::glass_sphere(2);
+        let material2 = sphere2.get_material();
+        assert!(fuzzy_equal(material2.transparency, 0.0));
+        assert!(fuzzy_equal(material2.refractive_index, 1.0));
     }
 }
