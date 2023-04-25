@@ -71,7 +71,7 @@ impl World
         {
             Some(intersection) =>
             {
-                let comps = intersection.prepare_computation(ray);
+                let comps = intersection.prepare_computations(ray, intersections);
                 self.shade_hit(comps, remaining)
             },
             None => create_color(0.0, 0.0, 0.0),
@@ -140,7 +140,7 @@ mod tests
         let ray3 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let shape3 = Shape::new_sphere(3);
         let intersection3 = Intersection::new(4.0, shape3.clone());
-        let comps3 = intersection3.prepare_computation(ray3);
+        let comps3 = intersection3.prepare_computations(ray3, Intersections::new(vec![intersection3.clone()]));
         assert!(fuzzy_equal(comps3.t, intersection3.t));
         assert_eq!(comps3.object, intersection3.object);
         assert_eq!(comps3.point, create_point(0.0, 0.0, -1.0));
@@ -151,14 +151,14 @@ mod tests
         let ray4 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let shape4 = Shape::new_sphere(4);
         let intersection4 = Intersection::new(4.0, shape4.clone());
-        let comps4 = intersection4.prepare_computation(ray4);
+        let comps4 = intersection4.prepare_computations(ray4, Intersections::new(vec![intersection4.clone()]));
         assert!(comps4.inside == false);
 
         // p.95 Scenario: The hit, when an intersection occurs on the inside
         let ray5 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 0.0, 1.0));
         let shape5 = Shape::new_sphere(5);
         let intersection5 = Intersection::new(1.0, shape5.clone());
-        let comps5 = intersection5.prepare_computation(ray5);
+        let comps5 = intersection5.prepare_computations(ray5, Intersections::new(vec![intersection5.clone()]));
         assert_eq!(comps5.point, create_point(0.0, 0.0, 1.0));
         assert_eq!(comps5.eyev, create_vector(0.0, 0.0, -1.0));
         assert!(comps5.inside);
@@ -170,7 +170,7 @@ mod tests
         let ray6 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let shape6 = world6.objects[0].clone();
         let intersection6 = Intersection::new(4.0, shape6.clone());
-        let comps6 = intersection6.prepare_computation(ray6);
+        let comps6 = intersection6.prepare_computations(ray6, Intersections::new(vec![intersection6.clone()]));
         let color6 = world6.shade_hit(comps6, World::REFLECTION_RECURSION);
         assert_eq!(color6, create_color(0.38066, 0.47583, 0.2855));
 
@@ -180,7 +180,7 @@ mod tests
         let ray7 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 0.0, 1.0));
         let shape7 = world7.objects[1].clone();
         let intersection7 = Intersection::new(0.5, shape7.clone());
-        let comps7 = intersection7.prepare_computation(ray7);
+        let comps7 = intersection7.prepare_computations(ray7, Intersections::new(vec![intersection7.clone()]));
         let color7 = world7.shade_hit(comps7, World::REFLECTION_RECURSION);
         assert_eq!(color7, create_color(0.90498, 0.90498, 0.90498));
 
@@ -245,7 +245,7 @@ mod tests
         world5.objects = vec![sphere1.clone(), sphere2.clone()];
         let ray5 = Ray::new(create_point(0.0, 0.0, 5.0), create_vector(0.0, 0.0, 1.0));
         let intersection5 = Intersection::new(4.0, sphere2);
-        let comps5 = intersection5.prepare_computation(ray5);
+        let comps5 = intersection5.prepare_computations(ray5, Intersections::new(vec![intersection5.clone()]));
         let color5 = world5.shade_hit(comps5, World::REFLECTION_RECURSION);
         assert_eq!(color5, create_color(0.1, 0.1, 0.1));
     }

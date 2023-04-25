@@ -21,8 +21,49 @@ impl Intersection
         Intersection{t: t, object: object}
     }
 
-    pub fn prepare_computation(&self, ray: Ray) -> Computations
+    pub fn prepare_computations(&self, ray: Ray, intersections: Intersections) -> Computations
     {
+        let mut n1 = 0.0;
+        let mut n2 = 0.0;
+        let mut containers: Vec<Shape> = Vec::new();
+        for i in 0..intersections.count()
+        {
+            let intersection = intersections.get_intersection(i);
+            if intersection.clone() == *self
+            {
+                n1 = match containers.last()
+                {
+                    Some(n) => n.get_material().refractive_index,
+                    None => 1.0,
+                }
+            }
+
+            let m = containers.iter().position(|n| n == &intersection.object);
+            match m
+            {
+                Some(index) =>
+                {
+                    containers.remove(index);
+                    ()
+                },
+                None =>
+                {
+                    containers.push(intersection.object.clone());
+                    ()
+                },
+            }
+
+            if intersection.clone() == *self
+            {
+                n2 = match containers.last()
+                {
+                    Some(n) => n.get_material().refractive_index,
+                    None => 1.0,
+                };
+                break;
+            }
+        }
+
         // precompute some useful values
         let point = ray.position(self.t);
         let eyev = ray.direction.negate();
@@ -41,7 +82,7 @@ impl Intersection
 
         let reflectv = ray.direction.reflect(normalv);
         Computations::new(self.t, self.object.clone(), point,
-            eyev, normalv, inside, over_point, reflectv)
+            eyev, normalv, inside, over_point, reflectv, n1, n2)
     }
 }
 
@@ -62,6 +103,7 @@ impl fmt::Display for Intersection
     }
 }
 
+#[derive(Clone)]
 pub struct Intersections
 {
     intersections: Vec<Intersection>,
@@ -182,7 +224,7 @@ mod tests
         let mut shape1 = Shape::new_sphere(1);
         shape1.set_transform(Matrix::translation(0.0, 0.0, 1.0));
         let i1 = Intersection::new(5.0, shape1);
-        let comps1 = i1.prepare_computation(r1);
+        let comps1 = i1.prepare_computations(r1, Intersections::new(vec![i1.clone()]));
         assert!(comps1.over_point.get_vec()[2] < -EPSILON / 2.0);
         assert!(comps1.point.get_vec()[2] > comps1.over_point.get_vec()[2]);
     }

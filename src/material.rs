@@ -29,7 +29,7 @@ impl Material
         Material{color: create_color(1.0, 1.0, 1.0), ambient: 0.1, diffuse: 0.9,
             specular: 0.9, shininess: 200.0, pattern: None,
             reflective: 0.0,
-            transparency: 0.0, refractive_index: 0.0}
+            transparency: 0.0, refractive_index: 1.0}
     }
 
     pub fn lighting(&self, object: Shape, light: PointLight,
@@ -208,7 +208,7 @@ mod tests
         let r2 = Ray::new(create_point(0.0, 1.0, -1.0),
             create_vector(0.0, -sqrt2 / 2.0, sqrt2 / 2.0));
         let i2 = Intersection::new(sqrt2, shape2);
-        let comps2 = i2.prepare_computation(r2);
+        let comps2 = i2.prepare_computations(r2, Intersections::new(vec![i2.clone()]));
         assert_eq!(comps2.reflectv, create_vector(0.0, sqrt2 / 2.0, sqrt2 / 2.0));
 
         // p.144 Scenario: The reflected color for a nonreflective material
@@ -220,7 +220,7 @@ mod tests
         material3.ambient = 1.0;
         shape3.set_material(material3);
         let i3 = Intersection::new(1.0, shape3);
-        let comps3 = i3.prepare_computation(r3);
+        let comps3 = i3.prepare_computations(r3, Intersections::new(vec![i3.clone()]));
         let color3 = world3.reflected_color(comps3, World::REFLECTION_RECURSION);
         assert_eq!(color3, create_color(0.0, 0.0, 0.0));
 
@@ -235,7 +235,7 @@ mod tests
         let r4 = Ray::new(create_point(0.0, 0.0, -3.0),
             create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
         let i4 = Intersection::new(sqrt2, plane4);
-        let comps4 = i4.prepare_computation(r4);
+        let comps4 = i4.prepare_computations(r4, Intersections::new(vec![i4.clone()]));
         let color4 = world4.reflected_color(comps4, World::REFLECTION_RECURSION);
         assert_eq!(color4, create_color(0.19032, 0.2379, 0.14274));
 
@@ -250,7 +250,7 @@ mod tests
         let r5 = Ray::new(create_point(0.0, 0.0, -3.0),
             create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
         let i5 = Intersection::new(sqrt2, plane5);
-        let comps5 = i5.prepare_computation(r5);
+        let comps5 = i5.prepare_computations(r5, Intersections::new(vec![i5.clone()]));
         let color5 = world5.shade_hit(comps5, World::REFLECTION_RECURSION);
         assert_eq!(color4, create_color(0.87677, 0.92436, 0.82918));
 
@@ -265,11 +265,12 @@ mod tests
         let r6 = Ray::new(create_point(0.0, 0.0, -3.0),
             create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
         let i6 = Intersection::new(sqrt2, plane6);
-        let comps6 = i6.prepare_computation(r6);
+        let comps6 = i6.prepare_computations(r6, Intersections::new(vec![i6.clone()]));
         let color6 = world6.reflected_color(comps6, 0);
         assert_eq!(color6, create_color(0.0, 0.0, 0.0));
     }
 
+    #[test]
     fn test_material_refraction_feature()
     {
         // p.150 Scenario: Transparency and Refractive Index for the default material
@@ -280,7 +281,42 @@ mod tests
         // p.151 Scenario: A helper for producing a sphere with a glassy material
         let sphere2 = Shape::glass_sphere(2);
         let material2 = sphere2.get_material();
-        assert!(fuzzy_equal(material2.transparency, 0.0));
-        assert!(fuzzy_equal(material2.refractive_index, 1.0));
+        assert!(fuzzy_equal(material2.transparency, 1.0));
+        assert!(fuzzy_equal(material2.refractive_index, 1.5));
+
+        // p.152 Scenario: Finding n1 and n2 at various intersections
+        let mut a3 = Shape::glass_sphere(3);
+        a3.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        let mut material_a3 = a3.get_material();
+        material_a3.refractive_index = 1.5;
+        a3.set_material(material_a3);
+
+        let mut b3 = Shape::glass_sphere(4);
+        b3.set_transform(Matrix::translation(0.0, 0.0, -0.25));
+        let mut material_b3 = b3.get_material();
+        material_b3.refractive_index = 2.0;
+        b3.set_material(material_b3);
+
+        let mut c3 = Shape::glass_sphere(5);
+        c3.set_transform(Matrix::translation(0.0, 0.0, 0.25));
+        let mut material_c3 = c3.get_material();
+        material_c3.refractive_index = 2.5;
+        c3.set_material(material_c3);
+
+        let r3 = Ray::new(create_point(0.0, 0.0, -4.0), create_vector(0.0, 0.0, 1.0));
+        let xs3 = Intersections::new(vec![Intersection::new(2.0, a3.clone()),
+            Intersection::new(2.75, b3.clone()),
+            Intersection::new(3.25, c3.clone()),
+            Intersection::new(4.75, b3.clone()),
+            Intersection::new(5.25, c3.clone()),
+            Intersection::new(6.0, a3.clone())]);
+        let expected_n1 = vec![1.0, 1.5, 2.0, 2.5, 2.5, 1.5];
+        let expected_n2 = vec![1.5, 2.0, 2.5, 2.5, 1.5, 1.0];
+        for i in 0..xs3.count()
+        {
+            let comps3 = xs3.get_intersection(i).prepare_computations(r3, xs3.clone());
+            assert!(fuzzy_equal(comps3.n1, expected_n1[i]));
+            assert!(fuzzy_equal(comps3.n2, expected_n2[i]));
+        }
     }
 }
