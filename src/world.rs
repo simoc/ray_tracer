@@ -109,6 +109,15 @@ impl World
 
         color.multiply(comps.object.get_material().reflective)
     }
+
+    pub fn refracted_color(&self, comps: Computations, remaining: i32) -> Tuple
+    {
+        if fuzzy_equal(comps.object.get_material().transparency, 0.0)
+        {
+            return create_color(0.0, 0.0, 0.0);
+        }
+        return create_color(1.0, 1.0, 1.0);
+    }
 }
 
 #[cfg(test)]
@@ -271,5 +280,20 @@ mod tests
         let ray1 = Ray::new(create_point(0.0, 0.0, 0.0), create_vector(0.0, 1.0, 0.0));
         // should terminate successfully
         world1.color_at(ray1, World::REFLECTION_RECURSION);
+    }
+
+    #[test]
+    fn test_world_refraction_feature()
+    {
+        // p.155 Scenario: The refracted color with an opaque surface
+        let mut world1 = World::default_world();
+        let shape1 = world1.objects[0].clone();
+        let r1 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let i11 = Intersection::new(4.0, shape1.clone());
+        let i12 = Intersection::new(6.0, shape1.clone());
+        let xs1 = Intersections::new(vec![i11.clone(), i12.clone()]);
+        let comps1 = i11.prepare_computations(r1, xs1);
+        let color1 = world1.refracted_color(comps1, 5);
+        assert_eq!(color1, create_color(0.0, 0.0, 0.0));
     }
 }
