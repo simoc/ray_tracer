@@ -12,6 +12,7 @@ pub struct Computations
     pub normalv: Tuple,
     pub inside: bool,
     pub over_point: Tuple,
+    pub under_point: Tuple,
     pub reflectv: Tuple,
     pub n1: f64,
     pub n2: f64,
@@ -21,9 +22,9 @@ impl Computations
 {
     pub fn new(t: f64, object: Shape, point: Tuple, eyev: Tuple,
          normalv: Tuple, inside: bool, over_point: Tuple,
-         reflectv: Tuple, n1: f64, n2: f64) -> Self
+         under_point: Tuple, reflectv: Tuple, n1: f64, n2: f64) -> Self
     {
         Computations{t, object, point, eyev, normalv, inside, over_point,
-            reflectv, n1, n2}
+            under_point, reflectv, n1, n2}
     }
 }

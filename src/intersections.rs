@@ -79,10 +79,12 @@ impl Intersection
             inside = false;
         }
         let over_point = point.add(normalv.multiply(EPSILON));
+        let under_point = point.sub(normalv.multiply(EPSILON));
 
         let reflectv = ray.direction.reflect(normalv);
         Computations::new(self.t, self.object.clone(), point,
-            eyev, normalv, inside, over_point, reflectv, n1, n2)
+            eyev, normalv, inside, over_point, under_point,
+            reflectv, n1, n2)
     }
 }
 
@@ -227,5 +229,19 @@ mod tests
         let comps1 = i1.prepare_computations(r1, Intersections::new(vec![i1.clone()]));
         assert!(comps1.over_point.get_vec()[2] < -EPSILON / 2.0);
         assert!(comps1.point.get_vec()[2] > comps1.over_point.get_vec()[2]);
+    }
+
+    #[test]
+    fn test_intersections_refraction_feature()
+    {
+        // p.154 Scenario: The under point is offset below the surface
+        let r1 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
+        let mut shape1 = Shape::glass_sphere(1);
+        shape1.set_transform(Matrix::translation(0.0, 0.0, 1.0));
+        let i1 = Intersection::new(5.0, shape1);
+        let xs1 = Intersections::new(vec![i1.clone()]);
+        let comps1 = i1.prepare_computations(r1, xs1);
+        assert!(comps1.under_point.get_vec()[2] > EPSILON / 2.0);
+        assert!(comps1.point.get_vec()[2] < comps1.under_point.get_vec()[2]);
     }
 }
