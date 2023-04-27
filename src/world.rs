@@ -120,6 +120,23 @@ impl World
         {
             return create_color(0.0, 0.0, 0.0);
         }
+
+        // Find the ratio of first index of refraction to the second.
+        // (Yup, this is inverted from the definition of Snell's Law.)
+        let n_ratio = comps.n1 / comps.n2;
+
+        // cos(theta_i) is the same as the dot product of the two vectors
+        let cos_i = comps.eyev.dot_product(comps.normalv);
+
+        // Find sin(theta_t)^2 via trigonometric identity
+        let sin2_t = (n_ratio * n_ratio) * (1.0 - (cos_i * cos_i));
+
+        // Check for total internal reflection
+        if sin2_t > 1.0
+        {
+            return create_color(0.0, 0.0, 0.0);
+        }
+
         return create_color(1.0, 1.0, 1.0);
     }
 }
@@ -303,5 +320,21 @@ mod tests
         // p.156 Scenario: The refracted color at the maximum recursive depth
         let color2 = world1.refracted_color(comps1, 0);
         assert_eq!(color2, create_color(0.0, 0.0, 0.0));
+
+        // p.157 Scenario: The refracted color under total internal reflection
+        let mut world3 = World::default_world();
+        let shape3 = world3.objects[0].clone();
+        let mut material3 = shape3.get_material();
+        material3.transparency = 1.0;
+        material3.refractive_index = 1.5;
+        let sqrt2 = 2.0_f64.sqrt();
+        let r3 = Ray::new(create_point(0.0, 0.0, sqrt2 / 2.0),
+            create_vector(0.0, 1.0, 0.0));
+        let i31 = Intersection::new(-sqrt2 / 2.0, shape3.clone());
+        let i32 = Intersection::new(sqrt2 / 2.0, shape3.clone());
+        let xs3 = Intersections::new(vec![i31.clone(), i32.clone()]);
+        let comps3 = i32.prepare_computations(r3, xs3);
+        let color3 = world3.refracted_color(comps3.clone(), 5);
+        assert_eq!(color3, create_color(0.0, 0.0, 0.0));
     }
 }
