@@ -112,6 +112,10 @@ impl World
 
     pub fn refracted_color(&self, comps: Computations, remaining: i32) -> Tuple
     {
+        if remaining <= 0
+        {
+            return create_color(0.0, 0.0, 0.0);
+        }
         if fuzzy_equal(comps.object.get_material().transparency, 0.0)
         {
             return create_color(0.0, 0.0, 0.0);
@@ -293,7 +297,11 @@ mod tests
         let i12 = Intersection::new(6.0, shape1.clone());
         let xs1 = Intersections::new(vec![i11.clone(), i12.clone()]);
         let comps1 = i11.prepare_computations(r1, xs1);
-        let color1 = world1.refracted_color(comps1, 5);
+        let color1 = world1.refracted_color(comps1.clone(), 5);
         assert_eq!(color1, create_color(0.0, 0.0, 0.0));
+
+        // p.156 Scenario: The refracted color at the maximum recursive depth
+        let color2 = world1.refracted_color(comps1, 0);
+        assert_eq!(color2, create_color(0.0, 0.0, 0.0));
     }
 }
