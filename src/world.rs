@@ -58,13 +58,26 @@ impl World
     {
         let comps2 = comps.clone();
         let comps3 = comps.clone();
+        let comps4 = comps.clone();
+        let material = comps.clone().object.get_material();
+
         let shadowed = self.is_shadowed(comps.over_point);
-        let surface = comps.object.get_material().lighting(comps.object,
+        let surface = material.lighting(comps.object,
             self.light, comps.point,
             comps.eyev, comps.normalv, shadowed);
         let reflected = self.reflected_color(comps2, remaining);
         let refracted = self.refracted_color(comps3, remaining);
-        surface.add(reflected).add(refracted)
+
+        if material.reflective > 0.0 && material.transparency > 0.0
+        {
+            let reflectance = comps4.schlick();
+            return surface.add(reflected.multiply(reflectance))
+                .add(refracted.multiply(1.0 - reflectance));
+        }
+        else
+        {
+            return surface.add(reflected).add(refracted);
+        }
     }
 
     pub fn color_at(&self, ray: Ray, remaining: i32) -> Tuple
@@ -400,5 +413,30 @@ mod tests
         let comps5 = i5.prepare_computations(r5, xs5);
         let color5 = world5.shade_hit(comps5, 5);
         assert_eq!(color5, create_color(0.93642, 0.68642, 0.68642));
+
+        // p.164 Scenario: shade_hit() with a reflective, transparent material
+        let mut world6 = World::default_world();
+        let r6 = Ray::new(create_point(0.0, 0.0, -3.0),
+            create_vector(0.0, -sqrt2 / 2.0, sqrt2 / 2.0));
+        let mut floor6 = Shape::new_plane(6);
+        let mut material_floor6 = floor5.get_material();
+        floor6.set_transform(Matrix::translation(0.0, -1.0, 0.0));
+        material_floor6.reflective = 0.5;
+        material_floor6.transparency = 0.5;
+        material_floor6.refractive_index = 1.5;
+        floor6.set_material(material_floor6);
+        world6.objects.push(floor6.clone());
+        let mut ball6 = Shape::new_sphere(7);
+        let mut material_ball6 = ball6.get_material();
+        material_ball6.color = create_color(1.0, 0.0, 0.0);
+        material_ball6.ambient = 0.5;
+        ball6.set_transform(Matrix::translation(0.0, -3.5, -0.5));
+        ball6.set_material(material_ball6);
+        world6.objects.push(ball6.clone());
+        let i6 = Intersection::new(sqrt2, floor6.clone());
+        let xs6 = Intersections::new(vec![i6.clone()]);
+        let comps6 = i6.prepare_computations(r6, xs6);
+        let color6 = world6.shade_hit(comps6, 5);
+        assert_eq!(color6, create_color(0.93391, 0.69643, 0.69243));
     }
 }
