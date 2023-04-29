@@ -3,6 +3,7 @@ use crate::computations::*;
 use crate::intersections::*;
 use crate::material::*;
 use crate::matrix::*;
+use crate::pattern::*;
 use crate::pointlight::*;
 use crate::ray::*;
 use crate::shape::*;
@@ -137,7 +138,19 @@ impl World
             return create_color(0.0, 0.0, 0.0);
         }
 
-        return create_color(1.0, 1.0, 1.0);
+        // Find cos(theta_t) via trigonmetric identity
+        let cos_t = (1.0 - sin2_t).sqrt();
+
+        // Compute the direction of the refracted ray
+        let direction = comps.normalv.multiply(n_ratio * cos_i - cos_t).sub(comps.eyev.multiply(n_ratio));
+
+        // Create the reflected ray
+        let refract_ray = Ray::new(comps.under_point, direction);
+
+        // Find the color of the refracted ray, making sure to multipy
+        // by the transparency value to account for any opacity
+        let color = self.color_at(refract_ray, remaining - 1).multiply(comps.object.get_material().transparency);
+        return color;
     }
 }
 
@@ -336,5 +349,30 @@ mod tests
         let comps3 = i32.prepare_computations(r3, xs3);
         let color3 = world3.refracted_color(comps3.clone(), 5);
         assert_eq!(color3, create_color(0.0, 0.0, 0.0));
+
+        // p.158 Scenario: The refracted color with a refracted ray
+        let mut world4 = World::default_world();
+        let mut a4 = world4.objects[0].clone();
+        let mut material_a4 = a4.get_material();
+        material_a4.ambient = 1.0;
+        material_a4.pattern = Some(Pattern::test_pattern());
+        a4.set_material(material_a4);
+        let mut b4 = world4.objects[1].clone();
+        let mut material_b4 = b4.get_material();
+        material_b4.transparency = 1.0;
+        material_b4.refractive_index = 1.5;
+        b4.set_material(material_b4);
+        world4.objects = vec![a4.clone(), b4.clone()];
+        let r4 = Ray::new(create_point(0.0, 0.0, 0.1),
+            create_vector(0.0, 1.0, 0.0));
+        let i41 = Intersection::new(-0.9899, a4.clone());
+        let i42 = Intersection::new(-0.4899, b4.clone());
+        let i43 = Intersection::new(0.4899, b4.clone());
+        let i44 = Intersection::new(0.9899, a4.clone());
+        let xs4 = Intersections::new(vec![i41.clone(),
+            i42.clone(), i43.clone(), i44.clone()]);
+        let comps4 = i43.prepare_computations(r4, xs4);
+        let color4 = world4.refracted_color(comps4, 5);
+        assert_eq!(color4, create_color(0.0, 0.99888, 0.04725));
     }
 }
