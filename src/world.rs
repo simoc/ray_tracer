@@ -57,12 +57,14 @@ impl World
     pub fn shade_hit(&self, comps: Computations, remaining: i32) -> Tuple
     {
         let comps2 = comps.clone();
+        let comps3 = comps.clone();
         let shadowed = self.is_shadowed(comps.over_point);
         let surface = comps.object.get_material().lighting(comps.object,
             self.light, comps.point,
             comps.eyev, comps.normalv, shadowed);
         let reflected = self.reflected_color(comps2, remaining);
-        surface.add(reflected)
+        let refracted = self.refracted_color(comps3, remaining);
+        surface.add(reflected).add(refracted)
     }
 
     pub fn color_at(&self, ray: Ray, remaining: i32) -> Tuple
@@ -374,5 +376,29 @@ mod tests
         let comps4 = i43.prepare_computations(r4, xs4);
         let color4 = world4.refracted_color(comps4, 5);
         assert_eq!(color4, create_color(0.0, 0.99888, 0.04725));
+
+        // p.159 Scenario: shade_hit() with a transparent material
+        let mut world5 = World::default_world();
+        let mut floor5 = Shape::new_plane(3);
+        let mut material_floor5 = floor5.get_material();
+        floor5.set_transform(Matrix::translation(0.0, -1.0, 0.0));
+        material_floor5.transparency = 0.5;
+        material_floor5.refractive_index = 1.5;
+        floor5.set_material(material_floor5);
+        world5.objects.push(floor5.clone());
+        let mut ball5 = Shape::new_sphere(4);
+        let mut material_ball5 = ball5.get_material();
+        material_ball5.color = create_color(1.0, 0.0, 0.0);
+        material_ball5.ambient = 0.5;
+        ball5.set_transform(Matrix::translation(0.0, -3.5, -0.5));
+        ball5.set_material(material_ball5);
+        world5.objects.push(ball5.clone());
+        let r5 = Ray::new(create_point(0.0, 0.0, -3.0),
+            create_vector(0.0, -sqrt2 / 2.0, sqrt2 / 2.0));
+        let i5 = Intersection::new(sqrt2, floor5.clone());
+        let xs5 = Intersections::new(vec![i5.clone()]);
+        let comps5 = i5.prepare_computations(r5, xs5);
+        let color5 = world5.shade_hit(comps5, 5);
+        assert_eq!(color5, create_color(0.93642, 0.68642, 0.68642));
     }
 }
