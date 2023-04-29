@@ -34,7 +34,7 @@ impl Computations
     pub fn schlick(&self) -> f64
     {
         // find the cosine of the angle between the eye and normal vectors
-        let cos = self.eyev.dot_product(self.normalv);
+        let mut cos = self.eyev.dot_product(self.normalv);
 
         // total internal reflection can only occur if n1 > n2
         if self.n1 > self.n2
@@ -45,11 +45,16 @@ impl Computations
             {
                 return 1.0;
             }
+
+            // compute cosine of theta_t using trig identity
+            let cos_t = (1.0 - sin2_t).sqrt();
+
+            // wnen n1 > n2, use cos(theta_t) instead
+            cos = cos_t
         }
 
-        // return anything but 1.0 here, so that the test will fail
-        // appropriately if something goes wrong.
-        return 0.0;
+        let r0 = ((self.n1 - self.n2) / (self.n1 + self.n2)).powf(2.0);
+        return r0 + (1.0 - r0) * (1.0 - cos).powf(5.0);
     }
 }
 
@@ -70,7 +75,28 @@ mod tests
         let i12 = Intersection::new(sqrt2 / 2.0, shape1.clone());
         let xs1 = Intersections::new(vec![i11.clone(), i12.clone()]);
         let comps1 = i12.prepare_computations(ray1, xs1);
-        let reflectance = comps1.schlick();
-        assert!(fuzzy_equal(reflectance, 1.0));
+        let reflectance1 = comps1.schlick();
+        assert!(fuzzy_equal(reflectance1, 1.0));
+
+        // p.162 Scenario: The Schlick approximation with a perpendicular viewing angle
+        let shape2 = Shape::glass_sphere(2);
+        let ray2 = Ray::new(create_point(0.0, 0.0, 0.0),
+            create_vector(0.0, 1.0, 0.0));
+        let i21 = Intersection::new(-1.0, shape2.clone());
+        let i22 = Intersection::new(1.0, shape2.clone());
+        let xs2 = Intersections::new(vec![i21.clone(), i22.clone()]);
+        let comps2 = i22.prepare_computations(ray2, xs2);
+        let reflectance2 = comps2.schlick();
+        assert!(fuzzy_equal(reflectance2, 0.04));
+
+        // p.163 Scenario: The Schlick approximation with small angle and n2 > n1
+        let shape3 = Shape::glass_sphere(3);
+        let ray3 = Ray::new(create_point(0.0, 0.99, -2.0),
+            create_vector(0.0, 0.0, 1.0));
+        let i31 = Intersection::new(1.8589, shape3.clone());
+        let xs3 = Intersections::new(vec![i31.clone()]);
+        let comps3 = i31.prepare_computations(ray3, xs3);
+        let reflectance3 = comps3.schlick();
+        assert!(fuzzy_equal(reflectance3, 0.48873));
     }
 }
