@@ -116,6 +116,11 @@ impl Cube
             tmax = ztmax;
         }
 
+        if (tmin > tmax)
+        {
+            return vec![];
+        }
+
         return vec![tmin, tmax];
     }
 
@@ -157,7 +162,7 @@ mod tests
     use super::*;
 
     #[test]
-    fn test_cubes_feature()
+    fn test_cubes_feature1()
     {
         // p.168 Scenario: A ray intersects a cube
         let mut c1 = Cube::new(1);
@@ -185,6 +190,32 @@ mod tests
             assert_eq!(xs1.len(), 2);
             assert!(fuzzy_equal(xs1[0], t11[i]));
             assert!(fuzzy_equal(xs1[1], t21[i]));
+        }
+    }
+
+    #[test]
+    fn test_cubes_feature2()
+    {
+        // p.172 Scenario: A ray misses a cube
+        let mut c2 = Cube::new(2);
+        let origins2 = vec![create_point(-2.0, 0.0, 0.0),
+            create_point(0.0, -2.0, 0.0),
+            create_point(0.0, 0.0, -2.0),
+            create_point(2.0, 0.0, 2.0),
+            create_point(0.0, 2.0, 2.0),
+            create_point(2.0, 2.0, 0.0)];
+        let directions2 = vec![create_vector(0.2673, 0.5345, 0.8018),
+            create_vector(0.8018, 0.2673, 0.5345),
+            create_vector(0.5345, 0.8018, 0.2673),
+            create_vector(0.0, 0.0, -1.0),
+            create_vector(0.0, -1.0, 0.0),
+            create_vector(-1.0, 0.0, 0.0)];
+
+        for i in 0..origins2.len()
+        {
+            let r2 = Ray::new(origins2[i], directions2[i]);
+            let xs2 = c2.local_intersect(r2);
+            assert_eq!(xs2.len(), 0);
         }
     }
 }
