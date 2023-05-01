@@ -13,6 +13,7 @@ mod camera;
 mod shape;
 mod plane;
 mod pattern;
+mod cube;
 
 use std::f64::consts::PI;
 use crate::tuple::*;
@@ -29,6 +30,7 @@ use crate::matrix::*;
 use crate::shape::*;
 use crate::plane::*;
 use crate::pattern::*;
+use crate::cube::*;
 
 fn main()
 {

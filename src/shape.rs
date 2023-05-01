@@ -1,5 +1,6 @@
 use std::fmt;
 
+use crate::cube::*;
 use crate::sphere::*;
 use crate::material::*;
 use crate::matrix::*;
@@ -12,6 +13,7 @@ pub enum Shape
 {
     Sphere(Sphere),
     Plane(Plane),
+    Cube(Cube),
 }
 
 impl Shape
@@ -37,6 +39,11 @@ impl Shape
         Shape::Plane(Plane::new(id))
     }
 
+    pub fn new_cube(id: i32) -> Shape
+    {
+        Shape::Cube(Cube::new(id))
+    }
+
     pub fn test_shape(id: i32) -> Shape
     {
         Self::new_sphere(id)
@@ -48,6 +55,7 @@ impl Shape
         {
             Shape::Sphere(s) => s.get_local_transform(),
             Shape::Plane(p) => p.get_local_transform(),
+            Shape::Cube(c) => c.get_local_transform(),
         }
     }
 
@@ -57,6 +65,7 @@ impl Shape
         {
             Shape::Sphere(s) => s.set_local_transform(transform),
             Shape::Plane(p) => p.set_local_transform(transform),
+            Shape::Cube(c) => c.set_local_transform(transform),
         }
     }
 
@@ -66,6 +75,7 @@ impl Shape
         {
             Shape::Sphere(s) => s.get_local_material(),
             Shape::Plane(p) => p.get_local_material(),
+            Shape::Cube(c) => c.get_local_material(),
         }
     }
 
@@ -75,6 +85,7 @@ impl Shape
         {
             Shape::Sphere(s) => s.set_local_material(material),
             Shape::Plane(p) => p.set_local_material(material),
+            Shape::Cube(c) => c.set_local_material(material),
         }
     }
 
@@ -93,6 +104,11 @@ impl Shape
                 p.local_set_saved_ray(local_ray);
                 p.local_intersect(local_ray)
             },
+            Shape::Cube(c) =>
+            {
+                c.local_set_saved_ray(local_ray);
+                c.local_intersect(local_ray)
+            },
         }
     }
 
@@ -102,6 +118,7 @@ impl Shape
         {
             Shape::Sphere(s) => s.local_get_saved_ray(),
             Shape::Plane(p) => p.local_get_saved_ray(),
+            Shape::Cube(c) => c.local_get_saved_ray(),
         }
     }
 
@@ -113,6 +130,7 @@ impl Shape
         {
             Shape::Sphere(s) => s.local_normal_at(local_point),
             Shape::Plane(p) => p.local_normal_at(local_point),
+            Shape::Cube(c) => c.local_normal_at(local_point),
         };
         let world_normal = inverse.transpose().multiply_tuple(local_normal);
         let v = world_normal.get_vec();
@@ -143,6 +161,14 @@ impl PartialEq for Shape
                     _ => false,
                 }
             },
+            Shape::Cube(c1) =>
+            {
+                match other
+                {
+                    Shape::Cube(c2) => c1.get_id() == c2.get_id(),
+                    _ => false,
+                }
+            },
         }
     }
 }
@@ -155,6 +181,7 @@ impl fmt::Display for Shape
         {
             Shape::Sphere(s) => write!(f, "sphere {}", s.get_id()),
             Shape::Plane(p) => write!(f, "plane {}", p.get_id()),
+            Shape::Cube(c) => write!(f, "cube {}", c.get_id()),
         }
     }
 }
