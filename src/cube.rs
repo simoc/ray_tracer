@@ -87,6 +87,34 @@ impl Cube
         (tmin, tmax)
     }
 
+    fn max3(&self, a: f64, b: f64, c: f64) -> f64
+    {
+        let mut n = a;
+        if b > n
+        {
+            n = b;
+        }
+        if c > n
+        {
+            n = c;
+        }
+        n
+    }
+
+    fn min3(&self, a: f64, b: f64, c: f64) -> f64
+    {
+        let mut n = a;
+        if b < n
+        {
+            n = b;
+        }
+        if c < n
+        {
+            n = c;
+        }
+        n
+    }
+
     pub fn local_intersect(&mut self, ray: Ray) -> Vec<f64>
     {
         let (xtmin, xtmax) = self.check_axis(ray.origin.get_vec()[0],
@@ -96,27 +124,10 @@ impl Cube
         let (ztmin, ztmax) = self.check_axis(ray.origin.get_vec()[2],
             ray.direction.get_vec()[2]);
 
-        let mut tmin = xtmin;
-        if ytmin > tmin
-        {
-            tmin = ytmin;
-        }
-        if ztmin > tmin
-        {
-            tmin = ztmin;
-        }
+        let tmin = self.max3(xtmin, ytmin, ztmin);
+        let tmax = self.min3(xtmax, ytmax, ztmax);
 
-        let mut tmax = xtmax;
-        if ytmax < tmax
-        {
-            tmax = ytmax;
-        }
-        if ztmax < tmax
-        {
-            tmax = ztmax;
-        }
-
-        if (tmin > tmax)
+        if tmin > tmax
         {
             return vec![];
         }
@@ -134,9 +145,23 @@ impl Cube
         self.saved_ray = saved_ray;
     }
 
-    pub fn local_normal_at(&self, _local_point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple) -> Tuple
     {
-        create_vector(0.0, 1.0, 0.0)
+        let v = point.get_vec();
+        let x = v[0];
+        let y = v[1];
+        let z =  v[2];
+        let maxc = self.max3(x.abs(), y.abs(), z.abs());
+
+        if maxc == x.abs()
+        {
+            return create_vector(x, 0.0, 0.0)
+        }
+        else if maxc == y.abs()
+        {
+            return create_vector(0.0, y, 0.0)
+        }
+        return create_vector(0.0, 0.0, z);
     }
 }
 
@@ -216,6 +241,35 @@ mod tests
             let r2 = Ray::new(origins2[i], directions2[i]);
             let xs2 = c2.local_intersect(r2);
             assert_eq!(xs2.len(), 0);
+        }
+    }
+
+    #[test]
+    fn test_cubes_feature3()
+    {
+        // p.172 Scenario: The normal on the surface of a cube
+        let mut c3 = Cube::new(3);
+        let points3 = vec![create_point(1.0, 0.5, -0.8),
+            create_point(-1.0, -0.2, 0.9),
+            create_point(-0.4, 1.0, -0.1),
+            create_point(0.3, -1.0, -0.7),
+            create_point(-0.6, 0.3, 1.0),
+            create_point(0.4, 0.4, -1.0),
+            create_point(1.0, 1.0, 1.0),
+            create_point(-1.0, -1.0, -1.0)];
+        let normals3 = vec![create_vector(1.0, 0.0, 0.0),
+            create_vector(-1.0, 0.0, 0.0),
+            create_vector(0.0, 1.0, 0.0),
+            create_vector(0.0, -1.0, 0.0),
+            create_vector(0.0, 0.0, 1.0),
+            create_vector(0.0, 0.0, -1.0),
+            create_vector(1.0, 0.0, 0.0),
+            create_vector(-1.0, 0.0, 0.0)];
+
+        for i in 0..points3.len()
+        {
+            let normal = c3.local_normal_at(points3[i]);
+            assert_eq!(normal, normals3[i]);
         }
     }
 }
