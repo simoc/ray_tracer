@@ -10,52 +10,16 @@ use crate::shape::*;
 #[derive(Clone, Debug)]
 pub struct Sphere
 {
-    id: i32,
-    transform: Matrix,
-    material: Material,
-    saved_ray: Ray,
 }
 
 impl Sphere
 {
-    pub fn get_local_transform(&self) -> Matrix
+    pub fn new() -> Self
     {
-        self.transform.clone()
+        Sphere{}
     }
 
-    pub fn set_local_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
-    }
-
-    pub fn get_local_material(&self) -> Material
-    {
-        self.material.clone()
-    }
-
-    pub fn set_local_material(&mut self, material: Material)
-    {
-        self.material = material;
-    }
-
-    pub fn get_id(&self) -> i32
-    {
-        self.id
-    }
-}
-
-impl Sphere
-{
-    pub fn new(id: i32) -> Self
-    {
-        let zero_point = create_point(0.0, 0.0, 0.0);
-        let zero_vector = create_vector(0.0, 0.0, 0.0);
-        Sphere{id: id, transform: Matrix::identity(4),
-            material: Material::new(),
-            saved_ray: Ray::new(zero_point, zero_vector)}
-    }
-
-    pub fn local_intersect(&mut self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
     {
         let ray2 = ray;
 
@@ -79,16 +43,6 @@ impl Sphere
         return vec![t1, t2];
     }
 
-    pub fn local_get_saved_ray(&self) -> Ray
-    {
-        self.saved_ray
-    }
-
-    pub fn local_set_saved_ray(&mut self, saved_ray: Ray)
-    {
-        self.saved_ray = saved_ray;
-    }
-
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple
     {
         let local_normal = local_point.sub(create_point(0.0, 0.0, 0.0));
@@ -96,19 +50,11 @@ impl Sphere
     }
 }
 
-impl PartialEq for Sphere
-{
-    fn eq(&self, other: &Self) -> bool
-    {
-        self.id == other.id
-    }
-}
-
 impl fmt::Display for Sphere
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
-        write!(f, "sphere {}", self.id)
+        write!(f, "sphere")
     }
 }
 

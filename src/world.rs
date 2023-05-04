@@ -335,7 +335,7 @@ mod tests
     fn test_world_refraction_feature()
     {
         // p.155 Scenario: The refracted color with an opaque surface
-        let mut world1 = World::default_world();
+        let world1 = World::default_world();
         let shape1 = world1.objects[0].clone();
         let r1 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let i11 = Intersection::new(4.0, shape1.clone());
@@ -350,7 +350,7 @@ mod tests
         assert_eq!(color2, create_color(0.0, 0.0, 0.0));
 
         // p.157 Scenario: The refracted color under total internal reflection
-        let mut world3 = World::default_world();
+        let world3 = World::default_world();
         let shape3 = world3.objects[0].clone();
         let mut material3 = shape3.get_material();
         material3.transparency = 1.0;

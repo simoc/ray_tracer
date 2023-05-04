@@ -9,39 +9,69 @@ use crate::ray::*;
 use crate::tuple::*;
 
 #[derive(Clone, Debug)]
-pub enum Shape
+pub enum ShapeSpecific
 {
     Sphere(Sphere),
     Plane(Plane),
     Cube(Cube),
 }
 
+#[derive(Clone, Debug)]
+pub struct Shape
+{
+    id: i32,
+    transform: Matrix,
+    material: Material,
+    saved_ray: Ray,
+    specific: ShapeSpecific,
+}
+
 impl Shape
 {
     pub fn new_sphere(id: i32) -> Shape
     {
-        Shape::Sphere(Sphere::new(id))
+        let zero_point = create_point(0.0, 0.0, 0.0);
+        let zero_vector = create_vector(0.0, 0.0, 0.0);
+
+        Shape{id: id,
+            transform: Matrix::identity(4),
+            material: Material::new(),
+            saved_ray: Ray::new(zero_point, zero_vector),
+            specific: ShapeSpecific::Sphere(Sphere::new())}
     }
 
     pub fn glass_sphere(id: i32) -> Shape
     {
-        let mut sphere = Shape::Sphere(Sphere::new(id));
-        let mut material = sphere.get_material();
+        let mut sphere = Self::new_sphere(id);
+        let mut material = sphere.material;
         material.transparency = 1.0;
         material.refractive_index = 1.5;
-        sphere.set_material(material);
-        sphere.set_transform(Matrix::identity(4));
+        sphere.material = material;
         sphere
     }
 
     pub fn new_plane(id: i32) -> Shape
     {
-        Shape::Plane(Plane::new(id))
+        let zero_point = create_point(0.0, 0.0, 0.0);
+        let zero_vector = create_vector(0.0, 0.0, 0.0);
+
+        Shape{id: id,
+            transform: Matrix::identity(4),
+            material: Material::new(),
+            saved_ray: Ray::new(zero_point, zero_vector),
+            specific: ShapeSpecific::Plane(Plane::new())}
     }
 
     pub fn new_cube(id: i32) -> Shape
     {
-        Shape::Cube(Cube::new(id))
+        let zero_point = create_point(0.0, 0.0, 0.0);
+        let zero_vector = create_vector(0.0, 0.0, 0.0);
+
+        Shape{id: id,
+            transform: Matrix::identity(4),
+            material: Material::new(),
+            saved_ray: Ray::new(zero_point, zero_vector),
+            specific: ShapeSpecific::Cube(Cube::new())}
     }
 
     pub fn test_shape(id: i32) -> Shape
@@ -51,86 +81,50 @@ impl Shape
 
     pub fn get_transform(&self) -> Matrix
     {
-        match &self
-        {
-            Shape::Sphere(s) => s.get_local_transform(),
-            Shape::Plane(p) => p.get_local_transform(),
-            Shape::Cube(c) => c.get_local_transform(),
-        }
+        self.transform.clone()
     }
 
     pub fn set_transform(&mut self, transform: Matrix)
     {
-        match self
-        {
-            Shape::Sphere(s) => s.set_local_transform(transform),
-            Shape::Plane(p) => p.set_local_transform(transform),
-            Shape::Cube(c) => c.set_local_transform(transform),
-        }
+        self.transform = transform;
     }
 
     pub fn get_material(&self) -> Material
     {
-        match self
-        {
-            Shape::Sphere(s) => s.get_local_material(),
-            Shape::Plane(p) => p.get_local_material(),
-            Shape::Cube(c) => c.get_local_material(),
-        }
+        self.material.clone()
     }
 
     pub fn set_material(&mut self, material: Material)
     {
-        match self
-        {
-            Shape::Sphere(s) => s.set_local_material(material),
-            Shape::Plane(p) => p.set_local_material(material),
-            Shape::Cube(c) => c.set_local_material(material),
-        }
+        self.material = material;
     }
 
     pub fn intersect(&mut self, ray: Ray) -> Vec<f64>
     {
-        let local_ray = ray.transform(self.get_transform().inverse());
-        match self
+        let local_ray = ray.transform(self.transform.inverse());
+        self.saved_ray = local_ray.clone();
+        match self.specific.clone()
         {
-            Shape::Sphere(s) =>
-            {
-                s.local_set_saved_ray(local_ray);
-                s.local_intersect(local_ray)
-            },
-            Shape::Plane(p) =>
-            {
-                p.local_set_saved_ray(local_ray);
-                p.local_intersect(local_ray)
-            },
-            Shape::Cube(c) =>
-            {
-                c.local_set_saved_ray(local_ray);
-                c.local_intersect(local_ray)
-            },
+            ShapeSpecific::Sphere(s) => s.local_intersect(local_ray),
+            ShapeSpecific::Plane(p) => p.local_intersect(local_ray),
+            ShapeSpecific::Cube(c) => c.local_intersect(local_ray),
         }
     }
 
     pub fn get_saved_ray(&self) -> Ray
     {
-        match self
-        {
-            Shape::Sphere(s) => s.local_get_saved_ray(),
-            Shape::Plane(p) => p.local_get_saved_ray(),
-            Shape::Cube(c) => c.local_get_saved_ray(),
-        }
+        self.saved_ray
     }
 
     pub fn normal_at(&self, world_point: Tuple) -> Tuple
     {
         let inverse = self.get_transform().inverse();
         let local_point = inverse.clone().multiply_tuple(world_point);
-        let local_normal = match self
+        let local_normal = match self.specific.clone()
         {
-            Shape::Sphere(s) => s.local_normal_at(local_point),
-            Shape::Plane(p) => p.local_normal_at(local_point),
-            Shape::Cube(c) => c.local_normal_at(local_point),
+            ShapeSpecific::Sphere(s) => s.local_normal_at(local_point),
+            ShapeSpecific::Plane(p) => p.local_normal_at(local_point),
+            ShapeSpecific::Cube(c) => c.local_normal_at(local_point),
         };
         let world_normal = inverse.transpose().multiply_tuple(local_normal);
         let v = world_normal.get_vec();
@@ -143,29 +137,29 @@ impl PartialEq for Shape
 {
     fn eq(&self, other: &Self) -> bool
     {
-        match self
+        match self.specific
         {
-            Shape::Sphere(s1) =>
+            ShapeSpecific::Sphere(_) =>
             {
-                match other
+                match other.specific
                 {
-                    Shape::Sphere(s2) => s1.get_id() == s2.get_id(),
+                    ShapeSpecific::Sphere(_) => self.id == other.id,
                     _ => false,
                 }
             },
-            Shape::Plane(p1) =>
+            ShapeSpecific::Plane(_) =>
             {
-                match other
+                match other.specific
                 {
-                    Shape::Plane(p2) => p1.get_id() == p2.get_id(),
+                    ShapeSpecific::Plane(_) => self.id == other.id,
                     _ => false,
                 }
             },
-            Shape::Cube(c1) =>
+            ShapeSpecific::Cube(_) =>
             {
-                match other
+                match other.specific
                 {
-                    Shape::Cube(c2) => c1.get_id() == c2.get_id(),
+                    ShapeSpecific::Cube(_) => self.id == other.id,
                     _ => false,
                 }
             },
@@ -177,11 +171,11 @@ impl fmt::Display for Shape
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
-        match self
+        match self.specific
         {
-            Shape::Sphere(s) => write!(f, "sphere {}", s.get_id()),
-            Shape::Plane(p) => write!(f, "plane {}", p.get_id()),
-            Shape::Cube(c) => write!(f, "cube {}", c.get_id()),
+            ShapeSpecific::Sphere(_) => write!(f, "sphere {}", self.id),
+            ShapeSpecific::Plane(_) => write!(f, "plane {}", self.id),
+            ShapeSpecific::Cube(_) => write!(f, "cube {}", self.id),
         }
     }
 }
