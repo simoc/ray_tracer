@@ -196,6 +196,7 @@ mod tests
         assert_eq!(result7, create_color(0.1, 0.1, 0.1));
     }
 
+    #[test]
     fn test_material_reflection_feature()
     {
         // p.143 Scenario: Reflectivity for the default material
@@ -233,7 +234,7 @@ mod tests
         plane4.set_material(material4);
         world4.objects.push(plane4.clone());
         let r4 = Ray::new(create_point(0.0, 0.0, -3.0),
-            create_vector(0.0, -sqrt2 / 2.0, -sqrt2 / 2.0));
+            create_vector(0.0, -sqrt2 / 2.0, sqrt2 / 2.0));
         let i4 = Intersection::new(sqrt2, plane4);
         let comps4 = i4.prepare_computations(r4, Intersections::new(vec![i4.clone()]));
         let color4 = world4.reflected_color(comps4, World::REFLECTION_RECURSION);
@@ -252,7 +253,7 @@ mod tests
         let i5 = Intersection::new(sqrt2, plane5);
         let comps5 = i5.prepare_computations(r5, Intersections::new(vec![i5.clone()]));
         let color5 = world5.shade_hit(comps5, World::REFLECTION_RECURSION);
-        assert_eq!(color4, create_color(0.87677, 0.92436, 0.82918));
+        assert_eq!(color5, create_color(0.87677, 0.92436, 0.82918));
 
         // p.147 Scenario: The reflected color at the maximum recursive depth
         let mut world6 = World::default_world();
