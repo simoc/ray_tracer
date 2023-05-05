@@ -13,53 +13,21 @@ use crate::shape::*;
 #[derive(Clone, Debug)]
 pub struct Cube
 {
-    id: i32,
-    transform: Matrix,
-    material: Material,
-    saved_ray: Ray,
 }
 
 // An axis aligned bounding box from -1 to +1 on each axis
 impl Cube
 {
-    pub fn get_local_transform(&self) -> Matrix
-    {
-        self.transform.clone()
-    }
-
-    pub fn set_local_transform(&mut self, transform: Matrix)
-    {
-        self.transform = transform;
-    }
-
-    pub fn get_local_material(&self) -> Material
-    {
-        self.material.clone()
-    }
-
-    pub fn set_local_material(&mut self, material: Material)
-    {
-        self.material = material;
-    }
-
-    pub fn get_id(&self) -> i32
-    {
-        self.id
-    }
 }
 
 impl Cube
 {
-    pub fn new(id: i32) -> Self
+    pub fn new() -> Self
     {
-        let zero_point = create_point(0.0, 0.0, 0.0);
-        let zero_vector = create_vector(0.0, 0.0, 0.0);
-        Cube{id: id, transform: Matrix::identity(4),
-            material: Material::new(),
-            saved_ray: Ray::new(zero_point, zero_vector)}
+        Cube{}
     }
 
-    fn check_axis(&mut self, origin: f64, direction: f64) -> (f64, f64)
+    fn check_axis(&self, origin: f64, direction: f64) -> (f64, f64)
     {
         let tmin_numerator = -1.0 - origin;
         let tmax_numerator = 1.0 - origin;
@@ -115,7 +83,7 @@ impl Cube
         n
     }
 
-    pub fn local_intersect(&mut self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
     {
         let (xtmin, xtmax) = self.check_axis(ray.origin.get_vec()[0],
             ray.direction.get_vec()[0]);
@@ -133,16 +101,6 @@ impl Cube
         }
 
         return vec![tmin, tmax];
-    }
-
-    pub fn local_get_saved_ray(&self) -> Ray
-    {
-        self.saved_ray
-    }
-
-    pub fn local_set_saved_ray(&mut self, saved_ray: Ray)
-    {
-        self.saved_ray = saved_ray;
     }
 
     pub fn local_normal_at(&self, point: Tuple) -> Tuple
@@ -165,19 +123,11 @@ impl Cube
     }
 }
 
-impl PartialEq for Cube
-{
-    fn eq(&self, other: &Self) -> bool
-    {
-        self.id == other.id
-    }
-}
-
 impl fmt::Display for Cube
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
-        write!(f, "cube {}", self.id)
+        write!(f, "cube")
     }
 }
 
@@ -190,7 +140,7 @@ mod tests
     fn test_cubes_feature1()
     {
         // p.168 Scenario: A ray intersects a cube
-        let mut c1 = Cube::new(1);
+        let c1 = Cube::new();
         let origins1 = vec![create_point(5.0, 0.5, 0.0),
             create_point(-5.0, 0.5, 0.0),
             create_point(0.5, 5.0, 0.0),
@@ -222,7 +172,7 @@ mod tests
     fn test_cubes_feature2()
     {
         // p.172 Scenario: A ray misses a cube
-        let mut c2 = Cube::new(2);
+        let c2 = Cube::new();
         let origins2 = vec![create_point(-2.0, 0.0, 0.0),
             create_point(0.0, -2.0, 0.0),
             create_point(0.0, 0.0, -2.0),
@@ -248,7 +198,7 @@ mod tests
     fn test_cubes_feature3()
     {
         // p.172 Scenario: The normal on the surface of a cube
-        let mut c3 = Cube::new(3);
+        let c3 = Cube::new();
         let points3 = vec![create_point(1.0, 0.5, -0.8),
             create_point(-1.0, -0.2, 0.9),
             create_point(-0.4, 1.0, -0.1),
