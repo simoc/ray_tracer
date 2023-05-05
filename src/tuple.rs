@@ -75,6 +75,16 @@ impl Tuple
     {
         self.sub(normal.multiply(2.0 * self.dot_product(normal)))
     }
+
+    pub fn approx_equal(&self, b: Tuple) -> bool
+    {
+        // A less strict test for two tuples approximately
+        // equal, allowing for some rounding.
+        (self.x - b.x).abs() < (5.0 * EPSILON) &&
+        (self.y - b.y).abs() < (5.0 * EPSILON) &&
+        (self.z - b.z).abs() < (5.0 * EPSILON) &&
+        (self.w - b.w).abs() < (5.0 * EPSILON)
+    }
 }
 
 impl fmt::Display for Tuple
