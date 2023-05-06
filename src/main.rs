@@ -75,7 +75,7 @@ fn main()
     right_sphere_material.diffuse = 0.2;
     right_sphere.set_material(right_sphere_material);
 
-    // 6. The smallest sphere is scalled by a third, before being translated.
+    // 6. The smallest sphere is scaled by a third, before being translated.
     let mut left_sphere = Shape::new_sphere(6);
     let left_sphere_translation = Matrix::translation(-1.5, 0.33, -0.75);
     let left_sphere_scaling = Matrix::scaling(0.33, 0.33, 0.33);
@@ -86,11 +86,22 @@ fn main()
     left_sphere_material.specular = 0.3;
     left_sphere.set_material(left_sphere_material);
 
+    // 7. A cube with high z value, far in the background (to test that shape too)
+    let mut cube = Shape::new_cube(7);
+    let cube_translation = Matrix::translation(4.0, 1.0, 9.0);
+    let cube_scaling = Matrix::scaling(0.66, 0.66, 0.66);
+    let cube_rotation = Matrix::rotation_x(PI / 4.0);
+    cube.set_transform(cube_translation.multiply(&cube_rotation.multiply(&cube_scaling)));
+    let mut cube_material = Material::new();
+    cube_material.color = create_color(0.8, 0.1, 0.1);
+    cube_material.diffuse = 0.5;
+    cube.set_material(cube_material);
+
     // The light source is white, shining from above and to the left:
     let mut world = World::default_world();
     world.light = PointLight::new(create_point(-10.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
     world.objects = vec![floor,
-        middle_sphere, right_sphere, left_sphere];
+        middle_sphere, right_sphere, left_sphere, cube];
 
     // And the camera is configured like so:
     let mut camera = Camera::new(100, 50, PI / 3.0);
