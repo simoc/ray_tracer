@@ -70,6 +70,9 @@ fn main()
     right_sphere_material.color = create_color(0.5, 1.0, 0.1);
     right_sphere_material.diffuse = 0.7;
     right_sphere_material.specular = 0.3;
+    right_sphere_material.transparency = 0.9;
+    right_sphere_material.reflective = 0.9;
+    right_sphere_material.diffuse = 0.2;
     right_sphere.set_material(right_sphere_material);
 
     // 6. The smallest sphere is scalled by a third, before being translated.
