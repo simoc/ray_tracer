@@ -30,8 +30,8 @@ PPM image output file on a Linux system:
 - [x] Chapter 8 - Shadows
 - [x] Chapter 9 - Planes
 - [x] Chapter 10 - Patterns
-- [x] Chapter 11 - Reflection and Refraction (however, Test #7 from p.158 fails)
-- [ ] Chapter 12 - Cubes
+- [x] Chapter 11 - Reflection and Refraction (several tests fail with probable floating point accuracy problem)
+- [x] Chapter 12 - Cubes
 - [ ] Chapter 13 - Cylinders
 - [ ] Chapter 14 - Groups
 - [ ] Chapter 15 - Triangles
