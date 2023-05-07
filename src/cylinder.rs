@@ -13,9 +13,9 @@ use crate::shape::*;
 #[derive(Clone, Debug)]
 pub struct Cylinder
 {
-    minimum: f64,
-    maximum: f64,
-    closed: bool,
+    pub minimum: f64,
+    pub maximum: f64,
+    pub closed: bool,
 }
 
 // A cylinder following the y axis
@@ -131,7 +131,7 @@ impl Cylinder
         {
             return create_vector(0.0, 1.0, 0.0);
         }
-        else if dist < 1.0 && v[1] <= self.maximum + EPSILON
+        else if dist < 1.0 && v[1] <= self.minimum + EPSILON
         {
             return create_vector(0.0, -1.0, 0.0);
         }

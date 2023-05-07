@@ -45,7 +45,7 @@ fn main()
     floor_material.specular = 0.0;
     let mut floor_pattern = Pattern::new_stripe_pattern(create_color(0.5, 0.5, 0.0),
         create_color(0.8, 0.8, 0.0));
-    floor_pattern.set_pattern_transform(Matrix::scaling(3.0, 3.0, 3.0));
+    floor_pattern.set_pattern_transform(Matrix::scaling(1.0, 1.0, 1.0));
     floor_material.pattern = Some(floor_pattern);
     floor.set_material(floor_material);
 
@@ -99,11 +99,24 @@ fn main()
     cube_material.diffuse = 0.5;
     cube.set_material(cube_material);
 
+    // 8. A cylinder with high z value, far in the background (to test that shape too)
+    let mut cylinder = Shape::new_cylinder(8, true, 0.0, 2.0);
+    let cylinder_translation = Matrix::translation(-6.0, 0.707, 9.0);
+    let cylinder_rotation = Matrix::rotation_x(-PI / 4.0);
+    cylinder.set_transform(cylinder_translation.multiply(&cylinder_rotation));
+    let mut cylinder_material = Material::new();
+    cylinder_material.color = create_color(0.6, 0.6, 0.6);
+    cylinder_material.ambient = 0.2;
+    cylinder_material.reflective = 0.7;
+    cylinder_material.diffuse = 0.3;
+    cylinder_material.shininess = 100.0;
+    cylinder.set_material(cylinder_material);
+
     // The light source is white, shining from above and to the left:
     let mut world = World::default_world();
     world.light = PointLight::new(create_point(-10.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
     world.objects = vec![floor,
-        middle_sphere, right_sphere, left_sphere, cube];
+        middle_sphere, right_sphere, left_sphere, cube, cylinder];
 
     // And the camera is configured like so:
     let mut camera = Camera::new(100, 50, PI / 3.0);

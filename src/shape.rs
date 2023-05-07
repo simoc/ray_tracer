@@ -1,6 +1,7 @@
 use std::fmt;
 
 use crate::cube::*;
+use crate::cylinder::*;
 use crate::sphere::*;
 use crate::material::*;
 use crate::matrix::*;
@@ -14,6 +15,7 @@ pub enum ShapeSpecific
     Sphere(Sphere),
     Plane(Plane),
     Cube(Cube),
+    Cylinder(Cylinder),
 }
 
 #[derive(Clone, Debug)]
@@ -74,6 +76,23 @@ impl Shape
             specific: ShapeSpecific::Cube(Cube::new())}
     }
 
+    pub fn new_cylinder(id: i32, closed: bool,
+        minimum_y: f64, maximum_y: f64) -> Shape
+    {
+        let zero_point = create_point(0.0, 0.0, 0.0);
+        let zero_vector = create_vector(0.0, 0.0, 0.0);
+        let mut cylinder = Cylinder::new();
+        cylinder.closed = closed;
+        cylinder.minimum = minimum_y;
+        cylinder.maximum = maximum_y;
+
+        Shape{id: id,
+            transform: Matrix::identity(4),
+            material: Material::new(),
+            saved_ray: Ray::new(zero_point, zero_vector),
+            specific: ShapeSpecific::Cylinder(cylinder)}
+    }
+
     pub fn test_shape(id: i32) -> Shape
     {
         Self::new_sphere(id)
@@ -108,6 +127,7 @@ impl Shape
             ShapeSpecific::Sphere(s) => s.local_intersect(local_ray),
             ShapeSpecific::Plane(p) => p.local_intersect(local_ray),
             ShapeSpecific::Cube(c) => c.local_intersect(local_ray),
+            ShapeSpecific::Cylinder(c) => c.local_intersect(local_ray),
         }
     }
 
@@ -125,6 +145,7 @@ impl Shape
             ShapeSpecific::Sphere(s) => s.local_normal_at(local_point),
             ShapeSpecific::Plane(p) => p.local_normal_at(local_point),
             ShapeSpecific::Cube(c) => c.local_normal_at(local_point),
+            ShapeSpecific::Cylinder(c) => c.local_normal_at(local_point),
         };
         let world_normal = inverse.transpose().multiply_tuple(local_normal);
         let v = world_normal.get_vec();
@@ -163,6 +184,14 @@ impl PartialEq for Shape
                     _ => false,
                 }
             },
+            ShapeSpecific::Cylinder(_) =>
+            {
+                match other.specific
+                {
+                    ShapeSpecific::Cylinder(_) => self.id == other.id,
+                    _ => false,
+                }
+            },
         }
     }
 }
@@ -176,6 +205,7 @@ impl fmt::Display for Shape
             ShapeSpecific::Sphere(_) => write!(f, "sphere {}", self.id),
             ShapeSpecific::Plane(_) => write!(f, "plane {}", self.id),
             ShapeSpecific::Cube(_) => write!(f, "cube {}", self.id),
+            ShapeSpecific::Cylinder(_) => write!(f, "cylinder {}", self.id),
         }
     }
 }
