@@ -13,6 +13,8 @@ use crate::shape::*;
 #[derive(Clone, Debug)]
 pub struct Cylinder
 {
+    minimum: f64,
+    maximum: f64,
 }
 
 // A cylinder following the y axis
@@ -20,7 +22,7 @@ impl Cylinder
 {
     pub fn new() -> Self
     {
-        Cylinder{}
+        Cylinder{minimum: f64::NEG_INFINITY, maximum: f64::INFINITY}
     }
 
     pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
@@ -133,5 +135,14 @@ mod tests
             let n3 = c3.local_normal_at(points3[i]);
             assert_eq!(n3, normals3[i]);
         }
+    }
+
+    #[test]
+    fn test_cylinders_feature4()
+    {
+        // p.182 Scenario: The default minimum and maximum for a cylinder
+        let c4 = Cylinder::new();
+        assert_eq!(c4.minimum, f64::NEG_INFINITY);
+        assert_eq!(c4.maximum, f64::INFINITY);
     }
 }
