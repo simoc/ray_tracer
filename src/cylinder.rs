@@ -123,8 +123,22 @@ impl Cylinder
 
     pub fn local_normal_at(&self, point: Tuple) -> Tuple
     {
+        // compute the square of the distance from the y axis
         let v = point.get_vec();
-        return create_vector(v[0], 0.0, v[2]);
+        let dist = (v[0] * v[0]) + (v[2] * v[2]);
+
+        if dist < 1.0 && v[1] >= self.maximum - EPSILON
+        {
+            return create_vector(0.0, 1.0, 0.0);
+        }
+        else if dist < 1.0 && v[1] <= self.maximum + EPSILON
+        {
+            return create_vector(0.0, -1.0, 0.0);
+        }
+        else
+        {
+            return create_vector(v[0], 0.0, v[2]);
+        }
     }
 }
 
@@ -279,6 +293,35 @@ mod tests
             let r7 = Ray::new(points7[i], directions7[i].normalize());
             let xs7 = c7.local_intersect(r7);
             assert_eq!(xs7.len(), counts7[i]);
+        }
+    }
+
+    #[test]
+    fn test_cylinders_feature8()
+    {
+        // p.187 Scenario: The normal vector on a cylinder's end caps
+        let mut c8 = Cylinder::new();
+        c8.minimum = 1.0;
+        c8.maximum = 2.0;
+        c8.closed = true;
+
+        let points8 = vec![create_point(0.0, 1.0, 0.0),
+            create_point(0.5, 1.0, 0.0),
+            create_point(0.0, 1.0, 0.5),
+            create_point(0.0, 2.0, 0.0),
+            create_point(0.5, 2.0, 0.0),
+            create_point(0.0, 2.0, 0.5)];
+        let normals8 = vec![create_vector(0.0, -1.0, 0.0),
+            create_vector(0.0, -1.0, 0.0),
+            create_vector(0.0, -1.0, 0.0),
+            create_vector(0.0, 1.0, 0.0),
+            create_vector(0.0, 1.0, 0.0),
+            create_vector(0.0, 1.0, 0.0)];
+
+        for i in 0..points8.len()
+        {
+            let n8 = c8.local_normal_at(points8[i]);
+            assert_eq!(n8, normals8[i]);
         }
     }
 }
