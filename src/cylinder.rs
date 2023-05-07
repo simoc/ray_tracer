@@ -52,7 +52,8 @@ impl Cylinder
 
     pub fn local_normal_at(&self, point: Tuple) -> Tuple
     {
-        return create_vector(0.0, 0.0, 0.0);
+        let v = point.get_vec();
+        return create_vector(v[0], 0.0, v[2]);
     }
 }
 
@@ -110,6 +111,27 @@ mod tests
             assert_eq!(xs2.len(), 2);
             assert!(fuzzy_equal(xs2[0], t20[i]));
             assert!(fuzzy_equal(xs2[1], t21[i]));
+        }
+    }
+
+    #[test]
+    fn test_cylinders_feature3()
+    {
+        // p.181 Scenario: Normal vector on a cylinder
+        let c3 = Cylinder::new();
+        let points3 = vec![create_point(1.0, 0.0, 0.0),
+            create_point(0.0, 5.0, -1.0),
+            create_point(0.0, -2.0, 1.0),
+            create_point(-1.0, 1.0, 0.0)];
+        let normals3 = vec![create_vector(1.0, 0.0, 0.0),
+            create_vector(0.0, 0.0, -1.0),
+            create_vector(0.0, 0.0, 1.0),
+            create_vector(-1.0, 0.0, 0.0)];
+
+        for i in 0..points3.len()
+        {
+            let n3 = c3.local_normal_at(points3[i]);
+            assert_eq!(n3, normals3[i]);
         }
     }
 }
