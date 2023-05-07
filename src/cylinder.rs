@@ -15,6 +15,7 @@ pub struct Cylinder
 {
     minimum: f64,
     maximum: f64,
+    closed: bool,
 }
 
 // A cylinder following the y axis
@@ -22,7 +23,50 @@ impl Cylinder
 {
     pub fn new() -> Self
     {
-        Cylinder{minimum: f64::NEG_INFINITY, maximum: f64::INFINITY}
+        Cylinder{minimum: f64::NEG_INFINITY, maximum: f64::INFINITY,
+            closed: false}
+    }
+
+    // a helper function to reduce duplication.
+    // checks to see if the intersection as `t` is within a radius
+    // of 1 (the radius of your cylinders) from the y axis.
+    fn check_cap(&self, ray: Ray, t: f64) -> bool
+    {
+        let vo = ray.origin.get_vec();
+        let vd = ray.direction.get_vec();
+        let x = vo[0] + t * vd[0];
+        let z = vo[2] + t * vd[2];
+        let dist_squared = (x * x) + (z * z);
+        dist_squared <= 1.0
+    }
+
+    fn intersect_caps(&self, ray: Ray) -> Vec<f64>
+    {
+        let mut xs = Vec::new();
+
+        // caps only matter if the cylinder is closed, and might possibly be
+        // intersected by the ray.
+        if (!self.closed) || fuzzy_equal(ray.direction.get_vec()[1], 0.0)
+        {
+            return xs;
+        }
+
+        // check for an intersection with the lower end cap by intersecting
+        // the ray with the plane at y=cly.minimum
+        let t0 = (self.minimum - ray.origin.get_vec()[1]) / ray.direction.get_vec()[1];
+        if self.check_cap(ray, t0)
+        {
+            xs.push(t0);
+        }
+
+        // check for an intersection with the upper end cap by intersecting
+        // the ray with the plane at y=cly.maximum
+        let t1 = (self.maximum - ray.origin.get_vec()[1]) / ray.direction.get_vec()[1];
+        if self.check_cap(ray, t1)
+        {
+            xs.push(t1);
+        }
+        return xs;
     }
 
     pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
@@ -33,7 +77,7 @@ impl Cylinder
         // ray is parallel to the y axis
         if fuzzy_equal(a, 0.0)
         {
-            return vec![];
+            return self.intersect_caps(ray);
         }
 
         let vo = ray.origin.get_vec();
@@ -44,7 +88,7 @@ impl Cylinder
         // ray does not intersect the cylinder
         if disc < 0.0
         {
-            return vec![];
+            return self.intersect_caps(ray);
         }
 
         let mut t0 = ((-b) - disc.sqrt()) / (2.0 * a);
@@ -53,8 +97,8 @@ impl Cylinder
         if t0 > t1
         {
             let swap = t0;
-            let t0 = t1;
-            let t1 = t0;
+            t0 = t1;
+            t1 = t0;
         }
 
         let mut xs = Vec::new();
@@ -70,6 +114,9 @@ impl Cylinder
         {
             xs.push(t1);
         }
+
+        let mut caps = self.intersect_caps(ray);
+        xs.append(&mut caps);
 
         return xs;
     }
@@ -195,6 +242,43 @@ mod tests
             let r5 = Ray::new(points5[i], directions5[i].normalize());
             let xs5 = c5.local_intersect(r5);
             assert_eq!(xs5.len(), counts5[i]);
+        }
+    }
+
+    #[test]
+    fn test_cylinders_feature6()
+    {
+        // p.185 Scenario: The default closed value for a cylinder
+        let mut c6 = Cylinder::new();
+        assert_eq!(c6.closed, false);
+    }
+
+    #[test]
+    fn test_cylinders_feature7()
+    {
+        // p.185 Scenario: Intersecting the caps of a closed cylinder
+        let mut c7 = Cylinder::new();
+        c7.minimum = 1.0;
+        c7.maximum = 2.0;
+        c7.closed = true;
+
+        let points7 = vec![create_point(0.0, 3.0, 0.0),
+            create_point(0.0, 3.0, -2.0),
+            create_point(0.0, 4.0, -2.0),
+            create_point(0.0, 0.0, -2.0),
+            create_point(0.0, -1.0, -2.0)];
+        let directions7 = vec![create_vector(0.0, -1.0, 0.0),
+            create_vector(0.0, -1.0, 2.0),
+            create_vector(0.0, -1.0, 1.0),
+            create_vector(0.0, 1.0, 2.0),
+            create_vector(0.0, 1.0, 1.0)];
+        let counts7 = vec![2, 2, 2, 2, 2];
+
+        for i in 0..points7.len()
+        {
+            let r7 = Ray::new(points7[i], directions7[i].normalize());
+            let xs7 = c7.local_intersect(r7);
+            assert_eq!(xs7.len(), counts7[i]);
         }
     }
 }
