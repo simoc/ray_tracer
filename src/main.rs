@@ -14,6 +14,7 @@ mod shape;
 mod plane;
 mod pattern;
 mod cube;
+mod cylinder;
 
 use std::f64::consts::PI;
 use crate::tuple::*;
@@ -31,6 +32,7 @@ use crate::shape::*;
 use crate::plane::*;
 use crate::pattern::*;
 use crate::cube::*;
+use crate::cylinder::*;
 
 fn main()
 {
