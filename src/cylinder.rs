@@ -47,9 +47,31 @@ impl Cylinder
             return vec![];
         }
 
-        let t0 = ((-b) - disc.sqrt()) / (2.0 * a);
-        let t1 = ((-b) + disc.sqrt()) / (2.0 * a);
-        return vec![t0, t1];
+        let mut t0 = ((-b) - disc.sqrt()) / (2.0 * a);
+        let mut t1 = ((-b) + disc.sqrt()) / (2.0 * a);
+
+        if t0 > t1
+        {
+            let swap = t0;
+            let t0 = t1;
+            let t1 = t0;
+        }
+
+        let mut xs = Vec::new();
+
+        let y0 = vo[1] + t0 * vd[1];
+        if self.minimum < y0 && y0 < self.maximum
+        {
+            xs.push(t0);
+        }
+
+        let y1 = vo[1] + t1 * vd[1];
+        if self.minimum < y1 && y1 < self.maximum
+        {
+            xs.push(t1);
+        }
+
+        return xs;
     }
 
     pub fn local_normal_at(&self, point: Tuple) -> Tuple
@@ -144,5 +166,35 @@ mod tests
         let c4 = Cylinder::new();
         assert_eq!(c4.minimum, f64::NEG_INFINITY);
         assert_eq!(c4.maximum, f64::INFINITY);
+    }
+
+    #[test]
+    fn test_cylinders_feature5()
+    {
+        // p.182 Scenario: Intersecting a constrained cylinder
+        let mut c5 = Cylinder::new();
+        c5.minimum = 1.0;
+        c5.maximum = 2.0;
+
+        let points5 = vec![create_point(0.0, 1.5, 0.0),
+            create_point(0.0, 3.0, -5.0),
+            create_point(0.0, 0.0, -5.0),
+            create_point(0.0, 2.0, -5.0),
+            create_point(0.0, 1.0, -5.0),
+            create_point(0.0, 1.5, -2.0)];
+        let directions5 = vec![create_vector(0.1, 1.0, 0.0),
+            create_vector(0.0, 0.0, 1.0),
+            create_vector(0.0, 0.0, 1.0),
+            create_vector(0.0, 0.0, 1.0),
+            create_vector(0.0, 0.0, 1.0),
+            create_vector(0.0, 0.0, 1.0)];
+        let counts5 = vec![0, 0, 0, 0, 0, 2];
+
+        for i in 0..points5.len()
+        {
+            let r5 = Ray::new(points5[i], directions5[i].normalize());
+            let xs5 = c5.local_intersect(r5);
+            assert_eq!(xs5.len(), counts5[i]);
+        }
     }
 }
