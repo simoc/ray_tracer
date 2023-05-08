@@ -32,7 +32,7 @@ PPM image output file on a Linux system:
 - [x] Chapter 10 - Patterns
 - [x] Chapter 11 - Reflection and Refraction (several tests fail with probable floating point accuracy problem)
 - [x] Chapter 12 - Cubes
-- [ ] Chapter 13 - Cylinders
+- [x] Chapter 13 - Cylinders
 - [ ] Chapter 14 - Groups
 - [ ] Chapter 15 - Triangles
 - [ ] Chapter 16 - Constructive Solid Geometry (CSG)
