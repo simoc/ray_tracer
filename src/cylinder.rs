@@ -98,7 +98,7 @@ impl Cylinder
         {
             let swap = t0;
             t0 = t1;
-            t1 = t0;
+            t1 = swap;
         }
 
         let mut xs = Vec::new();

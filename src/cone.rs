@@ -104,7 +104,7 @@ impl Cone
         {
             let swap = t0;
             t0 = t1;
-            t1 = t0;
+            t1 = swap;
         }
 
         let y0 = vo[1] + t0 * vd[1];
