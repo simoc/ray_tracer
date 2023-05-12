@@ -62,4 +62,25 @@ mod tests
         assert_eq!(groups1.get_transform(group_id1), Matrix::identity(4));
         assert!(groups1.get_children(group_id1).is_empty());
     }
+
+    #[test]
+    fn test_groups_feature2()
+    {
+        // p.195 Scenario: A shape has a parent attribute
+        let mut groups2 = Groups::new();
+        let s2 = Shape::test_shape(2);
+        assert!(s2.get_parent_id().is_none());
+    }
+
+    #[test]
+    fn test_groups_feature3()
+    {
+        // p.195 Scenario: Adding a child to a group
+        let mut groups3 = Groups::new();
+        let group_id3 = groups3.create_group();
+        let mut s3 = Shape::test_shape(3);
+        groups3.add_child(group_id3, &mut s3);
+        assert!(groups3.get_children(group_id3).contains(&s3));
+        assert_eq!(s3.get_parent_id().unwrap(), group_id3);
+    }
 }
