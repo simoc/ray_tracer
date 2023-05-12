@@ -27,6 +27,7 @@ pub struct Shape
     transform: Matrix,
     material: Material,
     saved_ray: Ray,
+    parent_id: Option<usize>,
     specific: ShapeSpecific,
 }
 
@@ -41,6 +42,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
+            parent_id: None,
             specific: ShapeSpecific::Sphere(Sphere::new())}
     }
 
@@ -63,6 +65,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
+            parent_id: None,
             specific: ShapeSpecific::Plane(Plane::new())}
     }
 
@@ -75,6 +78,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
+            parent_id: None,
             specific: ShapeSpecific::Cube(Cube::new())}
     }
 
@@ -92,6 +96,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
+            parent_id: None,
             specific: ShapeSpecific::Cylinder(cylinder)}
     }
 
@@ -109,6 +114,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
+            parent_id: None,
             specific: ShapeSpecific::Cone(cone)}
     }
 
@@ -172,6 +178,16 @@ impl Shape
         let v = world_normal.get_vec();
         let v2 = create_vector(v[0], v[1], v[2]); // resets world_normal.w to zero
         v2.normalize()
+    }
+
+    pub fn get_parent_id(&self) -> Option<usize>
+    {
+        self.parent_id
+    }
+
+    pub fn set_parent_id(&mut self, group_id: usize)
+    {
+        self.parent_id = Some(group_id);
     }
 }
 

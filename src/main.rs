@@ -16,6 +16,7 @@ mod pattern;
 mod cube;
 mod cylinder;
 mod cone;
+mod groups;
 
 use std::f64::consts::PI;
 use crate::tuple::*;
@@ -35,6 +36,7 @@ use crate::pattern::*;
 use crate::cube::*;
 use crate::cylinder::*;
 use crate::cone::*;
+use crate::groups::*;
 
 fn main()
 {
