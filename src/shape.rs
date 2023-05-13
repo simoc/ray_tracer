@@ -232,6 +232,20 @@ impl Shape
             },
         }
     }
+
+    pub fn world_to_object(&self, world_point: Tuple) -> Tuple
+    {
+        let mut point = world_point;
+        match &self.parent
+        {
+            Some(parent_group) =>
+            {
+                point = parent_group.world_to_object(world_point);
+            },
+            None => (),
+        }
+        return self.transform.inverse().multiply_tuple(point);
+    }
 }
 
 impl PartialEq for Shape

@@ -1,6 +1,7 @@
 use std::fmt;
 use std::cmp;
 use std::rc::Rc;
+use std::f64::consts::PI;
 use crate::arithmetic::*;
 use crate::intersections::*;
 use crate::matrix::*;
@@ -135,4 +136,20 @@ mod tests
         assert_eq!(xs6.len(), 2);
     }
 
+
+    #[test]
+    fn test_groups_feature7()
+    {
+        // p.198 Scenario: Converting a point from world to object space
+        let mut group71 = Shape::new_group(71);
+        let mut group72 = Shape::new_group(71);
+        group71.set_transform(Matrix::rotation_y(PI / 2.0));
+        group72.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        group71.add_child(&mut group72);
+        let mut s73 = Shape::new_sphere(73);
+        s73.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        group72.add_child(&mut s73);
+        let p7 = s73.world_to_object(create_point(-2.0, 0.0, -10.0));
+        assert_eq!(p7, create_point(0.0, 0.0, -1.0));
+    }
 }
