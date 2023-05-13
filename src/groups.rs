@@ -53,11 +53,15 @@ impl Groups
     pub fn local_intersect(&self, group_id: usize, ray: Ray) -> Intersections
     {
         let mut xs = Vec::new();
-        for mut s in self.get_children(group_id)
+        let group_transform = self.get_transform(group_id);
+        for shape in self.get_children(group_id)
         {
-            for t in s.intersect(ray)
+            let mut transformed_shape = shape.clone();
+            let transform = transformed_shape.get_transform();
+            transformed_shape.set_transform(group_transform.multiply(&transform));
+            for t in transformed_shape.intersect(ray)
             {
-                xs.push(Intersection::new(t, s.clone()));
+                xs.push(Intersection::new(t, shape.clone()));
             }
         }
         return Intersections::new(xs);
@@ -114,7 +118,7 @@ mod tests
     #[test]
     fn test_groups_feature5()
     {
-        // p.195 Scenario: Intersecting a ray with an nonempty group
+        // p.196 Scenario: Intersecting a ray with an nonempty group
         let mut groups5 = Groups::new();
         let group_id5 = groups5.create_group();
         let mut s51 = Shape::test_shape(51);
@@ -133,5 +137,21 @@ mod tests
         assert_eq!(xs5.get_intersection(1).object, s52);
         assert_eq!(xs5.get_intersection(2).object, s51);
         assert_eq!(xs5.get_intersection(3).object, s51);
+    }
+
+    #[test]
+    fn test_groups_feature6()
+    {
+        // p.197 Scenario: Intersecting a transformed group
+        let mut groups6 = Groups::new();
+        let group_id6 = groups6.create_group();
+        groups6.set_transform(group_id6, Matrix::scaling(2.0, 2.0, 2.0));
+        let mut s6 = Shape::new_sphere(6);
+        s6.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        groups6.add_child(group_id6, &mut s6);
+        let r6 = Ray::new(create_point(10.0, 0.0, -10.0),
+            create_vector(0.0, 0.0, 1.0));
+        let xs6 = groups6.local_intersect(group_id6, r6);
+        assert_eq!(xs6.count(), 2);
     }
 }
