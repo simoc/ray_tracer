@@ -229,7 +229,7 @@ mod tests
     fn test_cones_feature4()
     {
         // p.190 Scenario: Computing a normal vector on a cone
-        let mut c4 = Cone::new();
+        let c4 = Cone::new();
 
         let points4 = vec![create_point(0.0, 0.0, 0.0),
             create_point(1.0, 1.0, 1.0),

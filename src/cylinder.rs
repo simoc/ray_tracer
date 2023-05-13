@@ -263,7 +263,7 @@ mod tests
     fn test_cylinders_feature6()
     {
         // p.185 Scenario: The default closed value for a cylinder
-        let mut c6 = Cylinder::new();
+        let c6 = Cylinder::new();
         assert_eq!(c6.closed, false);
     }
 
