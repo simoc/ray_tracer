@@ -1,6 +1,4 @@
 use std::fmt;
-use std::rc::Rc;
-use std::cell::RefCell;
 
 use crate::cone::*;
 use crate::cube::*;
@@ -31,7 +29,7 @@ pub struct Shape
     transform: Matrix,
     material: Material,
     saved_ray: Ray,
-    parent: Option<Rc<Shape>>,
+    parent: Option<Box<Shape>>,
     specific: ShapeSpecific,
 }
 
@@ -46,7 +44,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent: None::<Rc<Shape>>,
+            parent: None::<Box<Shape>>,
             specific: ShapeSpecific::Sphere(Sphere::new())}
     }
 
@@ -69,7 +67,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent: None::<Rc<Shape>>,
+            parent: None::<Box<Shape>>,
             specific: ShapeSpecific::Plane(Plane::new())}
     }
 
@@ -82,7 +80,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent: None::<Rc<Shape>>,
+            parent: None::<Box<Shape>>,
             specific: ShapeSpecific::Cube(Cube::new())}
     }
 
@@ -100,7 +98,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent: None::<Rc<Shape>>,
+            parent: None::<Box<Shape>>,
             specific: ShapeSpecific::Cylinder(cylinder)}
     }
 
@@ -118,7 +116,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent: None::<Rc<Shape>>,
+            parent: None::<Box<Shape>>,
             specific: ShapeSpecific::Cone(cone)}
     }
 
@@ -131,7 +129,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent: None::<Rc<Shape>>,
+            parent: None::<Box<Shape>>,
             specific: ShapeSpecific::Group(group)}
     }
 
@@ -171,7 +169,7 @@ impl Shape
             ShapeSpecific::Cube(c) => c.local_intersect(local_ray),
             ShapeSpecific::Cylinder(c) => c.local_intersect(local_ray),
             ShapeSpecific::Cone(c) => c.local_intersect(local_ray),
-            ShapeSpecific::Group(g) => g.local_intersect(local_ray),
+            ShapeSpecific::Group(g) => g.local_intersect(local_ray, self.transform.clone()),
         }
     }
 
@@ -199,14 +197,14 @@ impl Shape
         v2.normalize()
     }
 
-    pub fn get_parent(&self) -> Option<Rc<Shape>>
+    pub fn get_parent(&self) -> Option<Box<Shape>>
     {
         self.parent.clone()
     }
 
     pub fn set_parent(&mut self, parent: Shape)
     {
-        self.parent = Some(Rc::new(parent));
+        self.parent = Some(Box::new(parent));
     }
 
     pub fn get_children(&self) -> Vec<Shape>
