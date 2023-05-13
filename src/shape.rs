@@ -169,7 +169,7 @@ impl Shape
             ShapeSpecific::Cube(c) => c.local_intersect(local_ray),
             ShapeSpecific::Cylinder(c) => c.local_intersect(local_ray),
             ShapeSpecific::Cone(c) => c.local_intersect(local_ray),
-            ShapeSpecific::Group(g) => g.local_intersect(local_ray, self.transform.clone()),
+            ShapeSpecific::Group(g) => g.local_intersect(local_ray),
         }
     }
 

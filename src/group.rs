@@ -23,15 +23,13 @@ impl Group
         Group{child_shapes: Vec::new()}
     }
 
-    pub fn local_intersect(&self, ray: Ray, group_transform: Matrix) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
     {
         let mut xs = Vec::<f64>::new();
         for shape in &self.child_shapes
         {
-            let mut transformed_shape = shape.clone();
-            let transform = transformed_shape.get_transform();
-            transformed_shape.set_transform(group_transform.multiply(&transform));
-            let intersections = transformed_shape.intersect(ray);
+            let mut child_shape = shape.clone();
+            let intersections = child_shape.intersect(ray);
             for t in intersections
             {
                 xs.push(t);
@@ -99,7 +97,7 @@ mod tests
         let mut group4 = Group::new();
         let r4 = Ray::new(create_point(0.0, 0.0, 0.0),
             create_vector(0.0, 0.0, 1.0));
-        let xs4 = group4.local_intersect(r4, Matrix::identity(4));
+        let xs4 = group4.local_intersect(r4);
         assert_eq!(xs4.len(), 0);
     }
 
@@ -121,4 +119,20 @@ mod tests
         let xs5 = group5.intersect(r5);
         assert_eq!(xs5.len(), 4);
     }
+
+    #[test]
+    fn test_groups_feature6()
+    {
+        // p.197 Scenario: Intersecting a transformed group
+        let mut group6 = Shape::new_group(6);
+        group6.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
+        let mut s6 = Shape::new_sphere(61);
+        s6.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        group6.add_child(&mut s6);
+        let r6 = Ray::new(create_point(10.0, 0.0, -10.0),
+            create_vector(0.0, 0.0, 1.0));
+        let xs6 = group6.intersect(r6);
+        assert_eq!(xs6.len(), 2);
+    }
+
 }
