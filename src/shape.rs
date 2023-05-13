@@ -1,9 +1,12 @@
 use std::fmt;
+use std::rc::Rc;
+use std::cell::RefCell;
 
 use crate::cone::*;
 use crate::cube::*;
 use crate::cylinder::*;
 use crate::sphere::*;
+use crate::group::*;
 use crate::material::*;
 use crate::matrix::*;
 use crate::plane::*;
@@ -18,6 +21,7 @@ pub enum ShapeSpecific
     Cube(Cube),
     Cylinder(Cylinder),
     Cone(Cone),
+    Group(Group),
 }
 
 #[derive(Clone, Debug)]
@@ -27,7 +31,7 @@ pub struct Shape
     transform: Matrix,
     material: Material,
     saved_ray: Ray,
-    parent_id: Option<usize>,
+    parent: Option<Rc<Shape>>,
     specific: ShapeSpecific,
 }
 
@@ -42,7 +46,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent_id: None,
+            parent: None::<Rc<Shape>>,
             specific: ShapeSpecific::Sphere(Sphere::new())}
     }
 
@@ -65,7 +69,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent_id: None,
+            parent: None::<Rc<Shape>>,
             specific: ShapeSpecific::Plane(Plane::new())}
     }
 
@@ -78,7 +82,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent_id: None,
+            parent: None::<Rc<Shape>>,
             specific: ShapeSpecific::Cube(Cube::new())}
     }
 
@@ -96,7 +100,7 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent_id: None,
+            parent: None::<Rc<Shape>>,
             specific: ShapeSpecific::Cylinder(cylinder)}
     }
 
@@ -114,8 +118,21 @@ impl Shape
             transform: Matrix::identity(4),
             material: Material::new(),
             saved_ray: Ray::new(zero_point, zero_vector),
-            parent_id: None,
+            parent: None::<Rc<Shape>>,
             specific: ShapeSpecific::Cone(cone)}
+    }
+
+    pub fn new_group(id: i32) -> Shape
+    {
+        let zero_point = create_point(0.0, 0.0, 0.0);
+        let zero_vector = create_vector(0.0, 0.0, 0.0);
+        let group = Group::new();
+        Shape{id: id,
+            transform: Matrix::identity(4),
+            material: Material::new(),
+            saved_ray: Ray::new(zero_point, zero_vector),
+            parent: None::<Rc<Shape>>,
+            specific: ShapeSpecific::Group(group)}
     }
 
     pub fn test_shape(id: i32) -> Shape
@@ -154,6 +171,7 @@ impl Shape
             ShapeSpecific::Cube(c) => c.local_intersect(local_ray),
             ShapeSpecific::Cylinder(c) => c.local_intersect(local_ray),
             ShapeSpecific::Cone(c) => c.local_intersect(local_ray),
+            ShapeSpecific::Group(g) => g.local_intersect(local_ray),
         }
     }
 
@@ -173,6 +191,7 @@ impl Shape
             ShapeSpecific::Cube(c) => c.local_normal_at(local_point),
             ShapeSpecific::Cylinder(c) => c.local_normal_at(local_point),
             ShapeSpecific::Cone(c) => c.local_normal_at(local_point),
+            ShapeSpecific::Group(g) => g.local_normal_at(local_point),
         };
         let world_normal = inverse.transpose().multiply_tuple(local_normal);
         let v = world_normal.get_vec();
@@ -180,14 +199,40 @@ impl Shape
         v2.normalize()
     }
 
-    pub fn get_parent_id(&self) -> Option<usize>
+    pub fn get_parent(&self) -> Option<Rc<Shape>>
     {
-        self.parent_id
+        self.parent.clone()
     }
 
-    pub fn set_parent_id(&mut self, group_id: usize)
+    pub fn set_parent(&mut self, parent: Shape)
     {
-        self.parent_id = Some(group_id);
+        self.parent = Some(Rc::new(parent));
+    }
+
+    pub fn get_children(&self) -> Vec<Shape>
+    {
+        match &self.specific
+        {
+            ShapeSpecific::Group(g) => g.child_shapes.clone(),
+            _ => Vec::new(),
+        }
+    }
+
+    pub fn add_child(&mut self, child: &mut Shape)
+    {
+        let parent = self.clone();
+        match &mut self.specific
+        {
+            ShapeSpecific::Group(g) =>
+            {
+                child.set_parent(parent);
+                g.child_shapes.push(child.clone());
+            },
+            _ =>
+            {
+                panic!("Cannot add child to this type of Shape");
+            },
+        }
     }
 }
 
@@ -237,6 +282,14 @@ impl PartialEq for Shape
                     _ => false,
                 }
             },
+            ShapeSpecific::Group(_) =>
+            {
+                match other.specific
+                {
+                    ShapeSpecific::Group(_) => self.id == other.id,
+                    _ => false,
+                }
+            },
         }
     }
 }
@@ -252,6 +305,7 @@ impl fmt::Display for Shape
             ShapeSpecific::Cube(_) => write!(f, "cube {}", self.id),
             ShapeSpecific::Cylinder(_) => write!(f, "cylinder {}", self.id),
             ShapeSpecific::Cone(_) => write!(f, "cone {}", self.id),
+            ShapeSpecific::Group(_) => write!(f, "group {}", self.id),
         }
     }
 }
