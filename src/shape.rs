@@ -219,6 +219,7 @@ impl Shape
         {
             ShapeSpecific::Group(g) =>
             {
+                // TODO use reference (Rc/RefCell), not copy, for parent-child
                 child.set_parent(parent);
                 g.child_shapes.push(child.clone());
             },
