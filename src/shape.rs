@@ -323,14 +323,14 @@ impl fmt::Display for Shape
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
-        match self.specific
+        match &self.specific
         {
             ShapeSpecific::Sphere(_) => write!(f, "sphere {}", self.id),
             ShapeSpecific::Plane(_) => write!(f, "plane {}", self.id),
             ShapeSpecific::Cube(_) => write!(f, "cube {}", self.id),
             ShapeSpecific::Cylinder(_) => write!(f, "cylinder {}", self.id),
             ShapeSpecific::Cone(_) => write!(f, "cone {}", self.id),
-            ShapeSpecific::Group(_) => write!(f, "group {}", self.id),
+            ShapeSpecific::Group(g) => write!(f, "group {} {}", self.id, g),
         }
     }
 }

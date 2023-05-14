@@ -50,7 +50,14 @@ impl fmt::Display for Group
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
     {
-        write!(f, "group")
+        let mut separator = "";
+        write!(f, "[")?;
+        for child in &self.child_shapes
+        {
+            write!(f, "{}{}", separator, child)?;
+            separator = ", ";
+        }
+        write!(f, "]")
     }
 }
 
