@@ -180,8 +180,7 @@ impl Shape
 
     pub fn normal_at(&self, world_point: Tuple) -> Tuple
     {
-        let inverse = self.get_transform().inverse();
-        let local_point = inverse.clone().multiply_tuple(world_point);
+        let local_point = self.world_to_object(world_point);
         let local_normal = match self.specific.clone()
         {
             ShapeSpecific::Sphere(s) => s.local_normal_at(local_point),
@@ -191,10 +190,7 @@ impl Shape
             ShapeSpecific::Cone(c) => c.local_normal_at(local_point),
             ShapeSpecific::Group(g) => g.local_normal_at(local_point),
         };
-        let world_normal = inverse.transpose().multiply_tuple(local_normal);
-        let v = world_normal.get_vec();
-        let v2 = create_vector(v[0], v[1], v[2]); // resets world_normal.w to zero
-        v2.normalize()
+        return self.normal_to_world(local_normal);
     }
 
     pub fn get_parent(&self) -> Option<Box<Shape>>

@@ -169,4 +169,20 @@ mod tests
             sqrt3 / 3.0, sqrt3 / 3.0));
         assert!(n8.approx_equal(create_vector(0.2857, 0.4286, -0.8571)));
     }
+
+    #[test]
+    fn test_groups_feature9()
+    {
+        // p.198 Scenario: Finding the normal on a child object
+        let mut group91 = Shape::new_group(91);
+        let mut group92 = Shape::new_group(92);
+        group91.set_transform(Matrix::rotation_y(PI / 2.0));
+        group92.set_transform(Matrix::scaling(1.0, 2.0, 3.0));
+        group91.add_child(&mut group92);
+        let mut s93 = Shape::new_sphere(93);
+        s93.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        group92.add_child(&mut s93);
+        let n9 = s93.normal_at(create_point(1.7321, 1.1547, -5.5774));
+        assert!(n9.approx_equal(create_vector(0.2857, 0.4286, -0.8571)));
+    }
 }

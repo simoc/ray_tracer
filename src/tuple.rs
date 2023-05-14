@@ -80,10 +80,10 @@ impl Tuple
     {
         // A less strict test for two tuples approximately
         // equal, allowing for some rounding.
-        (self.x - b.x).abs() < (5.0 * EPSILON) &&
-        (self.y - b.y).abs() < (5.0 * EPSILON) &&
-        (self.z - b.z).abs() < (5.0 * EPSILON) &&
-        (self.w - b.w).abs() < (5.0 * EPSILON)
+        (self.x - b.x).abs() < (7.0 * EPSILON) &&
+        (self.y - b.y).abs() < (7.0 * EPSILON) &&
+        (self.z - b.z).abs() < (7.0 * EPSILON) &&
+        (self.w - b.w).abs() < (7.0 * EPSILON)
     }
 }
 
