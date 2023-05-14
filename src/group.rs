@@ -136,13 +136,12 @@ mod tests
         assert_eq!(xs6.len(), 2);
     }
 
-
     #[test]
     fn test_groups_feature7()
     {
         // p.198 Scenario: Converting a point from world to object space
         let mut group71 = Shape::new_group(71);
-        let mut group72 = Shape::new_group(71);
+        let mut group72 = Shape::new_group(72);
         group71.set_transform(Matrix::rotation_y(PI / 2.0));
         group72.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
         group71.add_child(&mut group72);
@@ -151,5 +150,23 @@ mod tests
         group72.add_child(&mut s73);
         let p7 = s73.world_to_object(create_point(-2.0, 0.0, -10.0));
         assert_eq!(p7, create_point(0.0, 0.0, -1.0));
+    }
+
+    #[test]
+    fn test_groups_feature8()
+    {
+        // p.198 Scenario: Converting a normal from object to world space
+        let mut group81 = Shape::new_group(81);
+        let mut group82 = Shape::new_group(82);
+        group81.set_transform(Matrix::rotation_y(PI / 2.0));
+        group82.set_transform(Matrix::scaling(1.0, 2.0, 3.0));
+        group81.add_child(&mut group82);
+        let mut s83 = Shape::new_sphere(83);
+        s83.set_transform(Matrix::translation(5.0, 0.0, 0.0));
+        group82.add_child(&mut s83);
+        let sqrt3 = 3.0_f64.sqrt();
+        let n8 = s83.normal_to_world(create_point(sqrt3 / 3.0,
+            sqrt3 / 3.0, sqrt3 / 3.0));
+        assert!(n8.approx_equal(create_vector(0.2857, 0.4286, -0.8571)));
     }
 }

@@ -246,6 +246,22 @@ impl Shape
         }
         return self.transform.inverse().multiply_tuple(point);
     }
+
+    pub fn normal_to_world(&self, normal: Tuple) -> Tuple
+    {
+        let mut normal = self.transform.inverse().transpose().multiply_tuple(normal);
+        let v = normal.get_vec();
+        normal = create_vector(v[0], v[1], v[2]).normalize();
+        match &self.parent
+        {
+            Some(parent_group) =>
+            {
+                normal = parent_group.normal_to_world(normal);
+            },
+            None => (),
+        }
+        return normal;
+    }
 }
 
 impl PartialEq for Shape
