@@ -38,6 +38,49 @@ use crate::cylinder::*;
 use crate::cone::*;
 use crate::group::*;
 
+fn hexagon_corner(id: i32) -> Shape
+{
+    let mut corner = Shape::new_sphere(id);
+    corner.set_transform(Matrix::translation(0.0, 0.0, -1.0)
+        .multiply(&Matrix::scaling(0.25, 0.25, 0.25)));
+    return corner;
+}
+
+fn hexagon_edge(id: i32) -> Shape
+{
+    let mut edge = Shape::new_cylinder(id, true, 0.0, 1.0);
+    edge.set_transform(Matrix::translation(0.0, 0.0, -1.0)
+        .multiply(&Matrix::rotation_y(-PI / 6.0))
+        .multiply(&Matrix::rotation_z(-PI / 2.0))
+        .multiply(&Matrix::scaling(0.25, 1.0, 0.25)));
+    return edge;
+}
+
+fn hexagon_side(id: i32) -> Shape
+{
+    let mut side = Shape::new_group(id);
+    side.add_child(&mut hexagon_corner(id + 1));
+    side.add_child(&mut hexagon_edge(id + 2));
+    return side;
+}
+
+fn hexagon(id: i32) -> Shape
+{
+    let mut hex = Shape::new_group(id);
+    for n in 0..6
+    {
+        let mut side = hexagon_side(id + (n + 1) * 10);
+        side.set_transform(Matrix::rotation_y(f64::from(n) * PI / 3.0));
+        hex.add_child(&mut side);
+    }
+    let mut material = Material::new();
+    material.color = create_color(0.8, 0.1, 0.8);
+    material.diffuse = 0.7;
+    material.specular = 0.3;
+    hex.set_material(material);
+    return hex;
+}
+
 fn main()
 {
     // p.107 Chapter 7, Putting It Together
@@ -116,14 +159,22 @@ fn main()
     cylinder_material.shininess = 100.0;
     cylinder.set_material(cylinder_material);
 
+    // A group of objects making up a hexagon
+    let mut hex1 = hexagon(9);
+    hex1.set_transform(Matrix::translation(5.0, 1.0, 4.0).multiply(&Matrix::rotation_x(-PI / 4.0)));
+    let mut hex2 = hexagon(99);
+    hex2.set_transform(Matrix::translation(-5.4, 1.0, 2.0).multiply(&Matrix::rotation_x(-PI / 4.0)));
+
     // The light source is white, shining from above and to the left:
     let mut world = World::default_world();
     world.light = PointLight::new(create_point(-10.0, 10.0, -10.0), create_color(1.0, 1.0, 1.0));
     world.objects = vec![floor,
-        middle_sphere, right_sphere, left_sphere, cube, cylinder];
+        middle_sphere, right_sphere, left_sphere,
+        cube, cylinder,
+        hex1, hex2];
 
     // And the camera is configured like so:
-    let mut camera = Camera::new(100, 50, PI / 3.0);
+    let mut camera = Camera::new(100, 50, PI / 2.0);
     camera.transform = Matrix::view_transform(create_point(0.0, 1.5, -5.0),
         create_point(0.0, 1.0, 0.0),
         create_vector(0.0, 1.0, 0.0));
