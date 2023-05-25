@@ -30,10 +30,10 @@ PPM image output file on a Linux system:
 - [x] Chapter 8 - Shadows
 - [x] Chapter 9 - Planes
 - [x] Chapter 10 - Patterns
-- [x] Chapter 11 - Reflection and Refraction (several tests fail with probable floating point accuracy problem)
+- [x] Chapter 11 - Reflection and Refraction (several tests fail with floating point accuracy problems)
 - [x] Chapter 12 - Cubes
 - [x] Chapter 13 - Cylinders
-- [ ] Chapter 14 - Groups
+- [x] Chapter 14 - Groups (bounding box optimization not implemented)
 - [ ] Chapter 15 - Triangles
 - [ ] Chapter 16 - Constructive Solid Geometry (CSG)
 - [ ] Chapter 17 - Next Steps
