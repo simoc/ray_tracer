@@ -17,6 +17,7 @@ mod cube;
 mod cylinder;
 mod cone;
 mod group;
+mod triangle;
 
 use std::f64::consts::PI;
 use crate::tuple::*;
@@ -37,6 +38,7 @@ use crate::cube::*;
 use crate::cylinder::*;
 use crate::cone::*;
 use crate::group::*;
+use crate::triangle::*;
 
 fn hexagon_corner(id: i32) -> Shape
 {
