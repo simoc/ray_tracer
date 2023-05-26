@@ -34,6 +34,25 @@ impl Triangle
     {
         self.normal
     }
+
+    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    {
+        let dir_cross_e2 = ray.direction.cross_product(self.e2);
+        let det = self.e1.dot_product(dir_cross_e2);
+        if det.abs() < EPSILON
+        {
+            return Vec::new();
+        }
+        let f = 1.0 / det;
+        let p1_to_origin = ray.origin.sub(self.p1);
+        let u = f * p1_to_origin.dot_product(dir_cross_e2);
+        if u < 0.0 || u > 1.0
+        {
+            return Vec::new();
+        }
+        // A bogus intersection to ensure the result isn't a false positive
+        vec![1.0]
+    }
 }
 
 impl fmt::Display for Triangle
@@ -79,5 +98,31 @@ mod tests
         assert_eq!(n1, t1.normal);
         assert_eq!(n2, t1.normal);
         assert_eq!(n3, t1.normal);
+    }
+
+    #[test]
+    fn test_triangles_feature3()
+    {
+        // p.210 Scenario: Intersecting a ray parallel to the triangle
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let t3 = Triangle::new(p1, p2, p3);
+        let r3 = Ray::new(create_point(0.0, -1.0, -2.0), create_vector(0.0, 1.0, 0.0));
+        let xs3 = t3.local_intersect(r3);
+        assert!(xs3.is_empty());
+    }
+
+    #[test]
+    fn test_triangles_feature4()
+    {
+        // p.210 Scenario: A ray misses the p1-p3 edge
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let t4 = Triangle::new(p1, p2, p3);
+        let r4 = Ray::new(create_point(1.0, 1.0, -2.0), create_vector(0.0, 0.0, 1.0));
+        let xs4 = t4.local_intersect(r4);
+        assert!(xs4.is_empty());
     }
 }
