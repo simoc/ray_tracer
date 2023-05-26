@@ -29,6 +29,11 @@ impl Triangle
         let normal = e2.cross_product(e1).normalize();
         Triangle{p1: p1, p2: p2, p3: p3, e1: e1, e2: e2, normal: normal}
     }
+
+    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    {
+        self.normal
+    }
 }
 
 impl fmt::Display for Triangle
@@ -58,5 +63,21 @@ mod tests
         assert_eq!(t1.e1, create_vector(-1.0, -1.0, 0.0));
         assert_eq!(t1.e2, create_vector(1.0, -1.0, 0.0));
         assert_eq!(t1.normal, create_vector(0.0, 0.0, -1.0));
+    }
+
+    #[test]
+    fn test_triangles_feature2()
+    {
+        // p.209 Scenario: Finding the normal on a triangle
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let t1 = Triangle::new(p1, p2, p3);
+        let n1 = t1.local_normal_at(create_point(0.0, 0.5, 0.0));
+        let n2 = t1.local_normal_at(create_point(-0.5, 0.75, 0.0));
+        let n3 = t1.local_normal_at(create_point(0.5, 0.25, 0.0));
+        assert_eq!(n1, t1.normal);
+        assert_eq!(n2, t1.normal);
+        assert_eq!(n3, t1.normal);
     }
 }
