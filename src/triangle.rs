@@ -56,8 +56,8 @@ impl Triangle
         {
             return Vec::new();
         }
-        // A bogus intersection to ensure the result isn't a false positive
-        vec![1.0]
+        let t = f * self.e2.dot_product(origin_cross_e1);
+        vec![t]
     }
 }
 
@@ -156,5 +156,19 @@ mod tests
         let r6 = Ray::new(create_point(0.0, -1.0, -2.0), create_vector(0.0, 0.0, 1.0));
         let xs6 = t6.local_intersect(r6);
         assert!(xs6.is_empty());
+    }
+
+    #[test]
+    fn test_triangles_feature7()
+    {
+        // p.211 Scenario: A ray strikes a triangle
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let t7 = Triangle::new(p1, p2, p3);
+        let r7 = Ray::new(create_point(0.0, 0.5, -2.0), create_vector(0.0, 0.0, 1.0));
+        let xs7 = t7.local_intersect(r7);
+        assert_eq!(xs7.len(), 1);
+        assert!(fuzzy_equal(xs7[0], 2.0));
     }
 }
