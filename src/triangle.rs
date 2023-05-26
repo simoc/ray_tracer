@@ -50,6 +50,12 @@ impl Triangle
         {
             return Vec::new();
         }
+        let origin_cross_e1 = p1_to_origin.cross_product(self.e1);
+        let v = f * ray.direction.dot_product(origin_cross_e1);
+        if v < 0.0 || u + v > 1.0
+        {
+            return Vec::new();
+        }
         // A bogus intersection to ensure the result isn't a false positive
         vec![1.0]
     }
@@ -124,5 +130,31 @@ mod tests
         let r4 = Ray::new(create_point(1.0, 1.0, -2.0), create_vector(0.0, 0.0, 1.0));
         let xs4 = t4.local_intersect(r4);
         assert!(xs4.is_empty());
+    }
+
+    #[test]
+    fn test_triangles_feature5()
+    {
+        // p.211 Scenario: A ray misses the p1-p2 edge
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let t5 = Triangle::new(p1, p2, p3);
+        let r5 = Ray::new(create_point(-1.0, 1.0, -2.0), create_vector(0.0, 0.0, 1.0));
+        let xs5 = t5.local_intersect(r5);
+        assert!(xs5.is_empty());
+    }
+
+    #[test]
+    fn test_triangles_feature6()
+    {
+        // p.211 Scenario: A ray misses the p2-p3 edge
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let t6 = Triangle::new(p1, p2, p3);
+        let r6 = Ray::new(create_point(0.0, -1.0, -2.0), create_vector(0.0, 0.0, 1.0));
+        let xs6 = t6.local_intersect(r6);
+        assert!(xs6.is_empty());
     }
 }
