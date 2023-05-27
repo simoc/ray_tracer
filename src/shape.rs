@@ -9,6 +9,7 @@ use crate::material::*;
 use crate::matrix::*;
 use crate::plane::*;
 use crate::ray::*;
+use crate::triangle::*;
 use crate::tuple::*;
 
 #[derive(Clone, Debug)]
@@ -20,6 +21,7 @@ pub enum ShapeSpecific
     Cylinder(Cylinder),
     Cone(Cone),
     Group(Group),
+    Triangle(Triangle),
 }
 
 #[derive(Clone, Debug)]
@@ -133,6 +135,20 @@ impl Shape
             specific: ShapeSpecific::Group(group)}
     }
 
+    pub fn new_triangle(id: i32, p1: Tuple, p2: Tuple, p3: Tuple) -> Shape
+    {
+        let zero_point = create_point(0.0, 0.0, 0.0);
+        let zero_vector = create_vector(0.0, 0.0, 0.0);
+        let triangle = Triangle::new(p1, p2, p3);
+
+        Shape{id: id,
+            transform: Matrix::identity(4),
+            material: Material::new(),
+            saved_ray: Ray::new(zero_point, zero_vector),
+            parent: None::<Box<Shape>>,
+            specific: ShapeSpecific::Triangle(triangle)}
+    }
+
     pub fn test_shape(id: i32) -> Shape
     {
         Self::new_sphere(id)
@@ -170,6 +186,7 @@ impl Shape
             ShapeSpecific::Cylinder(c) => c.local_intersect(local_ray),
             ShapeSpecific::Cone(c) => c.local_intersect(local_ray),
             ShapeSpecific::Group(g) => g.local_intersect(local_ray),
+            ShapeSpecific::Triangle(t) => t.local_intersect(local_ray),
         }
     }
 
@@ -189,6 +206,7 @@ impl Shape
             ShapeSpecific::Cylinder(c) => c.local_normal_at(local_point),
             ShapeSpecific::Cone(c) => c.local_normal_at(local_point),
             ShapeSpecific::Group(g) => g.local_normal_at(local_point),
+            ShapeSpecific::Triangle(t) => t.local_normal_at(local_point),
         };
         return self.normal_to_world(local_normal);
     }
@@ -315,6 +333,14 @@ impl PartialEq for Shape
                     _ => false,
                 }
             },
+            ShapeSpecific::Triangle(_) =>
+            {
+                match other.specific
+                {
+                    ShapeSpecific::Triangle(_) => self.id == other.id,
+                    _ => false,
+                }
+            },
         }
     }
 }
@@ -331,6 +357,7 @@ impl fmt::Display for Shape
             ShapeSpecific::Cylinder(_) => write!(f, "cylinder {}", self.id),
             ShapeSpecific::Cone(_) => write!(f, "cone {}", self.id),
             ShapeSpecific::Group(g) => write!(f, "group {} {}", self.id, g),
+            ShapeSpecific::Triangle(_) => write!(f, "triangle {}", self.id),
         }
     }
 }
