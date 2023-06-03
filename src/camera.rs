@@ -74,6 +74,13 @@ impl Camera
                 let color = world.color_at(ray, World::REFLECTION_RECURSION);
                 image.write_pixel(x.into(), y.into(), color);
             }
+
+            // Display rendering progress to stderr every N rows
+            if y % 10 == 0
+            {
+                let percentage = (y * 100) / self.vsize;
+                eprintln!("progress {percentage}%");
+            }
         }
         image
     }
