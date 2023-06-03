@@ -14,8 +14,7 @@ PPM image output file on a Linux system:
 
     $ git clone https://github.com/simoc/ray_tracer.git
     $ cd ray_tracer
-    $ cargo build --release
-    $ ./target/release/ray_tracer > a.ppm
+    $ cargo run --release > a.ppm
     $ display a.ppm
 
 ## Completed Chapters
