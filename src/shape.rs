@@ -248,6 +248,24 @@ impl Shape
         }
     }
 
+    pub fn is_triangle(&self) -> bool
+    {
+        match self.specific
+        {
+            ShapeSpecific::Triangle(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn get_triangle(&self) -> Triangle
+    {
+        match &self.specific
+        {
+            ShapeSpecific::Triangle(t) => t.clone(),
+            _ => panic!("Shape is not a triangle"),
+        }
+    }
+
     pub fn world_to_object(&self, world_point: Tuple) -> Tuple
     {
         let mut point = world_point;
