@@ -30,12 +30,18 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
             }
             else if words[0] == "f"
             {
-                let i1 = words[1].parse::<usize>().unwrap();
-                let i2 = words[2].parse::<usize>().unwrap();
-                let i3 = words[3].parse::<usize>().unwrap();
-                let id = id + 1;
-                let mut t = Shape::new_triangle(id, v[i1], v[i2], v[i3]);
-                default_group.add_child(&mut t);
+                // Add single triangle if three vertices, or polygon
+                // with fan triangulation if more than three vertices
+                let last_index = words.len() - 1;
+                for index in 2..last_index
+                {
+                    let j1 = words[1].parse::<usize>().unwrap();
+                    let j2 = words[index].parse::<usize>().unwrap();
+                    let j3 = words[index + 1].parse::<usize>().unwrap();
+                    let id = id + 1;
+                    let mut t = Shape::new_triangle(id, v[j1], v[j2], v[j3]);
+                    default_group.add_child(&mut t);
+                }
             }
         }
     }
@@ -97,8 +103,43 @@ mod tests
         assert_eq!(t110.p1, obj10.vertices[1]);
         assert_eq!(t110.p2, obj10.vertices[2]);
         assert_eq!(t110.p3, obj10.vertices[3]);
+
         assert_eq!(t210.p1, obj10.vertices[1]);
         assert_eq!(t210.p2, obj10.vertices[3]);
         assert_eq!(t210.p3, obj10.vertices[4]);
+    }
+
+    #[test]
+    fn test_objfile_feature11()
+    {
+        // p.214 Scenario: Triangulating polygons
+        let lines11 = vec!["v -1 1 0",
+            "v -1 1 0",
+            "v -1 0 0",
+            "v 1 0 0",
+            "v 1 1 0",
+            "v 0 2 0",
+            "f 1 2 3 4 5"];
+        let obj11 = parse_obj_file(lines11);
+        assert_eq!(obj11.vertices.len(), 6 + 1);
+        let children11 = obj11.default_group.get_children();
+        assert!(children11.len() >= 3);
+        assert!(children11[0].is_triangle());
+        assert!(children11[1].is_triangle());
+        assert!(children11[2].is_triangle());
+        let t111 = children11[0].get_triangle();
+        let t211 = children11[1].get_triangle();
+        let t311 = children11[2].get_triangle();
+        assert_eq!(t111.p1, obj11.vertices[1]);
+        assert_eq!(t111.p2, obj11.vertices[2]);
+        assert_eq!(t111.p3, obj11.vertices[3]);
+
+        assert_eq!(t211.p1, obj11.vertices[1]);
+        assert_eq!(t211.p2, obj11.vertices[3]);
+        assert_eq!(t211.p3, obj11.vertices[4]);
+
+        assert_eq!(t311.p1, obj11.vertices[1]);
+        assert_eq!(t311.p2, obj11.vertices[4]);
+        assert_eq!(t311.p3, obj11.vertices[5]);
     }
 }
