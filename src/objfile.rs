@@ -86,6 +86,25 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
     ObjFile{vertices: v, default_group: default_group, groups: groups}
 }
 
+impl ObjFile
+{
+    pub fn obj_to_group(&self) -> Shape
+    {
+        let mut group = Shape::new_group(1);
+        let mut g2 = self.default_group.clone();
+        if !self.default_group.get_children().is_empty()
+        {
+            group.add_child(&mut g2);
+        }
+        for g in self.groups.values()
+        {
+            let mut g3 = g.clone();
+            group.add_child(&mut g3);
+        }
+        group
+    }
+}
+
 #[cfg(test)]
 mod tests
 {
@@ -184,7 +203,7 @@ mod tests
     #[test]
     fn test_objfile_feature12()
     {
-        // p.215 Scenario: Triangles in a group
+        // p.217 Scenario: Triangles in groups
         let lines12 = vec!["v -1 1 0",
             "v -1 0 0",
             "v 1 0 0",
@@ -234,5 +253,28 @@ mod tests
                 panic!("SecondGroup not found");
             },
         }
+    }
+
+    #[test]
+    fn test_objfile_feature13()
+    {
+        // p.218 Scenario: Converting an OBJ file to a group
+        let lines13 = vec!["v -1 1 0",
+            "v -1 0 0",
+            "v 1 0 0",
+            "v 1 1 0",
+            "g FirstGroup",
+            "f 1 2 3",
+            "g SecondGroup",
+            "f 1 3 4"];
+        let obj13 = parse_obj_file(lines13);
+        let group13 = obj13.obj_to_group();
+        let children13 = group13.get_children();
+        assert_eq!(children13.len(), 2);
+        let children113 = children13[0].get_children();
+        assert_eq!(children113.len(), 1);
+        assert!(children113[0].is_triangle());
+        let children213 = children13[1].get_children();
+        assert!(children213[0].is_triangle());
     }
 }
