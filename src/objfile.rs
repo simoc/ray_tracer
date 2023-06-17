@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use crate::tuple::*;
 use crate::shape::*;
 
@@ -6,6 +7,7 @@ pub struct ObjFile
 {
     pub vertices: Vec<Tuple>,
     pub default_group: Shape,
+    pub groups: HashMap<String, Shape>,
 }
 
 pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
@@ -15,12 +17,14 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
     // Add unused entry at index 0, so we can used 1-based indexing
     v.push(create_point(0.0, 0.0, 0.0));
     let mut default_group = Shape::new_group(id);
+    let mut groups: HashMap<String, Shape> = HashMap::new();
+    let mut current_groups: Vec<String> = Vec::new();
     for line in lines
     {
         let words: Vec<String> = line.split_ascii_whitespace().map(String::from).collect();
-        if words.len() >= 4
+        if words.len() >= 2
         {
-            if words[0] == "v"
+            if words[0] == "v" && words.len() == 4
             {
                 let p = create_point(
                     words[1].parse::<f64>().unwrap(),
@@ -28,7 +32,7 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
                     words[3].parse::<f64>().unwrap());
                 v.push(p);
             }
-            else if words[0] == "f"
+            else if words[0] == "f" && words.len() >= 4
             {
                 // Add single triangle if three vertices, or polygon
                 // with fan triangulation if more than three vertices
@@ -38,14 +42,48 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
                     let j1 = words[1].parse::<usize>().unwrap();
                     let j2 = words[index].parse::<usize>().unwrap();
                     let j3 = words[index + 1].parse::<usize>().unwrap();
-                    let id = id + 1;
+                    id = id + 1;
                     let mut t = Shape::new_triangle(id, v[j1], v[j2], v[j3]);
-                    default_group.add_child(&mut t);
+                    let groups2 = current_groups.clone();
+                    if !current_groups.is_empty()
+                    {
+                        for name in groups2
+                        {
+                            match groups.get(&name)
+                            {
+                                Some(g) =>
+                                {
+                                    let mut g2 = g.clone();
+                                    g2.add_child(&mut t);
+                                    groups.insert(name, g2);
+                                },
+                                _ =>
+                                {
+                                    id = id + 1;
+                                    let mut group = Shape::new_group(id);
+                                    group.add_child(&mut t);
+                                    groups.insert(name, group);
+                                },
+                            }
+                        }
+                    }
+                    else
+                    {
+                        default_group.add_child(&mut t);
+                    }
+                }
+            }
+            else if words[0] == "g"
+            {
+                current_groups.clear();
+                for index in 1..words.len()
+                {
+                    current_groups.push(words[index].clone());
                 }
             }
         }
     }
-    ObjFile{vertices: v, default_group: default_group}
+    ObjFile{vertices: v, default_group: default_group, groups: groups}
 }
 
 #[cfg(test)]
@@ -141,5 +179,60 @@ mod tests
         assert_eq!(t311.p1, obj11.vertices[1]);
         assert_eq!(t311.p2, obj11.vertices[4]);
         assert_eq!(t311.p3, obj11.vertices[5]);
+    }
+
+    #[test]
+    fn test_objfile_feature12()
+    {
+        // p.215 Scenario: Triangles in a group
+        let lines12 = vec!["v -1 1 0",
+            "v -1 0 0",
+            "v 1 0 0",
+            "v 1 1 0",
+            "g FirstGroup",
+            "f 1 2 3",
+            "g SecondGroup",
+            "f 1 3 4"];
+        let obj12 = parse_obj_file(lines12);
+        assert_eq!(obj12.vertices.len(), 4 + 1);
+        assert!(obj12.default_group.get_children().is_empty());
+        assert!(obj12.groups.contains_key("FirstGroup"));
+        let first_group = obj12.groups.get("FirstGroup");
+        match first_group
+        {
+            Some (g112) =>
+            {
+                let children112 = g112.get_children();
+                assert_eq!(children112.len(), 1);
+                assert!(children112[0].is_triangle());
+                let t112 = children112[0].get_triangle();
+                assert_eq!(t112.p1, obj12.vertices[1]);
+                assert_eq!(t112.p2, obj12.vertices[2]);
+                assert_eq!(t112.p3, obj12.vertices[3]);
+            },
+            _ =>
+            {
+                panic!("FirstGroup not found");
+            },
+        }
+        assert!(obj12.groups.contains_key("SecondGroup"));
+        let second_group = obj12.groups.get("SecondGroup");
+        match second_group
+        {
+            Some (g212) =>
+            {
+                let children212 = g212.get_children();
+                assert_eq!(children212.len(), 1);
+                assert!(children212[0].is_triangle());
+                let t212 = children212[0].get_triangle();
+                assert_eq!(t212.p1, obj12.vertices[1]);
+                assert_eq!(t212.p2, obj12.vertices[3]);
+                assert_eq!(t212.p3, obj12.vertices[4]);
+            },
+            _ =>
+            {
+                panic!("SecondGroup not found");
+            },
+        }
     }
 }
