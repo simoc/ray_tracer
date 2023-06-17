@@ -18,6 +18,7 @@ mod cylinder;
 mod cone;
 mod group;
 mod triangle;
+mod smoothtriangle;
 mod objfile;
 
 use std::f64::consts::PI;
@@ -39,7 +40,7 @@ use crate::cube::*;
 use crate::cylinder::*;
 use crate::cone::*;
 use crate::group::*;
-use crate::triangle::*;
+use crate::smoothtriangle::*;
 use crate::objfile::*;
 
 fn hexagon_corner(id: i32) -> Shape
