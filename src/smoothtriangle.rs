@@ -53,7 +53,7 @@ mod tests
     use super::*;
 
     #[test]
-    fn test_smoothtriangles_feature1()
+    fn test_smoothtriangles_feature14()
     {
         // p.221 Scenario: Constructing a smooth triangle
         let p1 = create_point(0.0, 1.0, 0.0);
@@ -62,12 +62,28 @@ mod tests
         let n1 = create_vector(0.0, 1.0, 0.0);
         let n2 = create_vector(-1.0, 0.0, 0.0);
         let n3 = create_vector(1.0, 0.0, 0.0);
-        let t1 = SmoothTriangle::new(p1, p2, p3, n1, n2, n3);
-        assert_eq!(t1.p1, p1);
-        assert_eq!(t1.p2, p2);
-        assert_eq!(t1.p3, p3);
-        assert_eq!(t1.n1, n1);
-        assert_eq!(t1.n2, n2);
-        assert_eq!(t1.n3, n3);
+        let t14 = SmoothTriangle::new(p1, p2, p3, n1, n2, n3);
+        assert_eq!(t14.p1, p1);
+        assert_eq!(t14.p2, p2);
+        assert_eq!(t14.p3, p3);
+        assert_eq!(t14.n1, n1);
+        assert_eq!(t14.n2, n2);
+        assert_eq!(t14.n3, n3);
+    }
+
+    #[test]
+    fn test_smoothtriangles_feature15()
+    {
+        // p.221 Scenario: An intersection can encapsulate u and v
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let n1 = create_vector(0.0, 1.0, 0.0);
+        let n2 = create_vector(-1.0, 0.0, 0.0);
+        let n3 = create_vector(1.0, 0.0, 0.0);
+        let t15 = Shape::new_smooth_triangle(15, p1, p2, p3, n1, n2, n3);
+        let i15 = Intersection::new_with_uv(3.5, t15, 0.2, 0.4);
+        assert!(fuzzy_equal(i15.u, 0.2));
+        assert!(fuzzy_equal(i15.v, 0.4));
     }
 }

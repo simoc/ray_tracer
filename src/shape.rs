@@ -9,6 +9,7 @@ use crate::material::*;
 use crate::matrix::*;
 use crate::plane::*;
 use crate::ray::*;
+use crate::smoothtriangle::*;
 use crate::triangle::*;
 use crate::tuple::*;
 
@@ -22,6 +23,7 @@ pub enum ShapeSpecific
     Cone(Cone),
     Group(Group),
     Triangle(Triangle),
+    SmoothTriangle(SmoothTriangle),
 }
 
 #[derive(Clone, Debug)]
@@ -149,6 +151,21 @@ impl Shape
             specific: ShapeSpecific::Triangle(triangle)}
     }
 
+    pub fn new_smooth_triangle(id: i32, p1: Tuple, p2: Tuple, p3: Tuple,
+        n1: Tuple, n2: Tuple, n3: Tuple) -> Shape
+    {
+        let zero_point = create_point(0.0, 0.0, 0.0);
+        let zero_vector = create_vector(0.0, 0.0, 0.0);
+        let triangle = SmoothTriangle::new(p1, p2, p3, n1, n2, n3);
+
+        Shape{id: id,
+            transform: Matrix::identity(4),
+            material: Material::new(),
+            saved_ray: Ray::new(zero_point, zero_vector),
+            parent: None::<Box<Shape>>,
+            specific: ShapeSpecific::SmoothTriangle(triangle)}
+    }
+
     pub fn test_shape(id: i32) -> Shape
     {
         Self::new_sphere(id)
@@ -187,6 +204,7 @@ impl Shape
             ShapeSpecific::Cone(c) => c.local_intersect(local_ray),
             ShapeSpecific::Group(g) => g.local_intersect(local_ray),
             ShapeSpecific::Triangle(t) => t.local_intersect(local_ray),
+            ShapeSpecific::SmoothTriangle(t) => t.local_intersect(local_ray),
         }
     }
 
@@ -207,6 +225,7 @@ impl Shape
             ShapeSpecific::Cone(c) => c.local_normal_at(local_point),
             ShapeSpecific::Group(g) => g.local_normal_at(local_point),
             ShapeSpecific::Triangle(t) => t.local_normal_at(local_point),
+            ShapeSpecific::SmoothTriangle(t) => t.local_normal_at(local_point),
         };
         return self.normal_to_world(local_normal);
     }
@@ -359,6 +378,14 @@ impl PartialEq for Shape
                     _ => false,
                 }
             },
+            ShapeSpecific::SmoothTriangle(_) =>
+            {
+                match other.specific
+                {
+                    ShapeSpecific::SmoothTriangle(_) => self.id == other.id,
+                    _ => false,
+                }
+            },
         }
     }
 }
@@ -376,6 +403,7 @@ impl fmt::Display for Shape
             ShapeSpecific::Cone(_) => write!(f, "cone {}", self.id),
             ShapeSpecific::Group(g) => write!(f, "group {} {}", self.id, g),
             ShapeSpecific::Triangle(_) => write!(f, "triangle {}", self.id),
+            ShapeSpecific::SmoothTriangle(_) => write!(f, "smoothtriangle {}", self.id),
         }
     }
 }

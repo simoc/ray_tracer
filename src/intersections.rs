@@ -12,13 +12,20 @@ pub struct Intersection
 {
     pub t: f64,
     pub object: Shape,
+    pub u: f64,
+    pub v: f64,
 }
 
 impl Intersection
 {
     pub fn new(t: f64, object: Shape) -> Self
     {
-        Intersection{t: t, object: object}
+        Intersection{t: t, object: object, u: 0.0, v: 0.0}
+    }
+
+    pub fn new_with_uv(t: f64, object: Shape, u: f64, v: f64) -> Self
+    {
+        Intersection{t: t, object: object, u: u, v: v}
     }
 
     pub fn prepare_computations(&self, ray: Ray, intersections: Intersections) -> Computations
