@@ -191,7 +191,7 @@ impl Shape
         self.material = material;
     }
 
-    pub fn intersect(&mut self, ray: Ray) -> Vec<f64>
+    pub fn intersect(&mut self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let local_ray = ray.transform(self.transform.inverse());
         self.saved_ray = local_ray.clone();

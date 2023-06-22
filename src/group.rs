@@ -24,16 +24,16 @@ impl Group
         Group{child_shapes: Vec::new()}
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
-        let mut xs = Vec::<f64>::new();
+        let mut xs = Vec::<(f64, f64, f64)>::new();
         for shape in &self.child_shapes
         {
             let mut child_shape = shape.clone();
             let intersections = child_shape.intersect(ray);
-            for t in intersections
+            for tuv in intersections
             {
-                xs.push(t);
+                xs.push(tuv);
             }
         }
         xs.sort_by(|a, b| a.partial_cmp(b).unwrap());

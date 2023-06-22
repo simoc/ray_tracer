@@ -19,7 +19,7 @@ impl Sphere
         Sphere{}
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let ray2 = ray;
 
@@ -40,7 +40,9 @@ impl Sphere
 
         let t1 = (-b - discriminant.sqrt()) / (2.0 * a);
         let t2 = (-b + discriminant.sqrt()) / (2.0 * a);
-        return vec![t1, t2];
+        let u = 0.0;
+        let v = 0.0;
+        return vec![(t1, u, v), (t2, u, v)];
     }
 
     pub fn local_normal_at(&self, local_point: Tuple) -> Tuple
@@ -76,16 +78,16 @@ mod tests
         let mut s3 = Shape::new_sphere(3);
         let xs3 = s3.intersect(r3);
         assert_eq!(xs3.len(), 2);
-        assert_eq!(xs3[0], 4.0);
-        assert_eq!(xs3[1], 6.0);
+        assert_eq!(xs3[0].0, 4.0);
+        assert_eq!(xs3[1].0, 6.0);
 
         // p.60 Scenario: A ray intersects a sphere at a tangent
         let r4 = Ray::new(create_point(0.0, 1.0, -5.0), create_vector(0.0, 0.0, 1.0));
         let mut s4 = Shape::new_sphere(4);
         let xs4 = s4.intersect(r4);
         assert_eq!(xs4.len(), 2);
-        assert_eq!(xs4[0], 5.0);
-        assert_eq!(xs4[1], 5.0);
+        assert_eq!(xs4[0].0, 5.0);
+        assert_eq!(xs4[1].0, 5.0);
 
         // p.60 Scenario: A ray misses a sphere
         let r5 = Ray::new(create_point(0.0, 2.0, -5.0), create_vector(0.0, 0.0, 1.0));
@@ -98,16 +100,16 @@ mod tests
         let mut s6 = Shape::new_sphere(6);
         let xs6 = s6.intersect(r6);
         assert_eq!(xs6.len(), 2);
-        assert_eq!(xs6[0], -1.0);
-        assert_eq!(xs6[1], 1.0);
+        assert_eq!(xs6[0].0, -1.0);
+        assert_eq!(xs6[1].0, 1.0);
 
         // p.62 Scenario: A sphere is behind a ray
         let r7 = Ray::new(create_point(0.0, 0.0, 5.0), create_vector(0.0, 0.0, 1.0));
         let mut s7 = Shape::new_sphere(7);
         let xs7 = s7.intersect(r7);
         assert_eq!(xs7.len(), 2);
-        assert_eq!(xs7[0], -6.0);
-        assert_eq!(xs7[1], -4.0);
+        assert_eq!(xs7[0].0, -6.0);
+        assert_eq!(xs7[1].0, -4.0);
 
         // p.69 Scenario: A sphere's default transformation
         let s8 = Shape::new_sphere(8);
@@ -125,8 +127,8 @@ mod tests
         s10.set_transform(Matrix::scaling(2.0, 2.0, 2.0));
         let xs10 = s10.intersect(r10);
         assert_eq!(xs10.len(), 2);
-        assert_eq!(xs10[0], 3.0);
-        assert_eq!(xs10[1], 7.0);
+        assert_eq!(xs10[0].0, 3.0);
+        assert_eq!(xs10[1].0, 7.0);
 
         // p.70 Scenario: Intersecting a translated sphere with a ray
         let r11 = Ray::new(create_point(0.0, 0.0, -5.0), create_vector(0.0, 0.0, 1.0));

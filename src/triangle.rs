@@ -35,7 +35,7 @@ impl Triangle
         self.normal
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let dir_cross_e2 = ray.direction.cross_product(self.e2);
         let det = self.e1.dot_product(dir_cross_e2);
@@ -57,7 +57,10 @@ impl Triangle
             return Vec::new();
         }
         let t = f * self.e2.dot_product(origin_cross_e1);
-        vec![t]
+        // u and v only implemented for smooth triangles
+        let u0 = 0.0;
+        let v0 = 0.0;
+        vec![(t, u0, v0)]
     }
 }
 
@@ -169,6 +172,6 @@ mod tests
         let r7 = Ray::new(create_point(0.0, 0.5, -2.0), create_vector(0.0, 0.0, 1.0));
         let xs7 = t7.local_intersect(r7);
         assert_eq!(xs7.len(), 1);
-        assert!(fuzzy_equal(xs7[0], 2.0));
+        assert!(fuzzy_equal(xs7[0].0, 2.0));
     }
 }

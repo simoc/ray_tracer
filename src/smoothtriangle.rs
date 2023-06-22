@@ -15,6 +15,8 @@ pub struct SmoothTriangle
     pub p1: Tuple,
     pub p2: Tuple,
     pub p3: Tuple,
+    pub e1: Tuple,
+    pub e2: Tuple,
     pub n1: Tuple,
     pub n2: Tuple,
     pub n3: Tuple,
@@ -25,7 +27,10 @@ impl SmoothTriangle
     pub fn new(p1: Tuple, p2: Tuple, p3: Tuple,
         n1: Tuple, n2: Tuple, n3: Tuple) -> Self
     {
-        SmoothTriangle{p1: p1, p2: p2, p3: p3, n1: n1, n2: n2, n3: n3}
+        let e1 = p2.sub(p1);
+        let e2 = p3.sub(p1);
+        SmoothTriangle{p1: p1, p2: p2, p3: p3,
+            e1: e1, e2: e2, n1: n1, n2: n2, n3: n3}
     }
 
     pub fn local_normal_at(&self, point: Tuple) -> Tuple
@@ -33,9 +38,29 @@ impl SmoothTriangle
         create_vector(0.0, 0.0, 0.0)
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
-        vec![]
+        let dir_cross_e2 = ray.direction.cross_product(self.e2);
+        let det = self.e1.dot_product(dir_cross_e2);
+        if det.abs() < EPSILON
+        {
+            return Vec::new();
+        }
+        let f = 1.0 / det;
+        let p1_to_origin = ray.origin.sub(self.p1);
+        let u = f * p1_to_origin.dot_product(dir_cross_e2);
+        if u < 0.0 || u > 1.0
+        {
+            return Vec::new();
+        }
+        let origin_cross_e1 = p1_to_origin.cross_product(self.e1);
+        let v = f * ray.direction.dot_product(origin_cross_e1);
+        if v < 0.0 || u + v > 1.0
+        {
+            return Vec::new();
+        }
+        let t = f * self.e2.dot_product(origin_cross_e1);
+        vec![(t, u, v)]
     }
 }
 
@@ -85,5 +110,24 @@ mod tests
         let i15 = Intersection::new_with_uv(3.5, t15, 0.2, 0.4);
         assert!(fuzzy_equal(i15.u, 0.2));
         assert!(fuzzy_equal(i15.v, 0.4));
+    }
+
+    #[test]
+    fn test_smoothtriangles_feature16()
+    {
+        // p.221 Scenario: An intersection with a smooth triangle stores u/v
+        let r1 = Ray::new(create_point(-0.2, 0.3, -2.0),
+            create_vector(0.0, 0.0, 1.0));
+        let p1 = create_point(0.0, 1.0, 0.0);
+        let p2 = create_point(-1.0, 0.0, 0.0);
+        let p3 = create_point(1.0, 0.0, 0.0);
+        let n1 = create_vector(0.0, 1.0, 0.0);
+        let n2 = create_vector(-1.0, 0.0, 0.0);
+        let n3 = create_vector(1.0, 0.0, 0.0);
+        let mut t16 = Shape::new_smooth_triangle(16, p1, p2, p3, n1, n2, n3);
+        let i16 = t16.intersect(r1);
+        assert_eq!(i16.len(), 1);
+        assert!(fuzzy_equal(i16[0].1, 0.45));
+        assert!(fuzzy_equal(i16[0].2, 0.25));
     }
 }

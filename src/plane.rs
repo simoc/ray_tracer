@@ -22,15 +22,17 @@ impl Plane
         Plane{}
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
+        let u = 0.0;
+        let v = 0.0;
         if ray.direction.get_vec()[1].abs() < EPSILON
         {
             // empty set -- no intersection
             return Vec::new();
         }
         let t = -ray.origin.get_vec()[1] / ray.direction.get_vec()[1];
-        return vec![t];
+        return vec![(t, u, v)];
     }
 
     pub fn local_normal_at(&self, _local_point: Tuple) -> Tuple
@@ -81,13 +83,13 @@ mod tests
         let r4 = Ray::new(create_point(0.0, 1.0, 0.0), create_vector(0.0, -1.0, 0.0));
         let xs4 = p4.local_intersect(r4);
         assert_eq!(xs4.len(), 1);
-        assert!(fuzzy_equal(xs4[0], 1.0));
+        assert!(fuzzy_equal(xs4[0].0, 1.0));
 
         // p.123 Scenario: A ray intersecting a plane from below
         let p5 = Plane::new();
         let r5 = Ray::new(create_point(0.0, -1.0, 0.0), create_vector(0.0, 1.0, 0.0));
         let xs5 = p5.local_intersect(r5);
         assert_eq!(xs5.len(), 1);
-        assert!(fuzzy_equal(xs5[0], 1.0));
+        assert!(fuzzy_equal(xs5[0].0, 1.0));
     }
 }

@@ -46,9 +46,9 @@ impl World
         for object in &self.objects
         {
             let xs = object.clone().intersect(ray);
-            for t in xs
+            for tuv in xs
             {
-                intersections.push(Intersection::new(t, object.clone()));
+                intersections.push(Intersection::new_with_uv(tuv.0, object.clone(), tuv.1, tuv.2));
             }
         }
         Intersections::new(intersections)
