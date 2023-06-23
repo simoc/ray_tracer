@@ -40,7 +40,7 @@ impl Group
         return xs;
     }
 
-    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         create_vector(0.0, 0.0, 1.0)
     }
@@ -189,7 +189,7 @@ mod tests
         let mut s93 = Shape::new_sphere(93);
         s93.set_transform(Matrix::translation(5.0, 0.0, 0.0));
         group92.add_child(&mut s93);
-        let n9 = s93.normal_at(create_point(1.7321, 1.1547, -5.5774));
+        let n9 = s93.normal_at(create_point(1.7321, 1.1547, -5.5774), (0.0, 0.0));
         assert!(n9.approx_equal(create_vector(0.2857, 0.4286, -0.8571)));
     }
 }

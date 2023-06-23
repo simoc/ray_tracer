@@ -130,7 +130,7 @@ impl Cone
         return xs;
     }
 
-    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         // compute the square of the distance from the y axis
         let v = point.get_vec();
@@ -246,7 +246,7 @@ mod tests
 
         for i in 0..points4.len()
         {
-            let n4 = c4.local_normal_at(points4[i]);
+            let n4 = c4.local_normal_at(points4[i], (0.0, 0.0));
             assert_eq!(n4, normals4[i]);
         }
     }

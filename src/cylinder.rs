@@ -125,7 +125,7 @@ impl Cylinder
         return xs;
     }
 
-    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         // compute the square of the distance from the y axis
         let v = point.get_vec();
@@ -219,7 +219,7 @@ mod tests
 
         for i in 0..points3.len()
         {
-            let n3 = c3.local_normal_at(points3[i]);
+            let n3 = c3.local_normal_at(points3[i], (0.0, 0.0));
             assert_eq!(n3, normals3[i]);
         }
     }
@@ -324,7 +324,7 @@ mod tests
 
         for i in 0..points8.len()
         {
-            let n8 = c8.local_normal_at(points8[i]);
+            let n8 = c8.local_normal_at(points8[i], (0.0, 0.0));
             assert_eq!(n8, normals8[i]);
         }
     }

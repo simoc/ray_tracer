@@ -35,7 +35,7 @@ impl Plane
         return vec![(t, u, v)];
     }
 
-    pub fn local_normal_at(&self, _local_point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         create_vector(0.0, 1.0, 0.0)
     }
@@ -59,9 +59,9 @@ mod tests
     {
         // p.122 Scenario: The normal of a plane is constant everywhere
         let p1 = Plane::new();
-        let n11 = p1.local_normal_at(create_point(0.0, 0.0, 0.0));
-        let n12 = p1.local_normal_at(create_point(10.0, 0.0, -10.0));
-        let n13 = p1.local_normal_at(create_point(-5.0, 0.0, 150.0));
+        let n11 = p1.local_normal_at(create_point(0.0, 0.0, 0.0), (0.0, 0.0));
+        let n12 = p1.local_normal_at(create_point(10.0, 0.0, -10.0), (0.0, 0.0));
+        let n13 = p1.local_normal_at(create_point(-5.0, 0.0, 150.0), (0.0, 0.0));
         assert_eq!(n11, create_vector(0.0, 1.0, 0.0));
         assert_eq!(n12, create_vector(0.0, 1.0, 0.0));
         assert_eq!(n13, create_vector(0.0, 1.0, 0.0));

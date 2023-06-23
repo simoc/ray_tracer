@@ -105,7 +105,7 @@ impl Cube
         return vec![(tmin, u, v), (tmax, u, v)];
     }
 
-    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         let v = point.get_vec();
         let x = v[0];
@@ -220,7 +220,7 @@ mod tests
 
         for i in 0..points3.len()
         {
-            let normal = c3.local_normal_at(points3[i]);
+            let normal = c3.local_normal_at(points3[i], (0.0, 0.0));
             assert_eq!(normal, normals3[i]);
         }
     }

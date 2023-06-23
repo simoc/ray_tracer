@@ -74,7 +74,7 @@ impl Intersection
         // precompute some useful values
         let point = ray.position(self.t);
         let eyev = ray.direction.negate();
-        let mut normalv = self.object.normal_at(point);
+        let mut normalv = self.object.normal_at(point, (self.u, self.v));
         let inside: bool;
         if normalv.dot_product(eyev) < 0.0
         {

@@ -213,19 +213,19 @@ impl Shape
         self.saved_ray
     }
 
-    pub fn normal_at(&self, world_point: Tuple) -> Tuple
+    pub fn normal_at(&self, world_point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         let local_point = self.world_to_object(world_point);
         let local_normal = match self.specific.clone()
         {
-            ShapeSpecific::Sphere(s) => s.local_normal_at(local_point),
-            ShapeSpecific::Plane(p) => p.local_normal_at(local_point),
-            ShapeSpecific::Cube(c) => c.local_normal_at(local_point),
-            ShapeSpecific::Cylinder(c) => c.local_normal_at(local_point),
-            ShapeSpecific::Cone(c) => c.local_normal_at(local_point),
-            ShapeSpecific::Group(g) => g.local_normal_at(local_point),
-            ShapeSpecific::Triangle(t) => t.local_normal_at(local_point),
-            ShapeSpecific::SmoothTriangle(t) => t.local_normal_at(local_point),
+            ShapeSpecific::Sphere(s) => s.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Plane(p) => p.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Cube(c) => c.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Cylinder(c) => c.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Cone(c) => c.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Group(g) => g.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Triangle(t) => t.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::SmoothTriangle(t) => t.local_normal_at(local_point, hit_uv),
         };
         return self.normal_to_world(local_normal);
     }
