@@ -6,6 +6,7 @@ use crate::shape::*;
 pub struct ObjFile
 {
     pub vertices: Vec<Tuple>,
+    pub normals: Vec<Tuple>,
     pub default_group: Shape,
     pub groups: HashMap<String, Shape>,
 }
@@ -14,8 +15,10 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
 {
     let mut id = 1;
     let mut v = Vec::new();
+    let mut vn = Vec::new();
     // Add unused entry at index 0, so we can used 1-based indexing
     v.push(create_point(0.0, 0.0, 0.0));
+    vn.push(create_point(0.0, 0.0, 0.0));
     let mut default_group = Shape::new_group(id);
     let mut groups: HashMap<String, Shape> = HashMap::new();
     let mut current_groups: Vec<String> = Vec::new();
@@ -31,6 +34,14 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
                     words[2].parse::<f64>().unwrap(),
                     words[3].parse::<f64>().unwrap());
                 v.push(p);
+            }
+            else if words[0] == "vn" && words.len() == 4
+            {
+                let p = create_point(
+                    words[1].parse::<f64>().unwrap(),
+                    words[2].parse::<f64>().unwrap(),
+                    words[3].parse::<f64>().unwrap());
+                vn.push(p);
             }
             else if words[0] == "f" && words.len() >= 4
             {
@@ -83,7 +94,8 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
             }
         }
     }
-    ObjFile{vertices: v, default_group: default_group, groups: groups}
+    ObjFile{vertices: v, normals: vn,
+        default_group: default_group, groups: groups}
 }
 
 impl ObjFile
@@ -276,5 +288,20 @@ mod tests
         assert!(children113[0].is_triangle());
         let children213 = children13[1].get_children();
         assert!(children213[0].is_triangle());
+    }
+
+    #[test]
+    fn test_objfile_feature19()
+    {
+        // p.218 Scenario: Vertex normal records
+        let lines19 = vec!["v -1 1 0",
+            "vn 0 0 1",
+            "vn 0.707 0 -0.707",
+            "vn 1 2 3"];
+        let obj19 = parse_obj_file(lines19);
+        assert_eq!(obj19.normals.len(), 3 + 1);
+        assert_eq!(obj19.normals[1], create_point(0.0, 0.0, 1.0));
+        assert_eq!(obj19.normals[2], create_point(0.707, 0.0, -0.707));
+        assert_eq!(obj19.normals[3], create_point(1.0, 2.0, 3.0));
     }
 }
