@@ -123,10 +123,10 @@ mod tests
     fn test_smoothtriangles_feature16()
     {
         // p.221 Scenario: An intersection with a smooth triangle stores u/v
-        let r1 = Ray::new(create_point(-0.2, 0.3, -2.0),
+        let r16 = Ray::new(create_point(-0.2, 0.3, -2.0),
             create_vector(0.0, 0.0, 1.0));
         let mut t16 = create_tri();
-        let i16 = t16.intersect(r1);
+        let i16 = t16.intersect(r16);
         assert_eq!(i16.len(), 1);
         assert!(fuzzy_equal(i16[0].1, 0.45));
         assert!(fuzzy_equal(i16[0].2, 0.25));
@@ -135,12 +135,23 @@ mod tests
     #[test]
     fn test_smoothtriangles_feature17()
     {
-        // p.221 Scenario: A smooth triangle uses  u/v to interpolate the normal
-        let r1 = Ray::new(create_point(-0.2, 0.3, -2.0),
-            create_vector(0.0, 0.0, 1.0));
+        // p.222 Scenario: A smooth triangle uses  u/v to interpolate the normal
         let mut t17 = create_tri();
         let i17 = Intersection::new_with_uv(1.0, t17.clone(), 0.45, 0.25);
         let n17 = t17.normal_at(create_point(0.0, 0.0, 0.0), (i17.u, i17.v));
         assert_eq!(n17, create_vector(-0.5547, 0.83205, 0.0));
+    }
+
+    #[test]
+    fn test_smoothtriangles_feature18()
+    {
+        // p.223 Scenario: Preparing the normal on a smooth triangle
+        let r18 = Ray::new(create_point(-0.2, 0.3, -2.0),
+            create_vector(0.0, 0.0, 1.0));
+        let mut t18 = create_tri();
+        let i18 = Intersection::new_with_uv(1.0, t18.clone(), 0.45, 0.25);
+        let comps18 = i18.prepare_computations(r18,
+            Intersections::new(vec![i18.clone()]));
+        assert_eq!(comps18.normalv, create_vector(-0.5547, 0.83205, 0.0));
     }
 }
