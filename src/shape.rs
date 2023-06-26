@@ -281,7 +281,25 @@ impl Shape
         match &self.specific
         {
             ShapeSpecific::Triangle(t) => t.clone(),
-            _ => panic!("Shape is not a triangle"),
+            _ => panic!("Shape is not a Triangle"),
+        }
+    }
+
+    pub fn is_smooth_triangle(&self) -> bool
+    {
+        match self.specific
+        {
+            ShapeSpecific::SmoothTriangle(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn get_smooth_triangle(&self) -> SmoothTriangle
+    {
+        match &self.specific
+        {
+            ShapeSpecific::SmoothTriangle(t) => t.clone(),
+            _ => panic!("Shape is not a SmoothTriangle"),
         }
     }
 

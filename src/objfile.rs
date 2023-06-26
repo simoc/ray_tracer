@@ -50,11 +50,29 @@ pub fn parse_obj_file(lines: Vec<&str>) -> ObjFile
                 let last_index = words.len() - 1;
                 for index in 2..last_index
                 {
-                    let j1 = words[1].parse::<usize>().unwrap();
-                    let j2 = words[index].parse::<usize>().unwrap();
-                    let j3 = words[index + 1].parse::<usize>().unwrap();
+                    let tokens1: Vec<&str> = words[1].split('/').collect();
+                    let tokens2: Vec<&str> = words[index].split('/').collect();
+                    let tokens3: Vec<&str> = words[index + 1].split('/').collect();
+
+                    let j1 = tokens1[0].parse::<usize>().unwrap();
+                    let j2 = tokens2[0].parse::<usize>().unwrap();
+                    let j3 = tokens3[0].parse::<usize>().unwrap();
+
                     id = id + 1;
-                    let mut t = Shape::new_triangle(id, v[j1], v[j2], v[j3]);
+                    let mut t: Shape;
+                    if tokens1.len() >= 3 && tokens2.len() >= 3 && tokens3.len() >= 3
+                    {
+                        let k1 = tokens1[2].parse::<usize>().unwrap();
+                        let k2 = tokens2[2].parse::<usize>().unwrap();
+                        let k3 = tokens3[2].parse::<usize>().unwrap();
+                        t = Shape::new_smooth_triangle(id, v[j1], v[j2], v[j3],
+                            vn[k1], vn[k2], vn[k3]);
+                    }
+                    else
+                    {
+                        t = Shape::new_triangle(id, v[j1], v[j2], v[j3]);
+                    }
+
                     let groups2 = current_groups.clone();
                     if !current_groups.is_empty()
                     {
@@ -303,5 +321,42 @@ mod tests
         assert_eq!(obj19.normals[1], create_point(0.0, 0.0, 1.0));
         assert_eq!(obj19.normals[2], create_point(0.707, 0.0, -0.707));
         assert_eq!(obj19.normals[3], create_point(1.0, 2.0, 3.0));
+    }
+
+    #[test]
+    fn test_objfile_feature20()
+    {
+        // p.224 Scenario: Faces with normals
+        let lines20 = vec!["v 0 1 0",
+            "v -1 0 0",
+            "v 1 0 0",
+            "vn -1 0 0",
+            "vn 1 0 0",
+            "vn 0 1 0",
+            "f 1//3 2//1 3//2",
+            "f 1/0/3 2/102/1 3/14/2"];
+        let obj20 = parse_obj_file(lines20);
+        assert_eq!(obj20.vertices.len(), 3 + 1);
+        let children20 = obj20.default_group.get_children();
+        assert!(children20.len() >= 2);
+        assert!(children20[0].is_smooth_triangle());
+        assert!(children20[1].is_smooth_triangle());
+        let t120 = children20[0].get_smooth_triangle();
+        let t220 = children20[1].get_smooth_triangle();
+        assert_eq!(t120.p1, obj20.vertices[1]);
+        assert_eq!(t120.p2, obj20.vertices[2]);
+        assert_eq!(t120.p3, obj20.vertices[3]);
+
+        assert_eq!(t120.n1, obj20.normals[3]);
+        assert_eq!(t120.n2, obj20.normals[1]);
+        assert_eq!(t120.n3, obj20.normals[2]);
+
+        assert_eq!(t220.p1, obj20.vertices[1]);
+        assert_eq!(t220.p2, obj20.vertices[2]);
+        assert_eq!(t220.p3, obj20.vertices[3]);
+
+        assert_eq!(t220.n1, obj20.normals[3]);
+        assert_eq!(t220.n2, obj20.normals[1]);
+        assert_eq!(t220.n3, obj20.normals[2]);
     }
 }
