@@ -191,7 +191,7 @@ impl Shape
         self.material = material;
     }
 
-    pub fn intersect(&mut self, ray: Ray) -> Vec<f64>
+    pub fn intersect(&mut self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let local_ray = ray.transform(self.transform.inverse());
         self.saved_ray = local_ray.clone();
@@ -213,19 +213,19 @@ impl Shape
         self.saved_ray
     }
 
-    pub fn normal_at(&self, world_point: Tuple) -> Tuple
+    pub fn normal_at(&self, world_point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         let local_point = self.world_to_object(world_point);
         let local_normal = match self.specific.clone()
         {
-            ShapeSpecific::Sphere(s) => s.local_normal_at(local_point),
-            ShapeSpecific::Plane(p) => p.local_normal_at(local_point),
-            ShapeSpecific::Cube(c) => c.local_normal_at(local_point),
-            ShapeSpecific::Cylinder(c) => c.local_normal_at(local_point),
-            ShapeSpecific::Cone(c) => c.local_normal_at(local_point),
-            ShapeSpecific::Group(g) => g.local_normal_at(local_point),
-            ShapeSpecific::Triangle(t) => t.local_normal_at(local_point),
-            ShapeSpecific::SmoothTriangle(t) => t.local_normal_at(local_point),
+            ShapeSpecific::Sphere(s) => s.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Plane(p) => p.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Cube(c) => c.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Cylinder(c) => c.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Cone(c) => c.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Group(g) => g.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::Triangle(t) => t.local_normal_at(local_point, hit_uv),
+            ShapeSpecific::SmoothTriangle(t) => t.local_normal_at(local_point, hit_uv),
         };
         return self.normal_to_world(local_normal);
     }
@@ -281,7 +281,25 @@ impl Shape
         match &self.specific
         {
             ShapeSpecific::Triangle(t) => t.clone(),
-            _ => panic!("Shape is not a triangle"),
+            _ => panic!("Shape is not a Triangle"),
+        }
+    }
+
+    pub fn is_smooth_triangle(&self) -> bool
+    {
+        match self.specific
+        {
+            ShapeSpecific::SmoothTriangle(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn get_smooth_triangle(&self) -> SmoothTriangle
+    {
+        match &self.specific
+        {
+            ShapeSpecific::SmoothTriangle(t) => t.clone(),
+            _ => panic!("Shape is not a SmoothTriangle"),
         }
     }
 

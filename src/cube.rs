@@ -83,7 +83,7 @@ impl Cube
         n
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let (xtmin, xtmax) = self.check_axis(ray.origin.get_vec()[0],
             ray.direction.get_vec()[0]);
@@ -99,11 +99,13 @@ impl Cube
         {
             return vec![];
         }
+        let u = 0.0;
+        let v = 0.0;
 
-        return vec![tmin, tmax];
+        return vec![(tmin, u, v), (tmax, u, v)];
     }
 
-    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         let v = point.get_vec();
         let x = v[0];
@@ -163,8 +165,8 @@ mod tests
             let r1 = Ray::new(origins1[i], directions1[i]);
             let xs1 = c1.local_intersect(r1);
             assert_eq!(xs1.len(), 2);
-            assert!(fuzzy_equal(xs1[0], t11[i]));
-            assert!(fuzzy_equal(xs1[1], t21[i]));
+            assert!(fuzzy_equal(xs1[0].0, t11[i]));
+            assert!(fuzzy_equal(xs1[1].0, t21[i]));
         }
     }
 
@@ -218,7 +220,7 @@ mod tests
 
         for i in 0..points3.len()
         {
-            let normal = c3.local_normal_at(points3[i]);
+            let normal = c3.local_normal_at(points3[i], (0.0, 0.0));
             assert_eq!(normal, normals3[i]);
         }
     }

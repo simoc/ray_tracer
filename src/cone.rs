@@ -40,9 +40,11 @@ impl Cone
         dist_squared <= radius * radius
     }
 
-    fn intersect_caps(&self, ray: Ray) -> Vec<f64>
+    fn intersect_caps(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let mut xs = Vec::new();
+        let u = 0.0;
+        let v = 0.0;
 
         // caps only matter if the cylinder is closed, and might possibly be
         // intersected by the ray.
@@ -56,7 +58,7 @@ impl Cone
         let t0 = (self.minimum - ray.origin.get_vec()[1]) / ray.direction.get_vec()[1];
         if self.check_cap(ray, t0, self.minimum)
         {
-            xs.push(t0);
+            xs.push((t0, u, v));
         }
 
         // check for an intersection with the upper end cap by intersecting
@@ -64,13 +66,16 @@ impl Cone
         let t1 = (self.maximum - ray.origin.get_vec()[1]) / ray.direction.get_vec()[1];
         if self.check_cap(ray, t1, self.maximum)
         {
-            xs.push(t1);
+            xs.push((t1, u, v));
         }
         return xs;
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
+        let u = 0.0;
+        let v = 0.0;
+
         let vd = ray.direction.get_vec();
         let a = (vd[0] * vd[0]) - (vd[1] * vd[1]) + (vd[2] * vd[2]);
 
@@ -88,7 +93,7 @@ impl Cone
                 return Vec::new();
             }
             let t = -c / (2.0 * b);
-            xs.push(t);
+            xs.push((t, u, v));
         }
 
         // ray does not intersect the cone
@@ -110,13 +115,13 @@ impl Cone
         let y0 = vo[1] + t0 * vd[1];
         if self.minimum < y0 && y0 < self.maximum
         {
-            xs.push(t0);
+            xs.push((t0, u, v));
         }
 
         let y1 = vo[1] + t1 * vd[1];
         if self.minimum < y1 && y1 < self.maximum
         {
-            xs.push(t1);
+            xs.push((t1, u, v));
         }
 
         let mut caps = self.intersect_caps(ray);
@@ -125,7 +130,7 @@ impl Cone
         return xs;
     }
 
-    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         // compute the square of the distance from the y axis
         let v = point.get_vec();
@@ -183,8 +188,8 @@ mod tests
             let r1 = Ray::new(origins1[i], directions1[i].normalize());
             let xs1 = c1.local_intersect(r1);
             assert_eq!(xs1.len(), 2);
-            assert!(fuzzy_equal(xs1[0], t10[i]));
-            assert!(fuzzy_equal(xs1[1], t11[i]));
+            assert!(fuzzy_equal(xs1[0].0, t10[i]));
+            assert!(fuzzy_equal(xs1[1].0, t11[i]));
         }
     }
 
@@ -197,7 +202,7 @@ mod tests
         let r2 = Ray::new(create_point(0.0, 0.0, -1.0), direction2);
         let xs2 = c2.local_intersect(r2);
         assert_eq!(xs2.len(), 1);
-        assert!(fuzzy_equal(xs2[0], 0.35355));
+        assert!(fuzzy_equal(xs2[0].0, 0.35355));
     }
 
     #[test]
@@ -241,7 +246,7 @@ mod tests
 
         for i in 0..points4.len()
         {
-            let n4 = c4.local_normal_at(points4[i]);
+            let n4 = c4.local_normal_at(points4[i], (0.0, 0.0));
             assert_eq!(n4, normals4[i]);
         }
     }

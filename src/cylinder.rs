@@ -40,9 +40,11 @@ impl Cylinder
         dist_squared <= 1.0
     }
 
-    fn intersect_caps(&self, ray: Ray) -> Vec<f64>
+    fn intersect_caps(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let mut xs = Vec::new();
+        let u = 0.0;
+        let v = 0.0;
 
         // caps only matter if the cylinder is closed, and might possibly be
         // intersected by the ray.
@@ -56,7 +58,7 @@ impl Cylinder
         let t0 = (self.minimum - ray.origin.get_vec()[1]) / ray.direction.get_vec()[1];
         if self.check_cap(ray, t0)
         {
-            xs.push(t0);
+            xs.push((t0, u, v));
         }
 
         // check for an intersection with the upper end cap by intersecting
@@ -64,12 +66,12 @@ impl Cylinder
         let t1 = (self.maximum - ray.origin.get_vec()[1]) / ray.direction.get_vec()[1];
         if self.check_cap(ray, t1)
         {
-            xs.push(t1);
+            xs.push((t1, u, v));
         }
         return xs;
     }
 
-    pub fn local_intersect(&self, ray: Ray) -> Vec<f64>
+    pub fn local_intersect(&self, ray: Ray) -> Vec<(f64, f64, f64)>
     {
         let vd = ray.direction.get_vec();
         let a = (vd[0] * vd[0]) + (vd[2] * vd[2]);
@@ -102,17 +104,19 @@ impl Cylinder
         }
 
         let mut xs = Vec::new();
+        let u = 0.0;
+        let v = 0.0;
 
         let y0 = vo[1] + t0 * vd[1];
         if self.minimum < y0 && y0 < self.maximum
         {
-            xs.push(t0);
+            xs.push((t0, u, v));
         }
 
         let y1 = vo[1] + t1 * vd[1];
         if self.minimum < y1 && y1 < self.maximum
         {
-            xs.push(t1);
+            xs.push((t1, u, v));
         }
 
         let mut caps = self.intersect_caps(ray);
@@ -121,7 +125,7 @@ impl Cylinder
         return xs;
     }
 
-    pub fn local_normal_at(&self, point: Tuple) -> Tuple
+    pub fn local_normal_at(&self, point: Tuple, hit_uv: (f64, f64)) -> Tuple
     {
         // compute the square of the distance from the y axis
         let v = point.get_vec();
@@ -194,8 +198,8 @@ mod tests
             let r2 = Ray::new(origins2[i], directions2[i].normalize());
             let xs2 = c2.local_intersect(r2);
             assert_eq!(xs2.len(), 2);
-            assert!(fuzzy_equal(xs2[0], t20[i]));
-            assert!(fuzzy_equal(xs2[1], t21[i]));
+            assert!(fuzzy_equal(xs2[0].0, t20[i]));
+            assert!(fuzzy_equal(xs2[1].0, t21[i]));
         }
     }
 
@@ -215,7 +219,7 @@ mod tests
 
         for i in 0..points3.len()
         {
-            let n3 = c3.local_normal_at(points3[i]);
+            let n3 = c3.local_normal_at(points3[i], (0.0, 0.0));
             assert_eq!(n3, normals3[i]);
         }
     }
@@ -320,7 +324,7 @@ mod tests
 
         for i in 0..points8.len()
         {
-            let n8 = c8.local_normal_at(points8[i]);
+            let n8 = c8.local_normal_at(points8[i], (0.0, 0.0));
             assert_eq!(n8, normals8[i]);
         }
     }
